@@ -1,0 +1,115 @@
+{
+  "$schema": "https://raw.githubusercontent.com/spdx/spdx-spec/v2.2.1/schemas/spdx-schema.json",
+  "spdxVersion": "SPDX-2.2",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "documentNamespace": "https://spdx.org/spdxdocs/asmjit-x86-windows-2021-10-26#1-8b5b3b6e-009a-4595-8697-8eac7e42151b",
+  "name": "asmjit:x86-windows@2021-10-26#1 c381538f158780324aadb349bcff34e2509658a21e0edb8823ee3f58a38233b1",
+  "creationInfo": {
+    "creators": [
+      "Tool: vcpkg-9268e366206712e38102b28dbd1617697a99ff2e"
+    ],
+    "created": "2022-07-06T00:41:19Z"
+  },
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "GENERATES",
+      "relatedSpdxElement": "SPDXRef-binary"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-0"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-1"
+    },
+    {
+      "spdxElementId": "SPDXRef-binary",
+      "relationshipType": "GENERATED_FROM",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-0",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-1",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-1",
+      "relationshipType": "DEPENDENCY_MANIFEST_OF",
+      "relatedSpdxElement": "SPDXRef-port"
+    }
+  ],
+  "packages": [
+    {
+      "name": "asmjit",
+      "SPDXID": "SPDXRef-port",
+      "versionInfo": "2021-10-26#1",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/asmjit",
+      "homepage": "https://github.com/asmjit/asmjit",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "description": "Complete x86/x64 JIT and Remote Assembler for C++",
+      "comment": "This is the port (recipe) consumed by vcpkg."
+    },
+    {
+      "name": "asmjit:x86-windows",
+      "SPDXID": "SPDXRef-binary",
+      "versionInfo": "c381538f158780324aadb349bcff34e2509658a21e0edb8823ee3f58a38233b1",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "comment": "This is a binary package built by vcpkg."
+    },
+    {
+      "SPDXID": "SPDXRef-resource-1",
+      "name": "asmjit/asmjit",
+      "downloadLocation": "git+https://github.com/asmjit/asmjit@d0d14ac774977d0060a351f66e35cb57ba0bf59c",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "2822763fcb3c18f6699119c1773404667d81f8afb86f8f2e8dbe627526a2877b049d16505557e680e4e310f0e0667263dc4ac442f682e95f2568bf0bf8b61b4b"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "fileName": "./portfile.cmake",
+      "SPDXID": "SPDXRef-file-0",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "8453ae74ac9170958153f0c8efcfb05d1672c53874e4433cc43a11080c90b4c1"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./vcpkg.json",
+      "SPDXID": "SPDXRef-file-1",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "b59be3278173b333f261ff57ae0d19e28f7fd8ab2240e54e5ef2d31b50461c05"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    }
+  ]
+}

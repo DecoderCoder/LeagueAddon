@@ -1,0 +1,352 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{7161fe7d-58a7-49bf-aac7-2f26c11ecb91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Patchables">
+      <UniqueIdentifier>{94acd2bf-0639-4abb-a51b-45ab6942dc04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hooks">
+      <UniqueIdentifier>{f20dae16-f9d4-4554-911f-8678c57548d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{56216148-9efe-4728-a93b-e2b763b016c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\ImGui">
+      <UniqueIdentifier>{b83e59cb-e147-45d7-9ece-c4bd6ad3cb6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\ImGui\Header Files">
+      <UniqueIdentifier>{49727afb-fd76-442f-a3e5-b65780789734}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\ImGui\Source Files">
+      <UniqueIdentifier>{11b68246-eac7-4f9f-bc3c-66779b22e7e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{3ffb214e-b140-4379-b116-1a786313e21d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\OrbWalker">
+      <UniqueIdentifier>{20e33450-8c60-4927-ace2-b36ee3aede58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AddonEngine">
+      <UniqueIdentifier>{81847bc8-5b8b-4d29-a547-06ce48416fcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EventManager">
+      <UniqueIdentifier>{95a69d4b-997a-492a-b9cb-6629e8c4721a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ObjectManager">
+      <UniqueIdentifier>{512e08e8-abe5-4d3a-b428-399783b76ca0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="League">
+      <UniqueIdentifier>{7a4d8a7a-664a-4b20-b1a6-1940a160da34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="League\BuffManager">
+      <UniqueIdentifier>{72056ee1-0860-4918-a4f6-4b1e8b80ca0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins">
+      <UniqueIdentifier>{c55b0eea-7665-4375-8ed7-220fd4278a10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\Prediction">
+      <UniqueIdentifier>{78a6a55b-74ee-4605-8b27-9ce6d8c33a66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\TargetSelector">
+      <UniqueIdentifier>{2f3e582f-b893-4f42-b3a5-1bc39e2da8de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Tristana">
+      <UniqueIdentifier>{1e032d14-c255-4146-b154-e669f168c7c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Yasuo">
+      <UniqueIdentifier>{5af218a1-fda8-4a48-9684-084c87c7221e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Twitch">
+      <UniqueIdentifier>{aed347a1-e87d-48e8-9ef9-bbb9bc9997a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\HealthBar">
+      <UniqueIdentifier>{5e4ac276-7d1e-46e0-a1f9-3742196d4b56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Evade">
+      <UniqueIdentifier>{0c0d2be9-7b50-4d2c-a647-b94eee42bd7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{eb350993-423c-40d7-bd01-5ebde5a22aaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Garen">
+      <UniqueIdentifier>{7b7282cf-6784-4df6-a96e-81a8107dfca5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts\Akali">
+      <UniqueIdentifier>{3dcd17fa-3d41-4d0d-940c-6e256b3961a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SkinChanger">
+      <UniqueIdentifier>{0f953d57-5526-4286-8712-463e6c132651}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Misc">
+      <UniqueIdentifier>{34f8d086-201c-4d7f-9c0c-0858c63394a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Visual">
+      <UniqueIdentifier>{15bb6231-f7de-4a75-8ebd-8fdefc3f3f69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="League\Inventory">
+      <UniqueIdentifier>{b8d5f58c-b2c9-4806-ac93-2430846c34ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="League\SpellBook">
+      <UniqueIdentifier>{7336683b-c1df-4d3c-984f-18b222181e61}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Utils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\Hooks.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\DirectX.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imconfig.h">
+      <Filter>Rendering\ImGui\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui.h">
+      <Filter>Rendering\ImGui\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_dx9.h">
+      <Filter>Rendering\ImGui\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_dx11.h">
+      <Filter>Rendering\ImGui\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_win32.h">
+      <Filter>Rendering\ImGui\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_internal.h">
+      <Filter>Rendering\ImGui\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_stdlib.h">
+      <Filter>Rendering\ImGui\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_rectpack.h">
+      <Filter>Rendering\ImGui\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_textedit.h">
+      <Filter>Rendering\ImGui\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_truetype.h">
+      <Filter>Rendering\ImGui\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AddonEngine.h">
+      <Filter>AddonEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Render.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\makesyscall.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Offset.h">
+      <Filter>Patchables</Filter>
+    </ClInclude>
+    <ClInclude Include="EventManager\EventManager.h">
+      <Filter>EventManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Structs.h">
+      <Filter>Patchables</Filter>
+    </ClInclude>
+    <ClInclude Include="Enums.h" />
+    <ClInclude Include="Vector.h" />
+    <ClInclude Include="ObjectManager.h">
+      <Filter>ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Functions.h">
+      <Filter>League</Filter>
+    </ClInclude>
+    <ClInclude Include="xorstr.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="BuffManager.h">
+      <Filter>League\BuffManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Health.h">
+      <Filter>Plugins\Prediction</Filter>
+    </ClInclude>
+    <ClInclude Include="TargetSelector.h">
+      <Filter>Plugins\TargetSelector</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\OrbWalker.h">
+      <Filter>Scripts\OrbWalker</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\ultimate_hooks.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthBar.h">
+      <Filter>Plugins\HealthBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Twitch.h">
+      <Filter>Scripts\Twitch</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts.h">
+      <Filter>Scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="Evade\Evade.h">
+      <Filter>Evade</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="clipper.hpp">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Garen.h">
+      <Filter>Scripts\Garen</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Akali.h">
+      <Filter>Scripts\Akali</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Yasuo.h">
+      <Filter>Scripts\Yasuo</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Visual.h">
+      <Filter>Visual</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>AddonEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="League\HeroInventory.h">
+      <Filter>League\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="League\Item.h">
+      <Filter>League\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="League\ItemInfo.h">
+      <Filter>League\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="League\SpellBook.h">
+      <Filter>League\SpellBook</Filter>
+    </ClInclude>
+    <ClInclude Include="League\SpellData.h">
+      <Filter>League\SpellBook</Filter>
+    </ClInclude>
+    <ClInclude Include="League\SpellInfo.h">
+      <Filter>League\SpellBook</Filter>
+    </ClInclude>
+    <ClInclude Include="League\SpellSlot.h">
+      <Filter>League\SpellBook</Filter>
+    </ClInclude>
+    <ClInclude Include="SkinChanger.h">
+      <Filter>SkinChanger</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\Hooks.cpp">
+      <Filter>Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\DirectX.cpp">
+      <Filter>Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_widgets.cpp">
+      <Filter>Rendering\ImGui\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui.cpp">
+      <Filter>Rendering\ImGui\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_draw.cpp">
+      <Filter>Rendering\ImGui\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_dx9.cpp">
+      <Filter>Rendering\ImGui\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_dx11.cpp">
+      <Filter>Rendering\ImGui\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_win32.cpp">
+      <Filter>Rendering\ImGui\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_stdlib.cpp">
+      <Filter>Rendering\ImGui\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_tables.cpp">
+      <Filter>Rendering\ImGui\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="AddonEngine.cpp">
+      <Filter>AddonEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Render.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="EventManager\EventManager.cpp">
+      <Filter>EventManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector.cpp" />
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Functions.cpp">
+      <Filter>League</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="BuffManager.cpp">
+      <Filter>League\BuffManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Health.cpp">
+      <Filter>Plugins\Prediction</Filter>
+    </ClCompile>
+    <ClCompile Include="TargetSelector.cpp">
+      <Filter>Plugins\TargetSelector</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\OrbWalker.cpp">
+      <Filter>Scripts\OrbWalker</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\ultimate_hooks.cpp">
+      <Filter>Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="HealthBar.cpp">
+      <Filter>Plugins\HealthBar</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Twitch.cpp">
+      <Filter>Scripts\Twitch</Filter>
+    </ClCompile>
+    <ClCompile Include="Evade\Evade.cpp">
+      <Filter>Evade</Filter>
+    </ClCompile>
+    <ClCompile Include="clipper.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Garen.cpp">
+      <Filter>Scripts\Garen</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Akali.cpp">
+      <Filter>Scripts\Akali</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Yasuo.cpp">
+      <Filter>Scripts\Yasuo</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Visual.cpp">
+      <Filter>Visual</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>AddonEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="SkinChanger.cpp">
+      <Filter>SkinChanger</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

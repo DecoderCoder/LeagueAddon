@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32519.111
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeagueAddon", "LeagueAddon\LeagueAddon.vcxproj", "{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeagueParser", "SkinNameParser\LeagueParser.csproj", "{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeagueAddonResources", "LeagueAddonResources\LeagueAddonResources.vcxproj", "{0F1686AC-EE4B-44B0-8827-8DD333F13801}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Debug|Any CPU.Build.0 = Debug|x64
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Debug|x64.ActiveCfg = Debug|x64
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Debug|x64.Build.0 = Debug|x64
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Debug|x86.ActiveCfg = Debug|Win32
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Debug|x86.Build.0 = Debug|Win32
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Release|Any CPU.ActiveCfg = Release|x64
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Release|Any CPU.Build.0 = Release|x64
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Release|x64.ActiveCfg = Release|x64
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Release|x64.Build.0 = Release|x64
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Release|x86.ActiveCfg = Release|Win32
+		{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}.Release|x86.Build.0 = Release|Win32
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Debug|x64.Build.0 = Debug|Any CPU
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Debug|x86.Build.0 = Debug|Any CPU
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Release|x64.ActiveCfg = Release|Any CPU
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Release|x64.Build.0 = Release|Any CPU
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Release|x86.ActiveCfg = Release|Any CPU
+		{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}.Release|x86.Build.0 = Release|Any CPU
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Debug|Any CPU.Build.0 = Debug|x64
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Debug|x64.ActiveCfg = Debug|x64
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Debug|x64.Build.0 = Debug|x64
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Debug|x86.ActiveCfg = Debug|Win32
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Debug|x86.Build.0 = Debug|Win32
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Release|Any CPU.ActiveCfg = Release|x64
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Release|Any CPU.Build.0 = Release|x64
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Release|x64.ActiveCfg = Release|x64
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Release|x64.Build.0 = Release|x64
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Release|x86.ActiveCfg = Release|Win32
+		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B46BF9F3-70DC-4062-A005-B328CBF0B047}
+	EndGlobalSection
+EndGlobal
