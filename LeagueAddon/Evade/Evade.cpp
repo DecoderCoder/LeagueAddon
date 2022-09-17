@@ -10,13 +10,14 @@ namespace Evade
 		//MessageBoxA(0, Local->GetChampionName().c_str(), "", 0);
 		for (GameObject* hero : ObjectManager::HeroList())
 		{
-			/*if (Local->IsAllyTo(hero) || hero->NetworkID == Local->NetworkID)
-				continue;*/
+			if (Local->IsAllyTo(hero) || hero->NetworkID == Local->NetworkID)
+				continue;
 
 			for (Champ spell : SpellDB)
 			{
 				if (hero->GetChampionName() == spell.hero)
 				{
+
 					spell.obj = hero;
 					ChampsInGame.emplace_back(spell);
 				}
@@ -57,7 +58,19 @@ namespace Evade
 	}
 
 	void Core::OnDraw()
-	{		
+	{
+		for (int i = 0; i < DetectedSkillshots.size(); i++) {
+			if (DetectedSkillshots[i].followEnemy) {
+				DetectedSkillshots[i].endPos = DetectedSkillshots[i].obj->Position;
+				//DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
+			}
+			if (DetectedSkillshots[i].followEnemy2) {
+				//DetectedSkillshots[i].startPos = DetectedSkillshots[i].obj->Position;
+				//DetectedSkillshots[i].endPos = DetectedSkillshots[i].endPos;
+				//DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
+			}
+			spell.path = GetPath(spell);
+		}
 		if (!DrawSpells)
 			return;
 		GameTimer = Function::GameTime();
@@ -76,27 +89,6 @@ namespace Evade
 				++it;  // go to next
 			}
 		}
-
-		for (int i = 0; i < DetectedSkillshots.size(); i++) {
-			if (DetectedSkillshots[i].followEnemy) {
-				DetectedSkillshots[i].endPos = DetectedSkillshots[i].obj->Position;
-				//DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
-			}
-			if (DetectedSkillshots[i].followEnemy2) {
-				//DetectedSkillshots[i].startPos = DetectedSkillshots[i].obj->Position;
-				//DetectedSkillshots[i].endPos = DetectedSkillshots[i].endPos;
-				//DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
-			}
-
-			//
-			//
-		}
-
-		for (Spell& spell : DetectedSkillshots) {
-			spell.endPos = CalculateEndPos(spell);
-			spell.path = GetPath(spell);
-		}
-
 
 		if (!EnabledSkillshots.empty())
 		{
@@ -982,7 +974,6 @@ namespace Evade
 
 	Vector3 Core::CalculateEndPos(Spell& spellInfo)
 	{
-
 		Vector3 startPos1 = spellInfo.startPos;
 		Vector3 placementPos = spellInfo.endPos;
 		Vector3 unitPos = spellInfo.obj->Position;
@@ -1006,7 +997,7 @@ namespace Evade
 		else if (spellInfo.type == linear)
 		{
 			if (spellInfo.speed != MathHuge)
-			{				
+			{
 				endPos = endPos.Append(startPos1, endPos, spellInfo.spell->BasicAttackSpellData->Resource->Radius);
 			}
 			if (spellInfo.collision)
@@ -1014,23 +1005,6 @@ namespace Evade
 				Vector3 startPos = startPos1.Extend(placementPos, 45);
 				std::list<Vector3>minions;
 				for (GameObject* minion : ObjectManager::MinionList())
-				{
-					if (minion->NetworkID - (unsigned int)0x40000000 > 0x100000)
-						continue;
-					if (minion && minion->IsTargetable && minion->IsEnemyTo(spellInfo.obj))
-					{
-						Vector3 minionPos = minion->Position;
-						if (minionPos.distanceTo(startPos) <= range && minion->MaxHealth > 295 && minion->Health > 5)
-						{
-							Vector3 col = minionPos.ProjectOn(startPos, placementPos).SegmentPoint;
-							if (!col.IsZero() && col.distanceTo(minionPos) < ((minion->GetBoundingRadius()) / 2 + spellInfo.radius))
-							{
-								minions.emplace_back(minionPos);
-							}
-						}
-					}
-				}
-				for (GameObject* minion : ObjectManager::HeroList()) // Todo remove code copying
 				{
 					if (minion->NetworkID - (unsigned int)0x40000000 > 0x100000)
 						continue;
@@ -1106,8 +1080,6 @@ namespace Evade
 		return Geometry::Rectangle(spell.startPos, spell.endPos, spell.radius).ToPolygon(BoundingRadius);
 	}
 
-	std::vector<SpellInfo> spellss; // ToDO remove this shity memory leakings
-
 	void Core::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
 		auto Caster = ObjectManager::FindObjectByIndex(ObjectManager::MinionList(), castInfo->source_id);
 		if (Caster)
@@ -1125,9 +1097,7 @@ namespace Evade
 				{
 					s.startTime = GameTimer;
 					s.obj = champ.obj;
-					SpellInfo spellInfoC = *castInfo; // ToDO remove this shity memory leakings
-					spellss.push_back(spellInfoC);
-					s.spell = &spellss[spellss.size() - 1];
+					s.spell = castInfo;
 					//s.speed = castInfo->BasicAttackSpellData->Resource->MissileSpeed == 0 ? MathHuge : castInfo->BasicAttackSpellData->Resource->MissileSpeed;
 					OnSpellCast(s);
 				}
@@ -3834,7 +3804,6 @@ namespace Evade
 			Q.fow = true;
 			Q.exception = true;
 			Q.extend = true;
-			//Q.followEnemy = true;
 			Q.followEnemy2 = true;
 			//Q.useMissile = true;
 			Taliyah.spells.emplace_back(Q);
