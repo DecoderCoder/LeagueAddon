@@ -7,7 +7,7 @@
 
 namespace Misc {
 	inline bool AutoSmite = true;
-	inline bool AntiAFK = true;
+	inline bool AntiAFK = false;
 
 	void Initialize();
 

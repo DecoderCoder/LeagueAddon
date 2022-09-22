@@ -150,4 +150,4 @@ bool StringContains(std::wstring strA, std::wstring strB, bool ignore_case)
 		return true;
 
 	return false;
-}
+} 

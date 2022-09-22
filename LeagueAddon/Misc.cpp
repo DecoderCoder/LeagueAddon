@@ -13,7 +13,7 @@ void Misc::OnThread() {
 void Misc::OnMenu() {
 	if (ImGui::CollapsingHeader("Misc")) {
 		ImGui::Checkbox("Anti AFK", &AntiAFK);
-		ImGui::Checkbox("Autosmite", &AutoSmite);
+		//ImGui::Checkbox("Autosmite", &AutoSmite);
 	}
 }
 
@@ -26,6 +26,6 @@ void Misc::OnDraw() {
 
 	if (AntiAFK && !IsLeagueInForeground() && lastAAFK < GetTickCount()) {
 		Function::IssueOrder(Local, 2, &Local->Position, NULL, false, false, NULL);
-		lastAAFK = GetTickCount() + 1000;
+		lastAAFK = GetTickCount() + 1000;		
 	}
 }

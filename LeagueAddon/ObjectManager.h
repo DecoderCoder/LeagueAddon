@@ -4,16 +4,16 @@
 
 class ObjectManager {
 public:
-	static GameObject* GetFirstObject()
-	{
-		typedef GameObject* (__thiscall* fnGetFirst)(void*);
-		return ((fnGetFirst)(DEFINE_RVA(Offset::Function::GetFirstObject)))(*(void**)(DEFINE_RVA(Offset::Data::ObjectManager)));
-	}
-	static GameObject* GetNextObject(GameObject* object)
-	{
-		typedef GameObject* (__thiscall* fnGetNext)(void*, GameObject*);
-		return ((fnGetNext)(DEFINE_RVA(Offset::Function::GetNextObject)))(*(void**)(DEFINE_RVA(Offset::Data::ObjectManager)), object);
-	}
+	//static GameObject* GetFirstObject()
+	//{
+	//	typedef GameObject* (__thiscall* fnGetFirst)(void*);
+	//	return ((fnGetFirst)(DEFINE_RVA(Offset::Function::GetFirstObject)))(*(void**)(DEFINE_RVA(Offset::Data::ObjectManager)));
+	//}
+	//static GameObject* GetNextObject(GameObject* object)
+	//{
+	//	typedef GameObject* (__thiscall* fnGetNext)(void*, GameObject*);
+	//	return ((fnGetNext)(DEFINE_RVA(Offset::Function::GetNextObject)))(*(void**)(DEFINE_RVA(Offset::Data::ObjectManager)), object);
+	//}
 
 	static GameObject* GetObjectByIndex(int Index)
 	{

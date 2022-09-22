@@ -16,7 +16,7 @@ void SkinChanger::Initialize() {
 	EventManager::AddEventHandler(EventManager::EventType::OnMenu, OnDraw);
 
 	for (auto hero : ObjectManager::HeroList()) {
-		heroesSkins[hero] = *(int*)((int)hero->Skin + 0x14);
+		heroesSkins[hero] = *(int*)((int)hero->SkinPtr + 0x14);
 	}
 }
 

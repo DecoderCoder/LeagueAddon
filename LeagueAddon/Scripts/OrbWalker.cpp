@@ -322,7 +322,6 @@ void OrbWalker::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
 	if (Local->Index != castInfo->source_id)
 		return;
 
-	/*MessageBoxA(0, to_string(castInfo->source_id).c_str(), to_string(Local->Index).c_str(), 0);*/
 	if (castInfo->Slot == kSpellSlot::SpellSlot_SpecialAttack)
 	{
 		LastAttackCommandT = 0;
@@ -341,7 +340,6 @@ void OrbWalker::OnDeleteObject(void* thisPtr, GameObject* obj)
 {}
 
 void OrbWalker::Initialize() {
-	//Function::IssueClick = (FuncType::fnIssueClick)(DEFINE_RVA(Offsets::Functions::IssueClick));
 	EventManager::AddEventHandler(EventManager::EventType::OnProcessSpell, OnProcessSpell);
 	EventManager::AddEventHandler(EventManager::EventType::OnDeleteObject, OnDeleteObject);
 	EventManager::AddEventHandler(EventManager::EventType::OnMenu, &OnMenu);

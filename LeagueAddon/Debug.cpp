@@ -113,7 +113,7 @@ void Debug::OnMenu() {
 
 					if (ImGui::CollapsingHeader("Spells")) {
 						CSpellBook* spellBook = &hero->SpellBook;
-						for (int i = 0; i < 5; i++) {
+						for (int i = 0; i < 6; i++) {
 							CSpellSlot* spell = spellBook->GetSpellSlotByID(i);
 							if (ImGui::TreeNode((("[ " + string(qwerdf[i]) + " ] " + spell->GetName()).c_str()))) {
 								ImGui::Text(("Spell CD		: " + to_string(spell->GetCD())).c_str());
@@ -177,8 +177,10 @@ void Debug::OnMenu() {
 						ImGui::TreePop();
 					}
 				}
-			}
+			}			
 		}
+
+		ImGui::Text(("IsWall: " + string((Function::IsWall(Function::GetMouseWorldPosition()) ? "true" : "false"))).c_str());
 
 		ImGui::End();
 	}

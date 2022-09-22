@@ -342,8 +342,8 @@ bool DirectXHook::unHook() {
 }
 
 HRESULT __stdcall DirectXHook::Hooked_PresentDX11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) {
-	if (GetAsyncKeyState(VK_HOME))
-		Inited = false;
+	//if (GetAsyncKeyState(VK_HOME))
+	//	Inited = false;
 	if (!Inited)
 	{
 		Utils::Log(" > DX11Present: Init: Begin");

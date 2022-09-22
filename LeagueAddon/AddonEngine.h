@@ -15,6 +15,7 @@
 #include "Visual.h"
 #include "Debug.h"
 #include "SkinChanger.h"
+#include "Misc.h"
 
 namespace AddonEngine {
 	bool Initialize();

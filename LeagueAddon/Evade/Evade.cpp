@@ -10,8 +10,8 @@ namespace Evade
 		//MessageBoxA(0, Local->GetChampionName().c_str(), "", 0);
 		for (GameObject* hero : ObjectManager::HeroList())
 		{
-			/*if (Local->IsAllyTo(hero) || hero->NetworkID == Local->NetworkID)
-				continue;*/
+			//if (Local->IsAllyTo(hero) || hero->NetworkID == Local->NetworkID)
+			//	continue;
 
 			for (Champ spell : SpellDB)
 			{
@@ -87,7 +87,11 @@ namespace Evade
 				//DetectedSkillshots[i].endPos = DetectedSkillshots[i].endPos;
 				//DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
 			}
-
+			if (DetectedSkillshots[i].followEnemy3) {
+				//DetectedSkillshots[i].startPos = DetectedSkillshots[i].obj->Position;
+				DetectedSkillshots[i].endPos = DetectedSkillshots[i].obj->Position;
+				DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
+			}
 			//
 			//
 		}
@@ -1007,7 +1011,7 @@ namespace Evade
 		{
 			if (spellInfo.speed != MathHuge)
 			{
-				endPos = endPos.Append(startPos1, endPos, spellInfo.spell->BasicAttackSpellData->Resource->Radius);
+				endPos = endPos.Append(startPos1, endPos, spellInfo.radiusRes);
 			}
 			if (spellInfo.collision)
 			{
@@ -1030,11 +1034,11 @@ namespace Evade
 						}
 					}
 				}
-				for (GameObject* minion : ObjectManager::HeroList()) // Todo remove code copying
+				for (GameObject* minion : ObjectManager::HeroList()) // TODO remove code copying
 				{
 					if (minion->NetworkID - (unsigned int)0x40000000 > 0x100000)
 						continue;
-					if (minion && minion->IsTargetable && minion->IsEnemyTo(spellInfo.obj))
+					if (minion && minion->IsTargetable && minion->NetworkID != Local->NetworkID && minion->IsEnemyTo(spellInfo.obj))
 					{
 						Vector3 minionPos = minion->Position;
 						if (minionPos.distanceTo(startPos) <= range && minion->MaxHealth > 295 && minion->Health > 5)
@@ -1106,8 +1110,6 @@ namespace Evade
 		return Geometry::Rectangle(spell.startPos, spell.endPos, spell.radius).ToPolygon(BoundingRadius);
 	}
 
-	std::vector<SpellInfo> spellss; // ToDO remove this shity memory leakings
-
 	void Core::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
 		auto Caster = ObjectManager::FindObjectByIndex(ObjectManager::MinionList(), castInfo->source_id);
 		if (Caster)
@@ -1124,10 +1126,9 @@ namespace Evade
 				if (StringContains(castInfo->BasicAttackSpellData->Name, s.name, true))
 				{
 					s.startTime = GameTimer;
-					s.obj = champ.obj;
-					SpellInfo spellInfoC = *castInfo; // ToDO remove this shity memory leakings
-					spellss.push_back(spellInfoC);
-					s.spell = &spellss[spellss.size() - 1];
+					s.obj = champ.obj;					
+					s.spell = castInfo;
+					s.radiusRes = castInfo->BasicAttackSpellData->Resource->Radius;
 					//s.speed = castInfo->BasicAttackSpellData->Resource->MissileSpeed == 0 ? MathHuge : castInfo->BasicAttackSpellData->Resource->MissileSpeed;
 					OnSpellCast(s);
 				}
@@ -2633,7 +2634,7 @@ namespace Evade
 			W.speed = 1200;
 			W.range = 1250;
 			W.delay = 0.25;
-			W.radius = 130;
+			W.radius = 80;
 			W.danger = 2;
 			W.cc = true;
 			W.collision = true;
@@ -3683,11 +3684,11 @@ namespace Evade
 			Janna.hero = "Janna";
 
 			Spell Q;
-			Q.name = "JannaQ";
+			Q.name = "HowlingGale";
 			Q.icon = "JannaQ";
 			Q.displayName = "Howling Gale";
 			Q.missileName = "HowlingGaleSpell";
-			Q.extraMissileNames.emplace_back("HowlingGaleSpell1");
+			/*Q.extraMissileNames.emplace_back("HowlingGaleSpell1");
 			Q.extraMissileNames.emplace_back("HowlingGaleSpell2");
 			Q.extraMissileNames.emplace_back("HowlingGaleSpell3");
 			Q.extraMissileNames.emplace_back("HowlingGaleSpell4");
@@ -3706,7 +3707,7 @@ namespace Evade
 			Q.extraMissileNames.emplace_back("HowlingGaleSpell17");
 			Q.extraMissileNames.emplace_back("HowlingGaleSpell18");
 			Q.extraMissileNames.emplace_back("HowlingGaleSpell19");
-			Q.extraMissileNames.emplace_back("HowlingGaleSpell20");
+			Q.extraMissileNames.emplace_back("HowlingGaleSpell20");*/
 			Q.slot = _Q;
 			Q.type = linear;
 			Q.speed = 900;
@@ -5236,6 +5237,7 @@ namespace Evade
 			E.hitbox = true;
 			E.fow = true;
 			E.exception = false;
+			E.followEnemy3 = true;
 			E.extend = false;
 			Pyke.spells.emplace_back(E);
 

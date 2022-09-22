@@ -48,7 +48,7 @@ LONG CALLBACK TopLevelHandler(EXCEPTION_POINTERS* info)
 
 	if (info->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)
 	{
-		
+
 		if (info->ExceptionRecord->ExceptionAddress > (PVOID)cheatAddr && info->ExceptionRecord->ExceptionAddress < (PVOID)cheatEndAddr) {
 			Utils::Log("Cheat Addr : " + to_hex(cheatAddr));
 			Utils::Log("Error Addr : " + to_hex((int)info->ExceptionRecord->ExceptionAddress));
@@ -97,9 +97,9 @@ LONG CALLBACK TopLevelHandler(EXCEPTION_POINTERS* info)
 
 DWORD WINAPI MainThread(LPVOID param) {
 	Utils::Log(">> LEAGUE ADDON INJECTED <<");
-//#if _DEBUG
+	//#if _DEBUG
 	Utils::Log(">> LEAGUE ADDON ADDR: " + to_hex((int)GetModuleHandleA("LeagueAddon.dll")) + " <<");
-//#endif
+	//#endif
 
 	exceptionHandler = AddVectoredExceptionHandler(TRUE, TopLevelHandler);
 
@@ -108,9 +108,11 @@ DWORD WINAPI MainThread(LPVOID param) {
 		std::this_thread::sleep_for(1ms);
 	}
 
-	while (*(int*)DEFINE_RVA(Offset::Data::LocalPlayer) == 0 ||((GameObject*)*(DWORD*)DEFINE_RVA(Offset::Data::LocalPlayer))->RecallState == 0) {
+	while ((*(int*)DEFINE_RVA(Offset::Data::LocalPlayer) == 0 || ((GameObject*)*(DWORD*)DEFINE_RVA(Offset::Data::LocalPlayer))->RecallState == 0) && !GetAsyncKeyState(VK_HOME)) {
 		std::this_thread::sleep_for(1ms);
 	}
+
+	std::this_thread::sleep_for(1s);
 
 	Hooks::ApplyHooks();
 

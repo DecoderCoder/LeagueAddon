@@ -57,3 +57,8 @@ enum class TargetingMode
 
 	MostStack
 };
+
+enum class PrintChatType {
+	WithTime = 0xFFFFFFFF,
+	WithoutTime = 0
+};

@@ -2,7 +2,6 @@
 #include "./Structs.h"
 
 namespace FuncType {
-	typedef void(__thiscall* tPrintChat)(DWORD ChatClient, const char* Message, int Color);
 	typedef int* (__thiscall* fnIssueOrder)(GameObject* Object, int Order, Vector3* Position, GameObject* Target, bool IsAttackMove, bool IsMinion, DWORD Unknown);
 	typedef int* (__thiscall* fnCastSpell)(DWORD* spellbook, DWORD* spelldatainst, int spellslot, Vector3* Origin, Vector3* Target, DWORD networkid);
 
@@ -39,15 +38,6 @@ namespace FuncType {
 };
 
 namespace Function {
-	//FuncType::WorldToScreen WorldToScreen;
-	//FuncType::fnIsAlive IsAlive;
-	//FuncType::fnGetBaseDrawPosition GetBaseDrawPosition;
-	//FuncType::fnGetBoundingRadius GetBoundingRadius;
-	//FuncType::fnGetAttackCastDelay GetAttackCastDelay;
-	//FuncType::fnGetAttackDelay GetAttackDelay;
-	//FuncType::fnDrawCircle DrawCircle;
-	//FuncType::fnPrintChat PrintChat;
-
 	Vector3* GetMouseWorldPosition();
 	bool IsChatOpen();
 	Vector2 WorldToScreen(Vector3* in);
@@ -62,6 +52,9 @@ namespace Function {
 	bool IsTurret(GameObject* Object);
 	void BlockInput(bool block);
 	void LockCamera(bool lock);
+
+	void PrintChat(string text, PrintChatType color = PrintChatType::WithoutTime);
+	void SendChat(string text, int color = 0xFFFFFF);
 
 	bool IsWall(Vector3* position);
 

@@ -211,7 +211,7 @@ void Function::BlockInput(bool block) {
 
 void Function::LockCamera(bool lock) {
 	DWORD camera = *(DWORD*)DEFINE_RVA(Offset::Data::Camera);
-	bool *cameraLock = (bool*)(camera + 0x2A);
+	bool* cameraLock = (bool*)(camera + 0x2A);
 	*cameraLock = lock;
 }
 
@@ -256,4 +256,20 @@ void Function::CharacterDataStack_Update(void* hero, bool change) noexcept
 {
 	static const auto Update{ reinterpret_cast<void(__thiscall*)(void*, bool)>(std::uintptr_t(DEFINE_RVA(Offset::Function::CharacterDataStack__Update))) };
 	Update(hero, change);
+}
+
+void Function::PrintChat(string text, PrintChatType color) {
+	// 0xFFFFFF - Log
+	// 0   - Log without time
+
+	FuncType::fnPrintChat printFunc = (FuncType::fnPrintChat)DEFINE_RVA(Offset::Function::PrintChat);
+	printFunc(DEFINE_RVA(Offset::Data::ChatInstance), text.c_str(), (int)color);
+}
+
+void Function::SendChat(string text, int color) {
+	// 0xFFFFFF - Log
+	// 0   - Log without time
+
+	FuncType::fnPrintChat printFunc = (FuncType::fnPrintChat)DEFINE_RVA(Offset::Function::SendChat);
+	printFunc(DEFINE_RVA(Offset::Data::ChatInstance), text.c_str(), color);
 }

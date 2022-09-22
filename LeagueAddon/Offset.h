@@ -2,59 +2,68 @@
 
 namespace Offset {
 	namespace Data {
-		static constexpr int LocalPlayer = 0x3141554; // 51 8B 0D ? ? ? ? 85 C9 74 21 
-		static constexpr int GameTime = 0x313AFF0; // F3 0F 11 05 ? ? ? ? 8B 49
-		static constexpr int ObjectManager = 0x18A503C; // A1 ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? C3
-		static constexpr int HudInstance = 0x18A50FC; //8B ? ? ? ? ? 6A 00 8B ? ? E8 ? ? ? ? B0 01 ?
-		static constexpr int Camera = 0x31388E4; // E8 ?? ?? ?? ?? 8B 0D ?? ?? ?? ?? 8D 43 24
+		static constexpr int LocalPlayer = 0x313D26C; // 51 8B 0D ? ? ? ? 85 C9 74 21 
+		static constexpr int GameTime = 0x3136040; // F3 0F 11 05 ? ? ? ? 8B 49
+		static constexpr int ObjectManager = 0x189FF7C; // A1 ?? ?? ?? ?? C7 40 ?? ?? ?? ?? ?? C3
+		static constexpr int HudInstance = 0x18A0040; //8B ? ? ? ? ? 6A 00 8B ? ? E8 ? ? ? ? B0 01 ?
+		static constexpr int Camera = 0x313381C; // E8 ?? ?? ?? ?? 8B 0D ?? ?? ?? ?? 8D 43 24
 
-		static constexpr int ManagerTemplate_Minions = 0x24F2850; // 8B 0D ? ? ? ? E8 ? ? ? ? EB 09 56 E8 ? ? ? ? 83 C4 04 8B CB C7 44 24 ? ? ? ? ?  First
-		static constexpr int ManagerTemplate_Turrets = 0x3139D5C; // 51 53 55 56 8B F1 8D 44 24 0C 89 35 ? ? ? ? 
-		static constexpr int ManagerTemplate_Heroes = 0x18A50D0; // 83 EC 64 A1 ? ? ? ? 33 C4 89 44 24 60 8B 44 24 68 83 CA FF 
-		static constexpr int ManagerTemplate_Missiles = 0x3142288; // 8D 4E 04 C7 05 ? ? ? ? ? ? ? ? 
+		static constexpr int ManagerTemplate_Minions = 0x24ED788; // 8B 0D ? ? ? ? E8 ? ? ? ? EB 09 56 E8 ? ? ? ? 83 C4 04 8B CB C7 44 24 ? ? ? ? ?  First
+		static constexpr int ManagerTemplate_Turrets = 0x3134C94; // 51 53 55 56 8B F1 8D 44 24 0C 89 35 ? ? ? ? 
+		static constexpr int ManagerTemplate_Heroes = 0x18A0014; // 83 EC 64 A1 ? ? ? ? 33 C4 89 44 24 60 8B 44 24 68 83 CA FF 
+		static constexpr int ManagerTemplate_Missiles = 0x313D2B4; // 8D 4E 04 C7 05 ? ? ? ? ? ? ? ? 
 
+		//int Offsets::HeroList = 0x18A0014; //8B 15 ? ? ? ? 0F 44 C1
+		//int Offsets::MinionList = 0x24ED788; //A3 ?? ?? ?? ?? E8 ?? ?? ?? ?? 83 C4 04 85 C0 74 32
+		//int Offsets::TurretList = 0x3134C94; //8B 35 ? ? ? ? 8B 76 18
+		//int Offsets::InhibList = 0x313D514; //A1 ?? ?? ?? ?? 53 55 56 8B 70 04 8B 40 08
 
-		static constexpr int AntiCheatCheck = 0x1889E80;
+		static constexpr int InhibList = 0x313D514; //A1 ?? ?? ?? ?? 53 55 56 8B 70 04 8B 40 08
 
-		static constexpr int PingObject = 0x314A28C; // ida v23, what is that - idk
-		static constexpr int ChatInstance = 0x31422E4; // 8B 0D ? ? ? ? 8A D8 85 C9
+		static constexpr int AntiCheatCheck = 0x1884C80;
+
+		static constexpr int PingObject = 0x314545C; // ida v23, what is that - idk
+		static constexpr int ChatInstance = 0x313D350; // 8B 0D ? ? ? ? 8A D8 85 C9
 		static constexpr int IsChatOpenOffset = 0x760;
 
-		static constexpr int W2SInstance = 0x24F282C; // https://imgur.com/a/UB8EeBO
-		static constexpr int W2SInstanceOffset = 0x268;
+		static constexpr int W2SInstance = 0x24ED764; // https://imgur.com/a/UB8EeBO
+		static constexpr int W2SInstanceOffset = 0x268; // OFFSET, W2SInstanceOffset, "FF 74 24 3C 8D 89 ? ? ? ?", 6, 2
 	}
 
 	namespace Function {
-		static constexpr int GetFirstObject = 0x269980; // E8 ?? ?? ?? ?? 8B F0 85 F6 74 4D 57
-		static constexpr int GetNextObject = 0x275CC0; // 8B 44 24 04 56 8B 71 18
+		//static constexpr int GetFirstObject = 0x269980; // E8 ?? ?? ?? ?? 8B F0 85 F6 74 4D 57
+		//static constexpr int GetNextObject = 0x275CC0; // 8B 44 24 04 56 8B 71 18
 
-		static constexpr int GetAttackDelay = 0x282A10; // 8B 44 24 04 51 F3
-		static constexpr int GetAttackCastDelay = 0x282910; // 83 EC 0C 53 8B 5C 24 14 8B CB 56 57 8B 03 FF 90
-		static constexpr int GetBoundingRadius = 0x14EF90; // 83 EC 08 56 8B F1 83 BE ? ? ? ? ? 74 69
-		static constexpr int GetBasicAttack = 0x14E780; // E8 ? ? ? ? 6A 40 56 8B D8 
+		static constexpr int GetAttackDelay = 0x2852A0; // 8B 44 24 04 51 F3
+		static constexpr int GetAttackCastDelay = 0x2851A0; // 83 EC 0C 53 8B 5C 24 14 8B CB 56 57 8B 03 FF 90
+		static constexpr int GetBoundingRadius = 0x150AB0; // 83 EC 08 56 8B F1 83 BE ? ? ? ? ? 74 69
+		static constexpr int GetBasicAttack = 0x1502A0; // E8 ? ? ? ? 6A 40 56 8B D8 
 
-		static constexpr int IsMinion = 0x184380; // 56 8B 74 24 08 57 BF ? ? ? ? 85 F6 74 52 // E8 ? ? ? ? 83 C4 04 84 C0 74 6C
-		static constexpr int IsTurret = 0x178650; // not used
-		static constexpr int IsAlive = 0x16AC50; // not used
+		static constexpr int IsMinion = 0x186F40; // 56 8B 74 24 08 57 BF ? ? ? ? 85 F6 74 52 // E8 ? ? ? ? 83 C4 04 84 C0 74 6C
+		static constexpr int IsTurret = 0x187030; // not used
+		//static constexpr int IsAlive = 0x16AC50; // not used
 
-		static constexpr int IssueOrder = 0x159940; // E8 ? ? ? ? 8D 46 11 
+		static constexpr int IssueOrder = 0x15B810; // E8 ? ? ? ? 8D 46 11 
 		static constexpr int CastSpell = 0x5E4130; // not used
 
-		static constexpr int OnProcessSpell = 0x517FB0; // E8 ? ? ? ? 8B 9D ? ? ? ? 89 44 24 28 -- pattern not working
+		static constexpr int OnProcessSpell = 0x5191B0;
+		// E8 ? ? ? ? 8B 9D ? ? ? ? 89 44 24 28 -- pattern work
 		// E8 ? ? ? ? 8B AF ? ? ? ? 89 44 24 24 -- pattern not working
-		// E8 ? ? ? ? 85 C0 0F 94 44 24 ?		-- pattern work
+		// E8 ? ? ? ? 85 C0 0F 94 44 24 ?		-- pattern not working
+		// E8 ? ? ? ? 8B 9D ? ? ? ? 89 44 24 28 -- pattern work
 
-		static constexpr int PrintChat = 0x5DFEF0; // E8 ? ? ? ? 6A 00 68 ? ? ? ? E8 ? ? ? ? 83 C4 04
-		static constexpr int GetPing = 0x34F9A0; // 8B C8 E8 ?? ?? ?? ?? 68 ?? ?? ?? ?? 8D 4D E0
+		static constexpr int PrintChat = 0x5E1680; // E8 ? ? ? ? 6A 00 68 ? ? ? ? E8 ? ? ? ? 83 C4 04
+		static constexpr int SendChat = 0x65D000; // A1 ? ? ? ? 56 6A FF
+		static constexpr int GetPing = 0x34E850; // 8B C8 E8 ?? ?? ?? ?? 68 ?? ?? ?? ?? 8D 4D E0
 
-		static constexpr int WorldToScreen = 0xA86470; //8B 11 8D 41 04 50 
+		static constexpr int WorldToScreen = 0xA815D0; //8B 11 8D 41 04 50 
 		// E8 ? ? ? ? 83 C4 08 83 F8 01 75 16 
 		// E8 ? ? ? ? 83 C4 08 84 C0 75 3D 
 
-		static constexpr int CharacterDataStack__Update = 0x105ED0; // 83 EC 1C 56 57 8D 44 24 ? 8B F1 50 8D 44 24 ? 50 8D 44 24 ? 50 8D 44 24 ? 50 8D 44 24 ? 50 8D 44 24 ? 50
-		static constexpr int CharacterDataStack__Push = 0x116BE0; // 83 EC 74 53 55 56 57 8B F9 8B 47 04 39 07
+		static constexpr int CharacterDataStack__Update = 0x107000; // 83 EC 1C 56 57 8D 44 24 ? 8B F1 50 8D 44 24 ? 50 8D 44 24 ? 50 8D 44 24 ? 50 8D 44 24 ? 50 8D 44 24 ? 50
+		static constexpr int CharacterDataStack__Push = 0x117BE0; // 83 EC 74 53 55 56 57 8B F9 8B 47 04 39 07
 
-		static constexpr int IsNotWall = 0xA19FF0; // E8 ? ? ? ? 33 C9 83 C4 0C 84
+		static constexpr int IsNotWall = 0xA15100; // E8 ? ? ? ? 33 C9 83 C4 0C 84
 	}
 
 	namespace SpellSlot {
@@ -72,7 +81,8 @@ namespace Offset {
 		static constexpr int SpellName = 0x6C; // 0x78;
 		static constexpr int CooldownTime = 0x0288;
 
-		static constexpr int MissileName = 0x78;
+		static constexpr int MissileName = 0x6C;//0x78;
+		static constexpr int SpellCost = 0x52C;
 	}
 
 	namespace SpellInfo {
@@ -92,8 +102,9 @@ namespace Offset {
 
 	namespace MissileData {
 		static constexpr int SpellInfo = 0x0260;
-		static constexpr int SrcIdx = 0x2DC;
-		static constexpr int DestIdx = 0x330;
+		static constexpr int SrcIdx = 0x2C4; //0x2DC;
+		static constexpr int DestCheck = 0x31C;
+		static constexpr int DestIdx = 0x318;// 0x330;
 		static constexpr int StartPos = 0x02DC;
 		static constexpr int EndPos = 0x02E8;
 	}
@@ -101,9 +112,9 @@ namespace Offset {
 	namespace Minimap {
 		static constexpr int Object = 0x3109FEC; // 55 8B EC 83 E4 F0 81 EC ? ? ? ? A1 ? ? ? ? 33 C4 89 84 24 ? ? ? ? 8B 0D ? ? ? ? 0F 57 C0 8B 45 08 89 44 24 08 53 56 57 0F 11 84 24 ? ? ? ? 0F 11 84 24 ? ? ? ? 85 C9 74 1D 8D 84 24 ? ? ? ? 50 E8 ? ? ? ? 0F 10 84 24 ? ? ? ?  mov     ecx, dword_329A27C
 
-		static constexpr int ObjectHud = 0x120;
-		static constexpr int HudPos = 0x44;
-		static constexpr int HudSize = 0x4C;
+		static constexpr int ObjectHud = 0x128;// 0x120;
+		static constexpr int HudPos = 0x3C;// 0x44;
+		static constexpr int HudSize = 0x44;// 0x4C;
 		static constexpr int HudWorldSize = 0x18;
 	}
 
@@ -126,7 +137,7 @@ namespace Offset {
 		static constexpr int NetworkID = 0xB4;
 		static constexpr int TeamID = 0x34; // 12.12
 		static constexpr int Position = 0x1DC; // 12.12
-		static constexpr int SpellBook = 0x2950; // 12.12
+		static constexpr int SpellBook = 0x2950; // 12.12 // 8B 84 83 ? ? ? ? EB 06 8B 83 ? ? ? ? 85 C0 0F 84 ? ? ? ? 53 8B CF E8 ? ? ? ? 8B C8 8B 10 FF 52 18 8B F0
 		static constexpr int Visibility = 0x274; // 12.12
 		static constexpr int Dead = 0x218; // Real Dead offset - 0x4
 		static constexpr int Health = 0xE74; // 12.12
@@ -143,7 +154,7 @@ namespace Offset {
 		static constexpr int BonusAttackDamage = 0x12CC; // 12.12
 		static constexpr int AttackSpeedMulti = 0x1350; // 12.12
 		static constexpr int MoveSpeed = 0x1394; // 12.12
-		static constexpr int ChampionName = 0x2D3C; // 12.12
+		static constexpr int ChampionName = 0x2D5C; // 12.12
 		static constexpr int CombatType = 0x20A8; // 12.12
 
 		static constexpr int MagicPenFlat = 0x1270;
@@ -151,9 +162,10 @@ namespace Offset {
 		static constexpr int MagicPenMod = MagicPenFlat + 0x8;
 		static constexpr int Lethality = MagicPenFlat + 0x1C;
 
-		static constexpr int CharacterDataStack = 0x2D30; // 8D 8E ? ? ? ? FF 74 24 4C
+		static constexpr int CharacterDataStack = 0x2D50; // 8D 8E ? ? ? ? FF 74 24 4C
 
 		static constexpr int RecallState = 0xD90;
+		static constexpr int SkinPtr = 0x2D34; // 12.12
 
 
 		//static constexpr int MinionPos = 0x34C; // 11.23
@@ -211,7 +223,7 @@ namespace Offset {
 
 	namespace Inventory
 	{
-		static constexpr int Instance = 0x3568;
+		static constexpr int Instance = 0x3588;
 		static constexpr int ItemSlotStart = 0x8;
 		static constexpr int ItemSlot = 0xC;
 		static constexpr int ItemSlotSpellName = 0x10;

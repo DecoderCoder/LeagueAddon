@@ -188,6 +188,7 @@ namespace Evade
 			float delay = 0.0f;
 			float time = 0.0f;
 			float radius = 0.0f;
+			float radiusRes = 0.0f;
 			float radiusEx = 0.0f;
 			float angle = 0.0f;
 			int danger = 0;
@@ -202,6 +203,7 @@ namespace Evade
 			bool useMissile = false;
 			bool followEnemy = false; // Follow Enemy like DariusQ
 			bool followEnemy2 = false; // Follow enemy like TaliyahQ
+			bool followEnemy3 = false; // Follow enemy like PykeE
 
 			// After detection
 			float startTime = 0.0f;
@@ -211,6 +213,9 @@ namespace Evade
 			Vector3 currPos;
 			Geometry::Polygon path;
 			SpellInfo* spell = nullptr;
+			/*SpellInfo spellInstance;
+			SpellData spellDataInstance;
+			SpellDataResource SpellDataResourceInstance;*/
 			GameObject* obj = nullptr;
 		};
 

@@ -118,6 +118,7 @@ bool AddonEngine::Initialize() {
 	OrbWalker::Initialize();
 	Evade::Core::Initalize();
 	SkinChanger::Initialize();
+	Misc::Initialize();
 
 	Debug::Initialize();
 
