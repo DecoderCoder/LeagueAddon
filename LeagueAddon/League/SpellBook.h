@@ -11,6 +11,8 @@ public:
 	CSpellSlot* GetSpellSlotByID(int ID) {
 		DWORD spellSlotPointerBuffer[7] = {};
 		memcpy(&spellSlotPointerBuffer, this, sizeof(DWORD) * 6);
+		if (*(int*)(spellSlotPointerBuffer[ID] + 0x8) == 0)
+			return nullptr;		
 		return (CSpellSlot*)(spellSlotPointerBuffer[ID]);
 	}
 

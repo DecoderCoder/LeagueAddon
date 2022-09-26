@@ -56,11 +56,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\ByDec\source\repos\LeagueAddon\LeagueAddon\PolyHook\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\ByDec\source\repos\LeagueAddon\LeagueAddonResources;C:\Users\ByDec\source\repos\LeagueAddon\LeagueAddon\PolyHook\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\ByDec\source\repos\LeagueAddon\LeagueAddon\PolyHook\lib;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\ByDec\source\repos\LeagueAddon\LeagueAddon\PolyHook\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\ByDec\source\repos\LeagueAddon\LeagueAddonResources;C:\Users\ByDec\source\repos\LeagueAddon\LeagueAddon\PolyHook\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\ByDec\source\repos\LeagueAddon\LeagueAddon\PolyHook\lib;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -195,6 +195,11 @@
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="Visual.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LeagueAddonResources\LeagueAddonResources.vcxproj">
+      <Project>{0f1686ac-ee4b-44b0-8827-8dd333f13801}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

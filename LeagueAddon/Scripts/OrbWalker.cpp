@@ -348,8 +348,6 @@ void OrbWalker::Initialize() {
 	LastMoveCommandT = 0;
 	LastAttackCommandT = 0;
 
-	//EventManager::AddEventHandler(EventManager::EventType::OnLoad, OnLoad);
-	//EventManager::AddEventHandler(EventManager::EventType::OnUnLoad, OnUnload);
 }
 
 void OrbWalker::OnLoad()

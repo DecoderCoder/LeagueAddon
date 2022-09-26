@@ -9,7 +9,9 @@ namespace TargetSelector
 	inline const char* targetingModeLabels[] = { "AutoPriority", "LowHP", "LowEfficientHP", "MostAD", "MostAP", "Closest", "NearMouse", "LessAttack", "LessCast", "MostStack" };
 
 	inline std::vector<GameObject*> attackOrder;
-	inline TargetingMode mode = TargetingMode::LowHP;
+	inline std::vector<GameObject*> attackOrderIgnore;
+	inline TargetingMode mode = TargetingMode::LowEfficientHP;
+	inline TargetingMode mode2 = TargetingMode::LowEfficientHP;
 
 	void Initialize();
 	bool checkUnit(GameObject* unit);

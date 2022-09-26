@@ -19,4 +19,5 @@
 
 namespace AddonEngine {
 	bool Initialize();
+	void Uninitialize();
 }

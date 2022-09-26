@@ -7,11 +7,10 @@ namespace Evade
 	void Core::Initalize() {
 		InitSpells();
 		//InitEvadeSpells();
-		//MessageBoxA(0, Local->GetChampionName().c_str(), "", 0);
 		for (GameObject* hero : ObjectManager::HeroList())
 		{
-			//if (Local->IsAllyTo(hero) || hero->NetworkID == Local->NetworkID)
-			//	continue;
+			if (Local->IsAllyTo(hero) || hero->NetworkID == Local->NetworkID)
+				continue;
 
 			for (Champ spell : SpellDB)
 			{
@@ -29,7 +28,7 @@ namespace Evade
 		EventManager::AddEventHandler(EventManager::EventType::OnMenu, OnMenu);
 	}
 
-	const char* qwer[] = { "Q", "W", "E", "R" };
+	//const char* qwer[] = { "Q", "W", "E", "R" };
 
 	void Core::OnMenu() {
 		if (ImGui::CollapsingHeader("Evade")) {
@@ -45,7 +44,7 @@ namespace Evade
 				if (ImGui::TreeNode(champ->hero.c_str())) {
 					for (int spell_c = 0; spell_c < champ->spells.size(); spell_c++) {
 						auto spell = &champ->spells[spell_c];
-						ImGui::Checkbox(("[ " + string(qwer[spell->slot]) + " ] " + spell->name + "##" + to_string(spell_c)).c_str(), &spell->enabled);
+						ImGui::Checkbox(("[ " + QWERDF[spell->slot] + " ] " + spell->name + "##" + to_string(spell_c)).c_str(), &spell->enabled);
 						//ImGui::SameLine();						
 					}
 					ImGui::NewLine();
@@ -56,10 +55,26 @@ namespace Evade
 		}
 	}
 
+	float lastChanged = 0;
+
 	void Core::OnDraw()
 	{
 		if (!DrawSpells)
 			return;
+
+		Vector3 lpPos;
+		Function::World2Screen(&Local->Position, &lpPos);
+
+		Render::BeginOverlay();
+		Render::Draw_Text_Centered(lpPos.x - 15, lpPos.y - 7, 30, 15, (EvadeSpells ? "E: ON" : "E: OFF"), (EvadeSpells ? ImColor(0, 255, 0) : ImColor(255, 0, 0)));
+		Render::EndOverlay();
+
+		if (IsLeagueInForeground() && !Function::IsChatOpen() && GetAsyncKeyStateN(0x4B) && lastChanged < GetTickCount()) { // K
+			EvadeSpells = !EvadeSpells;
+			lastChanged = GetTickCount() + 100;
+			DetectedSkillshots.clear();
+			Function::PrintChat("Evade: " + string((EvadeSpells ? "ON" : "OFF")));
+		}
 		GameTimer = Function::GameTime();
 
 		Render::BeginOverlay();
@@ -88,9 +103,20 @@ namespace Evade
 				//DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
 			}
 			if (DetectedSkillshots[i].followEnemy3) {
+				if (DetectedSkillshots[i].delayBR > 0) {
+					if (DetectedSkillshots[i].startTime + DetectedSkillshots[i].delay + DetectedSkillshots[i].delayBR < GameTimer && !DetectedSkillshots[i].directionChanged) {
+						DetectedSkillshots[i].startPos = DetectedSkillshots[i].endPos;
+						DetectedSkillshots[i].directionChanged = true;
+					}
+					if (DetectedSkillshots[i].directionChanged)
+						DetectedSkillshots[i].endPos = DetectedSkillshots[i].obj->Position;
+				}
+				else {
+					DetectedSkillshots[i].endPos = DetectedSkillshots[i].obj->Position;
+					DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
+				}
 				//DetectedSkillshots[i].startPos = DetectedSkillshots[i].obj->Position;
-				DetectedSkillshots[i].endPos = DetectedSkillshots[i].obj->Position;
-				DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
+
 			}
 			//
 			//
@@ -188,9 +214,9 @@ namespace Evade
 	{
 		if (s.spell && s.path.Points.size() > 0)
 		{
-			if ((s.startTime + s.range / s.speed + s.delay + s.time) > GameTimer)
+			if ((s.startTime + s.range / s.speed + s.delay + s.time + s.delayBR) > GameTimer)
 			{
-				if (s.speed != MathHuge && s.startTime + s.delay < GameTimer)
+				//if (s.speed != MathHuge && s.startTime + s.delay < GameTimer)
 				{
 					if (s.type == linear || s.type == threeway)
 					{
@@ -1013,40 +1039,44 @@ namespace Evade
 			{
 				endPos = endPos.Append(startPos1, endPos, spellInfo.radiusRes);
 			}
-			if (spellInfo.collision)
+			if (spellInfo.collision || spellInfo.collisionWC)
 			{
 				Vector3 startPos = startPos1.Extend(placementPos, 45);
 				std::list<Vector3>minions;
-				for (GameObject* minion : ObjectManager::MinionList())
-				{
-					if (minion->NetworkID - (unsigned int)0x40000000 > 0x100000)
-						continue;
-					if (minion && minion->IsTargetable && minion->IsEnemyTo(spellInfo.obj))
+				if (spellInfo.collision) {
+					for (GameObject* minion : ObjectManager::MinionList())
 					{
-						Vector3 minionPos = minion->Position;
-						if (minionPos.distanceTo(startPos) <= range && minion->MaxHealth > 295 && minion->Health > 5)
+						if (minion->NetworkID - (unsigned int)0x40000000 > 0x100000)
+							continue;
+						if (minion && minion->IsTargetable && minion->IsEnemyTo(spellInfo.obj))
 						{
-							Vector3 col = minionPos.ProjectOn(startPos, placementPos).SegmentPoint;
-							if (!col.IsZero() && col.distanceTo(minionPos) < ((minion->GetBoundingRadius()) / 2 + spellInfo.radius))
+							Vector3 minionPos = minion->Position;
+							if (minionPos.distanceTo(startPos) <= range && minion->MaxHealth > 295 && minion->Health > 5)
 							{
-								minions.emplace_back(minionPos);
+								Vector3 col = minionPos.ProjectOn(startPos, placementPos).SegmentPoint;
+								if (!col.IsZero() && col.distanceTo(minionPos) < ((minion->GetBoundingRadius()) / 2 + spellInfo.radius))
+								{
+									minions.emplace_back(minionPos);
+								}
 							}
 						}
 					}
 				}
-				for (GameObject* minion : ObjectManager::HeroList()) // TODO remove code copying
-				{
-					if (minion->NetworkID - (unsigned int)0x40000000 > 0x100000)
-						continue;
-					if (minion && minion->IsTargetable && minion->NetworkID != Local->NetworkID && minion->IsEnemyTo(spellInfo.obj))
+				if (spellInfo.collision || spellInfo.collisionWC) {
+					for (GameObject* minion : ObjectManager::HeroList()) // TODO remove code copying
 					{
-						Vector3 minionPos = minion->Position;
-						if (minionPos.distanceTo(startPos) <= range && minion->MaxHealth > 295 && minion->Health > 5)
+						if (minion->NetworkID - (unsigned int)0x40000000 > 0x100000)
+							continue;
+						if (minion && minion->IsTargetable && minion->NetworkID != Local->NetworkID && minion->IsEnemyTo(spellInfo.obj))
 						{
-							Vector3 col = minionPos.ProjectOn(startPos, placementPos).SegmentPoint;
-							if (!col.IsZero() && col.distanceTo(minionPos) < ((minion->GetBoundingRadius()) / 2 + spellInfo.radius))
+							Vector3 minionPos = minion->Position;
+							if (minionPos.distanceTo(startPos) <= range && minion->MaxHealth > 295 && minion->Health > 5)
 							{
-								minions.emplace_back(minionPos);
+								Vector3 col = minionPos.ProjectOn(startPos, placementPos).SegmentPoint;
+								if (!col.IsZero() && col.distanceTo(minionPos) < ((minion->GetBoundingRadius()) / 2 + spellInfo.radius))
+								{
+									minions.emplace_back(minionPos);
+								}
 							}
 						}
 					}
@@ -1126,7 +1156,7 @@ namespace Evade
 				if (StringContains(castInfo->BasicAttackSpellData->Name, s.name, true))
 				{
 					s.startTime = GameTimer;
-					s.obj = champ.obj;					
+					s.obj = champ.obj;
 					s.spell = castInfo;
 					s.radiusRes = castInfo->BasicAttackSpellData->Resource->Radius;
 					//s.speed = castInfo->BasicAttackSpellData->Resource->MissileSpeed == 0 ? MathHuge : castInfo->BasicAttackSpellData->Resource->MissileSpeed;
@@ -1571,6 +1601,7 @@ namespace Evade
 			W.danger = 2;
 			W.cc = false;
 			W.collision = false;
+			W.collisionWC = true;
 			W.windwall = true;
 			W.hitbox = true;
 			W.fow = true;
@@ -1623,6 +1654,7 @@ namespace Evade
 			R.danger = 4;
 			R.cc = true;
 			R.collision = false;
+			R.collisionWC = true;
 			R.windwall = true;
 			R.hitbox = true;
 			R.fow = true;
@@ -3096,7 +3128,7 @@ namespace Evade
 			R.radius = 140;
 			R.danger = 4;
 			R.cc = false;
-			R.collision = false;
+			R.collision = true;
 			R.windwall = true;
 			R.hitbox = true;
 			R.fow = true;
@@ -3956,7 +3988,7 @@ namespace Evade
 			Q.radius = 70;
 			Q.danger = 3;
 			Q.cc = false;
-			Q.collision = false;
+			Q.collision = true;
 			Q.windwall = true;
 			Q.hitbox = true;
 			Q.fow = true;
@@ -6254,11 +6286,12 @@ namespace Evade
 			Q.slot = _Q;
 			Q.type = linear;
 			Q.speed = 1350;
-			Q.range = 1250;
+			Q.range = 1000;
 			Q.delay = 0.25;
+			Q.delayBR = 0.8;
 			Q.radius = 100;
 			Q.danger = 2;
-			Q.followEnemy = true;
+			Q.followEnemy3 = true;
 			Q.cc = false;
 			Q.collision = false;
 			Q.windwall = true;

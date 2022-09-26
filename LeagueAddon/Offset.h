@@ -44,6 +44,8 @@ namespace Offset {
 		//static constexpr int IsAlive = 0x16AC50; // not used
 
 		static constexpr int IssueOrder = 0x15B810; // E8 ? ? ? ? 8D 46 11 
+		static constexpr int GetBaseDrawPosition = 0x1528A0; // E8 ?? ?? ?? ?? EB ?? 8B 01 8B 40
+
 		static constexpr int CastSpell = 0x5E4130; // not used
 
 		static constexpr int OnProcessSpell = 0x5191B0;
@@ -110,7 +112,7 @@ namespace Offset {
 	}
 
 	namespace Minimap {
-		static constexpr int Object = 0x3109FEC; // 55 8B EC 83 E4 F0 81 EC ? ? ? ? A1 ? ? ? ? 33 C4 89 84 24 ? ? ? ? 8B 0D ? ? ? ? 0F 57 C0 8B 45 08 89 44 24 08 53 56 57 0F 11 84 24 ? ? ? ? 0F 11 84 24 ? ? ? ? 85 C9 74 1D 8D 84 24 ? ? ? ? 50 E8 ? ? ? ? 0F 10 84 24 ? ? ? ?  mov     ecx, dword_329A27C
+		static constexpr int Object = 0x313383C; // 55 8B EC 83 E4 F0 81 EC ? ? ? ? A1 ? ? ? ? 33 C4 89 84 24 ? ? ? ? 8B 0D ? ? ? ? 0F 57 C0 8B 45 08 89 44 24 08 53 56 57 0F 11 84 24 ? ? ? ? 0F 11 84 24 ? ? ? ? 85 C9 74 1D 8D 84 24 ? ? ? ? 50 E8 ? ? ? ? 0F 10 84 24 ? ? ? ?  mov     ecx, dword_329A27C
 
 		static constexpr int ObjectHud = 0x128;// 0x120;
 		static constexpr int HudPos = 0x3C;// 0x44;

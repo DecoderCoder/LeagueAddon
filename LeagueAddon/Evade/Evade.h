@@ -186,6 +186,8 @@ namespace Evade
 			float speed = 0.0f;
 			float range = 0.0f;
 			float delay = 0.0f;
+			float delayBR = 0.0f; // Delay before return
+			bool directionChanged = false; // Delay before return
 			float time = 0.0f;
 			float radius = 0.0f;
 			float radiusRes = 0.0f;
@@ -194,6 +196,7 @@ namespace Evade
 			int danger = 0;
 			bool cc = false; // Stun, Root e.t.c
 			bool collision = false;
+			bool collisionWC = false; // Collision with champs
 			bool windwall = false;
 			bool hitbox = false;
 			bool fow = false;

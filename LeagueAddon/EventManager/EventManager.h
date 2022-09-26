@@ -3,7 +3,7 @@
 namespace EventManager {
 	enum class EventType {
 		OnLoad,
-		OnUnLoad,
+		OnUnload,
 		OnThread,
 		OnDraw,
 		OnMenu,

@@ -112,7 +112,7 @@ void HealthPrediction::Initialize() {
 	EventManager::AddEventHandler(EventManager::EventType::OnDraw, OnDraw);
 
 	EventManager::AddEventHandler(EventManager::EventType::OnLoad, OnLoad);
-	EventManager::AddEventHandler(EventManager::EventType::OnUnLoad, OnUnload);
+	EventManager::AddEventHandler(EventManager::EventType::OnUnload, OnUnload);
 }
 
 void HealthPrediction::OnLoad()

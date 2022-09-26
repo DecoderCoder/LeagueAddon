@@ -135,7 +135,7 @@ public:
 
 		// TODO: 3D Optimization
 
-		if (drawX > GetSystemMetrics(SM_CXSCREEN) || drawY > GetSystemMetrics(SM_CYSCREEN))
+		if (drawX > Render::RenderWidth || drawY > Render::RenderHeight)
 			return;
 		if (drawX + this->Width < 0 || drawY + this->Height < 0)
 			return;

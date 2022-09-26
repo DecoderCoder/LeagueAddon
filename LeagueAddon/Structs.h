@@ -137,7 +137,7 @@ public:
 			//DEFINE_MEMBER_N(CharacterData* BaseCharacterData, Offset::GameObject::BaseCharacterData)
 			DEFINE_MEMBER_N(BuffManager BuffManager, Offset::BuffManager::Instance)
 			DEFINE_MEMBER_N(CombatType combat, Offset::GameObject::CombatType)
-			DEFINE_MEMBER_N(int RecallState, Offset::GameObject::RecallState);
+			DEFINE_MEMBER_N(kRecallState RecallState, Offset::GameObject::RecallState);
 
 	};
 

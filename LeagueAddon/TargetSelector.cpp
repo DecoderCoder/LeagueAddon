@@ -52,21 +52,23 @@ GameObject* TargetSelector::GetTarget(GameObject* champion, float range, DamageT
 {
 	GameObject* first = nullptr;
 	int prevPriority = attackOrder.size();
-	for (GameObject* next : filter(ObjectManager::HeroList(), [&](GameObject* enemy) { return Helper::isValidUnit(enemy) && enemy->IsInRange(Local, Local->AttackRange, true); }))
+	TargetingMode prevTargetMode = mode;
+	std::list<GameObject*> objects = filter(ObjectManager::HeroList(), [&](GameObject* enemy) { return Helper::isValidUnit(enemy) && enemy->IsInRange(Local, Local->AttackRange, true); });
+	for (GameObject* next : objects)
 	{
 		switch (mode)
 		{
 		case TargetingMode::AutoPriority:
-			if (first == nullptr)
-				first = next;
-			if (first != nullptr)
-				for (int i = 0; i < attackOrder.size(); i++) {
-					if (next->NetworkID == attackOrder[i]->NetworkID && i < prevPriority) {
-						prevPriority = i;
-						first = next;
-						break;
-					}
+			//if (first == nullptr)
+			//	first = next;
+			//if (first != nullptr)
+			for (int i = 0; i < attackOrder.size(); i++) {
+				if (next->NetworkID == attackOrder[i]->NetworkID && i < prevPriority) {
+					prevPriority = i;
+					first = next;
+					break;
 				}
+			}
 			break;
 		case TargetingMode::LowHP:
 			if (first == nullptr)
@@ -105,6 +107,11 @@ GameObject* TargetSelector::GetTarget(GameObject* champion, float range, DamageT
 				first = next;
 			break;
 		};
+	}
+	if (first == nullptr && mode == TargetingMode::AutoPriority && objects.size() > 0) {
+		mode = mode2;
+		first = GetTarget(champion, range, damageType, ignoreShield, rangeCheckFrom);
+		mode = prevTargetMode;
 	}
 	return first;
 }

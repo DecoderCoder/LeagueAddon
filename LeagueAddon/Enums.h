@@ -62,3 +62,23 @@ enum class PrintChatType {
 	WithTime = 0xFFFFFFFF,
 	WithoutTime = 0
 };
+
+enum class kRecallState
+{
+	None = 0,
+	Odin_Recall = 6,
+	Super_Recall = 11,
+	Teleporting = 16,
+	Stand_United = 19,
+	Yuumi_W_Ally = 10
+};
+
+enum class IsNotWallFlags {
+	Ground = 0x0,
+	Ground2 = 0x800000,
+	wall = 0x20000,
+	Wall2 = 0x820000,
+	Bush = 0x10000,
+	Bush2 = 0x810000,
+	Structure = 0x460000
+};

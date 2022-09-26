@@ -71,6 +71,52 @@ Vector2 Function::WorldToScreen(Vector3* in)
 	return out2;
 }
 
+DWORD Gadget = DEFINE_RVA(0x510D);
+
+int Function::GetBaseDrawPosition(GameObject* Object, Vector3* Position) {
+	DWORD BaseDrawPositionAddr = DEFINE_RVA(Offset::Function::GetBaseDrawPosition);//GetBaseDrawPosition
+
+	__asm {
+		//	mov esi, [hudInstance30]
+		push retnHere
+		push Position
+		mov ecx, Object
+		push Gadget
+		jmp BaseDrawPositionAddr
+		retnHere :
+	}
+
+}
+
+bool Function::GetHPBarPosition(GameObject* Object, Vector3* out) {
+	//There is a problem with this call
+	Vector3 drawPosition;
+	Function::GetBaseDrawPosition(Object, &drawPosition);
+
+
+	Vector3 screen;
+	if (!Function::World2Screen(&drawPosition, &screen))
+	{
+		return false;
+	}
+
+	float delta = abs(drawPosition.y - Object->Position.y);
+	delta = delta / 1920 * Render::RenderWidth;
+	delta *= 1.1f;
+	if (!Function::World2Screen(&drawPosition, out))
+	{
+		return false;
+	}
+
+	out->x -= 45;
+	out->y -= delta;
+	out->z = 0;
+
+	//out->x = out->x / Render::RenderWidth * 1920;
+	//out->y = out->y / Render::RenderHeight * 1080;
+	return true;
+}
+
 int* Function::IssueOrder(GameObject* Object, int Order, Vector3* Position, GameObject* Target, bool IsAttackMove, bool IsMinion, DWORD Unknown) {
 	// Move - 0x13 | Order - 2
 	// Attack - 0x14 | Attack - 3
@@ -90,8 +136,7 @@ int* Function::IssueOrder(GameObject* Object, int Order, Vector3* Position, Game
 	}
 	memset(antiCheatCheck + 0x1, 0, 0x3);
 
-	DWORD IssueOrderAddr = baseAddr + Offset::Function::IssueOrder;//IssueOrder
-	DWORD Gadget = baseAddr + 0x510D;
+	DWORD IssueOrderAddr = DEFINE_RVA(Offset::Function::IssueOrder);//IssueOrder	
 	bool Detected;
 	__asm {
 		//	mov esi, [hudInstance30]
@@ -227,10 +272,10 @@ bool Function::IsTurret(GameObject* Object)
 	return ((fnIsTurret)(DEFINE_RVA(Offset::Function::IsTurret)))(Object);
 }
 
-bool Function::IsWall(Vector3* position)
+bool Function::IsWall(Vector3* position, unsigned __int16 uk)
 {
 	typedef bool(__cdecl* fnIsNotWall)(Vector3* position, unsigned __int16 uk);
-	return !((fnIsNotWall)(DEFINE_RVA(Offset::Function::IsNotWall)))(position, (unsigned __int16)0);
+	return !((fnIsNotWall)(DEFINE_RVA(Offset::Function::IsNotWall)))(position, (unsigned __int16)uk);
 }
 
 int Function::GetSelected() {

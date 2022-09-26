@@ -53,7 +53,7 @@ BOOL WINAPI hGetCursorPos(LPPOINT lpPoint)
 {
 
 	auto org = ((fGetCursorPos)Input::oGetCursorPos)(lpPoint);
-	if (Input::mMouseX > 0 && Input::mMouseY > 0 && Input::mMouseX < GetSystemMetrics(SM_CXSCREEN) && Input::mMouseY < GetSystemMetrics(SM_CYSCREEN)) {
+	if (Input::mMouseX > 0 && Input::mMouseY > 0 && Input::mMouseX < Render::RenderWidth && Input::mMouseY < Render::RenderHeight) {
 		lpPoint->x = Input::mMouseX;
 		lpPoint->y = Input::mMouseY;
 		Input::mMouseX = -1;

@@ -3,15 +3,9 @@
 #include "ObjectManager.h"
 #include "Render.h"
 #include <map>
+#include "Resources.h"
 
 namespace SkinChanger {
-	class Skin {
-	public:
-		std::map<string, string> Name;
-		int Id;
-		bool Chromas;
-	};
-
 	inline string currentLang = "en_US";
 
 	inline std::map<string, std::vector<Skin>> SkinsDB; // string = ChampionName
@@ -23,7 +17,5 @@ namespace SkinChanger {
 
 	void OnThread();
 	void OnMenu();
-	void OnDraw();
-
-	void LoadSkinsDB();
+	void OnDraw();	
 }

@@ -5,7 +5,9 @@
 #include <dxgi.h>
 #include <iostream>
 #include "vector"
-#include "Images.h"
+#include <map>
+#include <string>
+//#include "Structs.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
@@ -15,6 +17,15 @@
 #else
 #  define EXPORT __declspec(dllexport)
 #endif
+
+using namespace std;
+
+extern "C" class EXPORT Skin {
+public:
+	std::map<string, string> Name;
+	int Id;
+	bool Chromas;
+};
 
 extern "C" class EXPORT RImage {
 public:
@@ -33,13 +44,8 @@ public:
 
 extern "C" class EXPORT Image_Manager {
 public:
-	Image_Manager() {
-
-	}
-
 	Image_Manager(ID3D11Device* pDevice) {
 		this->pDevice = pDevice;
-
 	}
 
 	int ImagesCount() {
@@ -78,4 +84,9 @@ private:
 	std::vector<RImage> Images;
 };
 
-extern "C" EXPORT void InitImages(Image_Manager & Images_Manager);
+namespace  Resources {
+	extern "C" EXPORT void LoadImages(Image_Manager & Images_Manager);
+
+
+	extern "C" EXPORT void LoadSkinsDB(std::map<string, std::vector<Skin>>&SkinsDB);
+}

@@ -45,8 +45,8 @@ void Akali::OnMenu() {
 void Akali::OnDraw() {
 	int ultLvl = Local->SpellBook.GetSpellSlotByID(3)->GetLevel();
 	Render::BeginOverlay();
-	ImGui::SetWindowPos(ImVec2(0, 0));
-	ImGui::SetWindowSize(ImVec2(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)));
+	//ImGui::SetWindowPos(ImVec2(0, 0));
+	//ImGui::SetWindowSize(ImVec2(Render::RenderWidth, Render::RenderHeight));
 
 	for (auto obj : ObjectManager::HeroList()) {
 		float health = obj->Health;

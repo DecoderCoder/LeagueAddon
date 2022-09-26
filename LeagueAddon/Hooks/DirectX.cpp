@@ -20,7 +20,7 @@ ID3D11DeviceContext* pContext = NULL;
 std::unique_ptr<PLH::VTableSwapHook> h;
 std::unique_ptr<PLH::x86Detour> detour;
 
-bool Inited = false;
+
 HWND window = NULL;
 ID3D11RenderTargetView* mainRenderTargetView = NULL;
 WNDPROC oWndProc = NULL;
@@ -323,6 +323,7 @@ bool DirectXHook::HookDX11() {
 		Utils::Log(" > Renderer: Rehook");
 		detour->reHook();
 	}
+
 	Utils::Log(" > Renderer: Hook OK");
 	Utils::Log(" > Renderer: Ok");
 	return true;
@@ -349,11 +350,18 @@ HRESULT __stdcall DirectXHook::Hooked_PresentDX11(IDXGISwapChain* pSwapChain, UI
 		Utils::Log(" > DX11Present: Init: Begin");
 		if (pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&pDevice) >= 0)
 		{
+			Render::Images_Manager = Image_Manager(pDevice);
+			Resources::LoadImages(Render::Images_Manager);
 			//Images_Manager = Renderer_Image_Manager(pDevice);
 			pDevice->GetImmediateContext(&pContext);
 			DXGI_SWAP_CHAIN_DESC sd;
 			pSwapChain->GetDesc(&sd);
-			window = sd.OutputWindow;
+			window = sd.OutputWindow; 
+			RECT rect;
+			GetWindowRect(window, &rect);
+			Render::RenderWidth = rect.right - rect.left;
+			Render::RenderHeight = rect.bottom - rect.top;
+
 			ID3D11Texture2D* pBackBuffer;
 			pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 			pDevice->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView);

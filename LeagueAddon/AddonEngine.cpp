@@ -38,7 +38,7 @@ void DrawMenu() {
 		EventManager::Trigger(EventManager::EventType::OnMenu);
 
 		if (ImGui::CollapsingHeader("Settings")) {
-			if (ImGui::BeginCombo("Target mode", TargetSelector::targetingModeLabels[(int)TargetSelector::mode])) {
+			if (ImGui::BeginCombo("Target mode 1", TargetSelector::targetingModeLabels[(int)TargetSelector::mode])) {
 				for (int i = 0; i < 10; i++) {
 					if (ImGui::Selectable(TargetSelector::targetingModeLabels[i], (int)TargetSelector::mode == i)) {
 						TargetSelector::mode = (TargetingMode)i;
@@ -47,14 +47,23 @@ void DrawMenu() {
 				ImGui::EndCombo();
 			}
 			if (TargetSelector::mode == TargetingMode::AutoPriority) {
+				if (ImGui::BeginCombo("Target mode 2", TargetSelector::targetingModeLabels[(int)TargetSelector::mode2])) {
+					for (int i = 1; i < 10; i++) {
+						if (ImGui::Selectable(TargetSelector::targetingModeLabels[i], (int)TargetSelector::mode2 == i)) {
+							TargetSelector::mode2 = (TargetingMode)i;
+						}
+					}
+					ImGui::EndCombo();
+				}
 				ImGui::Separator();
+				int secondTarget = 0;
 				for (int i = 0; i < TargetSelector::attackOrder.size(); i++) {
 					ImGui::Text(("[" + to_string(i) + "] " + TargetSelector::attackOrder[i]->GetChampionName()).c_str());
 					if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
 						ImGui::SetDragDropPayload("TARGETORDER", &i, sizeof(int));
 						ImGui::Text(TargetSelector::attackOrder[i]->GetChampionName().c_str());
 						ImGui::EndDragDropSource();
-						/*Render::BeginOverlay();
+						Render::BeginOverlay();
 						for (auto hero : ObjectManager::HeroList()) {
 							if (hero->NetworkID == TargetSelector::attackOrder[i]->NetworkID) {
 								Render::Draw_Circle3DFilled(hero->Position, hero->GetBoundingRadius(), ImColor(255, 0, 0));
@@ -62,17 +71,49 @@ void DrawMenu() {
 							}
 
 						}
-						Render::EndOverlay();*/
+						Render::EndOverlay();
 					}
+
 					if (ImGui::BeginDragDropTarget())
 					{
 						const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TARGETORDER");
 						if (payload != NULL) {
-							GameObject* swap = TargetSelector::attackOrder[i];
-							TargetSelector::attackOrder[i] = TargetSelector::attackOrder[*(int*)payload->Data];
-							TargetSelector::attackOrder[*(int*)payload->Data] = swap;
+							if (*(int*)payload->Data >= 10) {
+								int pos = *(int*)payload->Data - 10;								
+								TargetSelector::attackOrder.insert(TargetSelector::attackOrder.begin() + i + 1, TargetSelector::attackOrderIgnore[pos]);
+								TargetSelector::attackOrderIgnore.erase(TargetSelector::attackOrderIgnore.begin() + pos);
+								//TargetSelector::attackOrder[*(int*)payload->Data] = swap;
+							}
+							else {
+								GameObject* swap = TargetSelector::attackOrder[i];
+								TargetSelector::attackOrder[i] = TargetSelector::attackOrder[*(int*)payload->Data];
+								TargetSelector::attackOrder[*(int*)payload->Data] = swap;
+							}
 						}
 						ImGui::EndDragDropTarget();
+					}
+				}
+				ImGui::Separator();
+				ImGui::Text("Drag the hero at this label to ignore priority");
+
+				if (ImGui::BeginDragDropTarget())				{
+
+					const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TARGETORDER");
+					if (payload != NULL && *(int*)payload->Data < 10 && TargetSelector::attackOrder.size() > 1) {
+						TargetSelector::attackOrderIgnore.push_back(TargetSelector::attackOrder[*(int*)payload->Data]);
+						TargetSelector::attackOrder.erase(TargetSelector::attackOrder.begin() + *(int*)payload->Data);
+						//GameObject* swap = TargetSelector::attackOrder[i];
+						//TargetSelector::attackOrder[i] = ;
+						//TargetSelector::attackOrder[*(int*)payload->Data] = swap;
+					}
+				}
+				for (int i = 0; i < TargetSelector::attackOrderIgnore.size(); i++) {
+					ImGui::Text(("[" + to_string(i) + "] " + TargetSelector::attackOrderIgnore[i]->GetChampionName()).c_str());
+					if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+						secondTarget = i + 10;
+						ImGui::SetDragDropPayload("TARGETORDER", &secondTarget, sizeof(int));
+						ImGui::Text(TargetSelector::attackOrderIgnore[secondTarget - 10]->GetChampionName().c_str());
+						ImGui::EndDragDropSource();
 					}
 				}
 				ImGui::Separator();
@@ -83,9 +124,6 @@ void DrawMenu() {
 				Debug::detectedSpellsPtr.clear();
 			}
 		}
-	}
-	else {
-		ImGui::Text("Waiting for Hooks, use recall");
 	}
 
 	ImGui::End();
@@ -112,7 +150,7 @@ bool AddonEngine::Initialize() {
 	if (Local->GetChampionName() == "Yasuo")
 		Yasuo::Initialize();
 
-	//// OrbWalker
+	//// Main code
 
 	Visual::Initialize();
 	OrbWalker::Initialize();
@@ -123,4 +161,8 @@ bool AddonEngine::Initialize() {
 	Debug::Initialize();
 
 	return true;
+}
+
+void AddonEngine::Uninitialize() {
+	EventManager::Trigger(EventManager::EventType::OnUnload);
 }

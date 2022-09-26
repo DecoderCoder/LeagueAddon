@@ -3,7 +3,13 @@
 bool Helper::isValidUnit(GameObject* unit, float range, bool checkTeam, Vector3 from)
 {
 	if (unit == NULL || !unit->IsVisible || !Function::IsAlive(unit) || !unit->IsTargetable
-		|| unit->IsInvulnearable())
+		|| unit->IsInvulnearable()		
+		|| unit->BuffManager.hasBuff("NilahWBuff")
+		|| unit->BuffManager.hasBuff("NilahWAllyBuff")
+		|| (unit->Health < 150 && unit->BuffManager.hasBuff("UndyingRage")) // Tryndamere ult
+		|| unit->BuffManager.hasBuff("NilahWAllyBuff")
+
+		)
 
 	{
 		return false;
@@ -19,7 +25,7 @@ bool Helper::isValidUnit(GameObject* unit, float range, bool checkTeam, Vector3 
 		return false;
 	}
 	(from.IsValid() ? from : Local->Position).DistanceSquared(unit->Position) > range* range;
-	return !(range < FLT_MAX) || (from.IsValid() ? from : Local->Position).DistanceSquared(unit->Position) > range * range;;
+	return !(range < FLT_MAX) || (from.IsValid() ? from : Local->Position).DistanceSquared(unit->Position) > range * range;
 }
 
 float Helper::calcReducedDamage(float rawDamage, float armor, float penetration, float lethality, bool calc0armor)

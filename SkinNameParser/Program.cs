@@ -14,7 +14,8 @@ namespace LeagueParser
     class Spell
     {
         public string Name { get; set; }
-        public string Image { get; set; }
+        public string ImageName { get; set; }
+        public byte[] ImageBytes { get; set; }
         public string MissileName { get; set; }
 
     }
@@ -80,6 +81,14 @@ namespace LeagueParser
         static object ThreadLocker = new object();
 
         static List<Character> characters = new List<Character>();
+        static List<Spell> summoners = new List<Spell>();
+
+        static void ParseSummonerThread()
+        {
+            HttpRequest request = new HttpRequest();
+            string HTML = request.Get("").ToString();
+
+        }
 
         static void ParseCharacterInfoThread()
         {
@@ -132,7 +141,7 @@ namespace LeagueParser
                     var names = Parses("name\":\"", SkinData[lang], "\"");
                     names.RemoveAt(0);
                     skinNames.Add(lang, names.ToArray());
-                    
+
                 }
                 bool[] skinChromas = Parses("chromas\":", SkinData[LANGUAGES[0]], "}").Select((x) => { return x == "true"; }).ToArray();
 
@@ -142,7 +151,7 @@ namespace LeagueParser
                     skin.Id = skinIds[i];
                     skin.Name = new Dictionary<string, string>();
                     foreach (var lang in LANGUAGES)
-                    {                       
+                    {
                         skin.Name.Add(lang, skinNames[lang][i]);
                     }
                     skin.Chromas = skinChromas[i];
@@ -174,7 +183,7 @@ namespace LeagueParser
                             {
                                 if (Path.GetFileNameWithoutExtension(ability.Value.mSpell.mImgIconName[0]).ToLower() == Path.GetFileNameWithoutExtension(im).ToLower())
                                 {
-                                    character.spells.Add(new Spell() { Name = ability.Value.mScriptName, Image = ability.Value.mSpell.mImgIconName[0] });
+                                    character.spells.Add(new Spell() { Name = ability.Value.mScriptName, ImageName = ability.Value.mScriptName, ImageBytes = image });
                                     Console.WriteLine(ability.Value.mScriptName);
                                 }
                             }
@@ -199,7 +208,7 @@ namespace LeagueParser
             if (heroesLinks.Count > 2)
             {
                 threads = new Thread[10];
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < threads.Length; i++)
                 {
                     threadCount++;
                     threads[i] = new Thread(ParseCharacterInfoThread) { IsBackground = false };
@@ -212,30 +221,57 @@ namespace LeagueParser
                 }
                 // Saving all
                 Console.WriteLine("Saving all data");
-                List<string> skinsDotH = new List<string>();
+                List<string> resourcesCpp = new List<string>();
+                List<string> ImagesH = new List<string>();
+
+                resourcesCpp.Add("#include \"pch.h\"\r\n\r\n\r\n");
+                resourcesCpp.Add("#include \"Resources.h\"");
+                resourcesCpp.Add("#include \"Images.h\"");
+                resourcesCpp.Add("void Resources::LoadSkinsDB(std::map<string, std::vector<Skin>>& SkinsDB)");
+                resourcesCpp.Add(" {");
                 foreach (var character in characters)
                 {
-                    skinsDotH.Add("{");
-                    skinsDotH.Add(" std::vector<Skin> heroSkins;");
+                    resourcesCpp.Add("{");
+                    resourcesCpp.Add(" std::vector<Skin> heroSkins;");
                     int counter = 0;
                     foreach (var skin in character.skins)
                     {
-                        skinsDotH.Add(" Skin skin" + counter.ToString() + ";");
-                        skinsDotH.Add(" skin" + counter.ToString() + ".Id = " + skin.Id + ";");
-                        foreach(var lang in LANGUAGES)
+                        resourcesCpp.Add(" Skin skin" + counter.ToString() + ";");
+                        resourcesCpp.Add(" skin" + counter.ToString() + ".Id = " + skin.Id + ";");
+                        foreach (var lang in LANGUAGES)
                         {
-                            skinsDotH.Add(" skin" + counter.ToString() + ".Name[\"" + lang + "\"] = \"" + skin.Name[lang] + "\";");
+                            resourcesCpp.Add(" skin" + counter.ToString() + ".Name[\"" + lang + "\"] = \"" + skin.Name[lang] + "\";");
                         }
-                        skinsDotH.Add(" skin" + counter.ToString() + ".Chromas = " + (skin.Chromas ? "true" : "false") + ";");
-                        skinsDotH.Add(" heroSkins.push_back(skin" + counter + ");");
-                        skinsDotH.Add("");
+                        resourcesCpp.Add(" skin" + counter.ToString() + ".Chromas = " + (skin.Chromas ? "true" : "false") + ";");
+                        resourcesCpp.Add(" heroSkins.push_back(skin" + counter + ");");
+                        resourcesCpp.Add("");
                         counter++;
                     }
-                    skinsDotH.Add(" SkinsDB[\"" + character.cdnName + "\"] = heroSkins;");
-                    skinsDotH.Add("}");
-                    skinsDotH.Add("");
+                    resourcesCpp.Add(" SkinsDB[\"" + character.cdnName + "\"] = heroSkins;");
+                    resourcesCpp.Add("}");
+                    resourcesCpp.Add("");
                 }
-                File.WriteAllLines("Skin.h", skinsDotH);
+                resourcesCpp.Add(" }");
+
+                ImagesH.Add("#pragma once\r\n#ifndef DEBUG\r\nnamespace Images {");
+                resourcesCpp.Add("void Resources::LoadImages(Image_Manager & Images_Manager) {");
+
+                foreach (var character in characters)
+                {
+                    foreach (var spell in character.spells)
+                    {
+                        resourcesCpp.Add("Images_Manager.AddImage(\"" + spell.Name + "\", (char*)&Images::" + spell.ImageName + ", sizeof(Images::" + spell.ImageName + "));");
+                        ImagesH.Add("const unsigned char " + spell.Name + "[] = {");
+                        ImagesH.Add(String.Join(", ", spell.ImageBytes.Select((x) => { return "0x" +  x.ToString("X2"); })));
+                        ImagesH.Add("};");
+                    }
+                }
+
+                resourcesCpp.Add("}");
+                ImagesH.Add("}\r\n#endif");
+
+                File.WriteAllLines("Resources.cpp", resourcesCpp);
+                File.WriteAllLines("Images.h", ImagesH);
             }
         }
     }

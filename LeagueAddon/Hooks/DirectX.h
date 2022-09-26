@@ -17,6 +17,8 @@ typedef HRESULT(__stdcall* PresentDX11) (IDXGISwapChain* pSwapChain, UINT SyncIn
 typedef HRESULT(__stdcall* ResizeBuffer)(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 
 namespace DirectXHook {
+	inline bool Inited = false;
+
 	bool HookDX11();
 	bool HookDX9();
 	bool HookInput();

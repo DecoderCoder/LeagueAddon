@@ -7,14 +7,10 @@
 class CSpellSlot {
 public:
 	int GetLevel() {
-		if (IsBadReadPtr((int*)(this + Offset::SpellSlot::Level), 4))
-			return 0;
 		return *(int*)((DWORD)this + Offset::SpellSlot::Level);
 	}
 
 	float GetTime() {
-		if (IsBadReadPtr((int*)(this + Offset::SpellSlot::Time), 4))
-			return 0;
 		return *(float*)((DWORD)this + Offset::SpellSlot::Time);
 	}
 

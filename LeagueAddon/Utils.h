@@ -20,6 +20,7 @@ using namespace std;
 #define MAKE_PAD(size)                        BYTE STR_MERGE(pad_, __COUNTER__) [ size ]
 #define DEFINE_MEMBER_0(x)                    x;
 #define DEFINE_MEMBER_N(x,offset)            struct { MAKE_PAD((DWORD)offset); x; };
+#define GetAsyncKeyStateN(key)	GetAsyncKeyState(key) & 0x8000
 
 bool IsLeagueInForeground();
 HWND GetHwndProc();
@@ -172,3 +173,5 @@ inline char* GetStr(DWORD offset) {
 	else
 		return (char*)offset;
 }
+
+inline string QWERDF[6] = { "Q", "W", "E", "R", "D", "F" };

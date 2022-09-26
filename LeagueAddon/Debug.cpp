@@ -1,6 +1,6 @@
 #include "Debug.h"
 
-const char* qwerdf[] = { "Q", "W", "E", "R", "D", "F" };
+//const char* qwerdf[] = { "Q", "W", "E", "R", "D", "F" };
 
 
 void Debug::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
@@ -18,6 +18,10 @@ void Debug::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
 void Debug::OnDraw() {
 	if (Enabled) {
 		Render::BeginOverlay();
+		Vector3 bdp; // BaseDrawPosition
+		Function::GetHPBarPosition(Local, &bdp);
+		Render::Draw_Line(bdp.x, bdp.y, bdp.x + 1, bdp.y, ImColor(255, 0, 0), 3);
+
 
 		Render::Draw_Text(100, 100, "Addon time~: " + to_string(addonTime - GetTickCount()));
 
@@ -34,10 +38,10 @@ void Debug::OnDraw() {
 				Function::World2Screen(&detectedSpells[i].EndPosition2, &w2sEndPos2);
 				Render::Draw_Line(w2sEndPos2.x, w2sEndPos2.y, w2sEndPos.x, w2sEndPos.y, ImColor(255, 0, 0), 1);
 			}
-				
+
 
 			Render::Draw_Line(w2sStartPos.x, w2sStartPos.y, w2sEndPos.x, w2sEndPos.y, ImColor(0, 0, 255), 1);
-			
+
 
 
 			Render::Draw_Text(w2sStartPos.x, w2sStartPos.y, "StartPos of " + detectedSpells[i].BasicAttackSpellData->Name + " [ " + to_hex((int)detectedSpellsPtr[i]) + " ]");
@@ -85,7 +89,7 @@ void Debug::OnMenu() {
 					ImGui::Text(("PTR: " + to_hex((int)hero)).c_str());
 
 					ImGui::SliderFloat("Health", &hero->Health, 0, hero->MaxHealth);
-
+					ImGui::Text(("RecallState: " + to_string((int)hero->RecallState)).c_str());
 					ImGui::Text("Position: ");
 					ImGui::SameLine();
 					ImGui::Text(to_string(pos.x).c_str());
@@ -93,7 +97,6 @@ void Debug::OnMenu() {
 					ImGui::Text(to_string(pos.y).c_str());
 					ImGui::SameLine();
 					ImGui::Text(to_string(pos.z).c_str());
-					ImGui::SameLine();
 					ImGui::Separator();
 					ImGui::Text("AD Damage: ");
 					ImGui::SameLine();
@@ -115,7 +118,9 @@ void Debug::OnMenu() {
 						CSpellBook* spellBook = &hero->SpellBook;
 						for (int i = 0; i < 6; i++) {
 							CSpellSlot* spell = spellBook->GetSpellSlotByID(i);
-							if (ImGui::TreeNode((("[ " + string(qwerdf[i]) + " ] " + spell->GetName()).c_str()))) {
+							if (!spell)
+								continue;
+							if (ImGui::TreeNode((("[ " + QWERDF[i] + " ] " + spell->GetName()).c_str()))) {
 								ImGui::Text(("Spell CD		: " + to_string(spell->GetCD())).c_str());
 								ImGui::Text(("Spell Charges	: " + to_string(spell->GetCharges())).c_str());
 								//ImGui::Text(("Spell Charges	: " + to_string(spell->GetSpellInfo())).c_str());
@@ -177,10 +182,50 @@ void Debug::OnMenu() {
 						ImGui::TreePop();
 					}
 				}
-			}			
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Render")) {
+			{
+				Vector3 bdp; // BaseDrawPosition
+				Function::GetHPBarPosition(Local, &bdp);
+				ImGui::Text("GetHPBarPosition: ");
+				ImGui::SameLine();
+				ImGui::Text(to_string(bdp.x).c_str());
+				ImGui::SameLine();
+				ImGui::Text(to_string(bdp.y).c_str());
+				ImGui::SameLine();
+				ImGui::Text(to_string(bdp.z).c_str());
+
+				if (ImGui::TreeNode("Images Manager")) {
+					for (auto obj : *Render::Images_Manager.GetVector()) {
+						if (ImGui::TreeNode(("[" + obj.Name + "]").c_str())) {
+							ImGui::Image(obj.Image, ImVec2(100, 100));
+							ImGui::Separator();
+							ImGui::TreePop();
+						}
+					}
+					ImGui::Separator();
+					ImGui::TreePop();
+				}
+			}
+
+			ImGui::Text(("SM_CXSCREEN: " + to_string(GetSystemMetrics(SM_CXSCREEN))).c_str());
+			ImGui::Text(("SM_CYSCREEN: " + to_string(GetSystemMetrics(SM_CYSCREEN))).c_str());
+
+			ImGui::Text(("RenderWidth : " + to_string(Render::RenderWidth)).c_str());
+			ImGui::Text(("RenderHeight: " + to_string(Render::RenderHeight)).c_str());
+
+
 		}
 
 		ImGui::Text(("IsWall: " + string((Function::IsWall(Function::GetMouseWorldPosition()) ? "true" : "false"))).c_str());
+		
+		ImGui::Text(("GameTime    : " + to_string(Function::GameTime())).c_str());
+		ImGui::Text(("GameTick    : " + to_string(Function::GameTimeTick())).c_str());
+		ImGui::Text(("GetTickCount: " + to_string(GetTickCount())).c_str());
+
+
 
 		ImGui::End();
 	}

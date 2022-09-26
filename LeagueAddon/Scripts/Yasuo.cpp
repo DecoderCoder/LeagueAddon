@@ -77,7 +77,7 @@ void Yasuo::MainThread() {
 				Function::World2Screen(&predictedPath, &w2s);
 				if (Local->Position.Distance(predictedPath) <= 520) {
 					//Functions.WorldToScreen(&pos, &w2s);
-					if (w2s.x >= 0 && w2s.y >= 0 && w2s.x <= GetSystemMetrics(SM_CXSCREEN) && w2s.y <= GetSystemMetrics(SM_CYSCREEN)) {
+					if (w2s.x >= 0 && w2s.y >= 0 && w2s.x <= Render::RenderWidth && w2s.y <= Render::RenderHeight) {
 						Input::Move(w2s.x, w2s.y);
 						//Functions.PrintChat(Offset::Chat, ("Input::Move called Input::mMouse [" + to_string(Input::mMouseX) + "] [" + to_string(Input::mMouseY) + "]").c_str(), 0xFFFFFF);
 						Q_Pressed = Function::GameTimeTick();
@@ -109,27 +109,29 @@ void Yasuo::OnDraw() {
 	//ImGui::Begin("Overlay", &CheatEngine::OverlayOpen, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoTitleBar);
 	Render::BeginOverlay();
 
-	for (auto obj : ObjectManager::HeroList()) {
-		if (obj->IsEnemyTo(Local) && Function::IsAlive(obj)) {
-			AIManager* aiManager = obj->GetAIManager();
-			Vector3 pos = obj->Position;
-			//Vector3 w2sPos = obj.GetHpBarPosition();
-			//Vector3 HpBarPosition = obj.GetHpBarPosition();
-			Vector3 w2sPos;
-			Function::World2Screen(&pos, &w2sPos);
+	if (Yasuo::Q_Aim)
+		for (auto obj : ObjectManager::HeroList()) {
+			if (obj->IsEnemyTo(Local) && Function::IsAlive(obj)) {
+				AIManager* aiManager = obj->GetAIManager();
+				//MessageBoxA(0, to_hex((int)aiManager).c_str(), "ai_manager", 0);
+				Vector3 pos = obj->Position;
+				//Vector3 w2sPos = obj.GetHpBarPosition();
+				//Vector3 HpBarPosition = obj.GetHpBarPosition();
+				Vector3 w2sPos;
+				Function::World2Screen(&pos, &w2sPos);
 
-			Vector3 predictedPath = Predict(pos, aiManager->Velocity, 350 - (Local->AttackSpeedMulti * 100) / 2);
-			Vector3 w2sPrediction;
-			Function::World2Screen(&predictedPath, &w2sPrediction);
-			ImColor color;
-			if (Local->Position.Distance(predictedPath) < 520)
-				color = ImColor(192, 57, 43);
-			else
-				color = ImColor(41, 128, 185);
-			Render::Draw_Line(ImVec2(w2sPos.x, w2sPos.y), ImVec2(w2sPrediction.x, w2sPrediction.y), color, 1);
-			Render::Draw_Circle3D(predictedPath, 10, color, 1);
+				Vector3 predictedPath = Predict(pos, aiManager->Velocity, 350 - (Local->AttackSpeedMulti * 100) / 2);
+				Vector3 w2sPrediction;
+				Function::World2Screen(&predictedPath, &w2sPrediction);
+				ImColor color;
+				if (Local->Position.Distance(predictedPath) < 520)
+					color = ImColor(192, 57, 43);
+				else
+					color = ImColor(41, 128, 185);
+				Render::Draw_Line(ImVec2(w2sPos.x, w2sPos.y), ImVec2(w2sPrediction.x, w2sPrediction.y), color, 1);
+				Render::Draw_Circle3D(predictedPath, 10, color, 1);
+			}
 		}
-	}
 
 	Render::EndOverlay();
 }

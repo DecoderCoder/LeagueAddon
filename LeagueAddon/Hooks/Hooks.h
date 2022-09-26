@@ -3,6 +3,7 @@
 #include "../Utils.h"
 #include "ultimate_hooks.h"
 #include "../Offset.h"
+#include "../Render.h"
 
 #pragma comment(lib, "D3DX11.lib")
 #pragma comment(lib, "D3DX9.lib")

@@ -1,7 +1,5 @@
 #include "Render.h"
 
-bool overlayOpen = true;
-
 //ImFont* overlayFont;
 
 void Render::BeginOverlay() {
@@ -16,11 +14,27 @@ void Render::BeginOverlay() {
 	//	style->Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.000f, 0.000f, 0.000f, 0.510f);
 	//	style->Colors[ImGuiCol_TitleBgActive] = ImVec4(0.160f, 0.290f, 0.480f, 1.000f);
 	//}
-	ImGui::Begin("Overlay", &overlayOpen, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoTitleBar);
+	ImGui::Begin("Overlay", NULL, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoTitleBar);
 }
 
 void Render::EndOverlay() {
 	ImGui::End();
+}
+
+void Render::BeginOverlayTab(string name) {
+	if (GetAsyncKeyState(VK_TAB))
+		ImGui::Begin(name.c_str());
+
+	else
+		ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoTitleBar);
+	
+}
+void Render::EndOverlayTab() {
+	ImGui::End();
+}
+
+void Render::Draw_Circle(float_t x, float_t y, float_t radius, ImColor color, float thickness) {
+	ImGui::GetWindowDrawList()->AddCircle(ImVec2(x, y), radius, color, 0, thickness);
 }
 
 void Render::Draw_Circle3DFilled(Vector3 center, float radius, ImColor color) {
@@ -167,4 +181,12 @@ void Render::Draw_Text_Centered(float_t x, float_t y, float_t width, float_t hei
 	ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
 
 	ImGui::GetWindowDrawList()->AddText(NULL, fontSize, ImVec2(x + width / 2 - textSize.x / 2, y + height / 2 - textSize.y / 2), color, text.c_str());
+}
+
+void Render::Draw_Image(ImVec2 pos, ImVec2 size, ID3D11ShaderResourceView* image) {
+	Render::Draw_Image(pos.x, pos.y, size.x, size.y, image);
+}
+
+void Render::Draw_Image(float_t x, float_t y, float_t width, float_t height, ID3D11ShaderResourceView* image) {
+	ImGui::GetWindowDrawList()->AddImage(image, ImVec2(x, y), ImVec2(x + width, y + height));
 }
