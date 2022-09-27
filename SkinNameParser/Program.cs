@@ -86,8 +86,28 @@ namespace LeagueParser
         static void ParseSummonerThread()
         {
             HttpRequest request = new HttpRequest();
-            string HTML = request.Get("").ToString();
-
+            string HTML = request.Get("https://raw.communitydragon.org/latest/game/data/shared/shared.bin.json").ToString();
+            //HTML = request.Get("https://raw.communitydragon.org/latest/game/data/spells/icons2d/").ToString();
+            var dict = JsonConvert.DeserializeObject<Dictionary<string, abilityInformation>>(HTML);
+            var nD = dict.Where((x) => { return x.Value.mScriptName != null && x.Value.mScriptName.Contains("Summoner"); });
+            foreach (var d in nD)
+            {
+                
+                if (d.Value.mSpell != null)
+                {
+                   
+                    try
+                    {
+                        byte[] image = request.Get("https://raw.communitydragon.org/latest/game/data/spells/icons2d/" + Path.GetFileNameWithoutExtension(d.Value.mSpell.mImgIconName[0]).ToLower() + ".png").ToBytes();
+                        summoners.Add(new Spell() { Name = d.Value.mScriptName, ImageName = d.Value.mScriptName, ImageBytes = image });
+                        Console.WriteLine("Name: " + d.Value.mScriptName);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                   
+                }                
+            }
         }
 
         static void ParseCharacterInfoThread()
@@ -219,6 +239,9 @@ namespace LeagueParser
                     Console.Title = threadCount.ToString();
                     Thread.Sleep(100);
                 }
+
+                ParseSummonerThread();
+
                 // Saving all
                 Console.WriteLine("Saving all data");
                 List<string> resourcesCpp = new List<string>();
@@ -256,13 +279,21 @@ namespace LeagueParser
                 ImagesH.Add("#pragma once\r\n#ifndef DEBUG\r\nnamespace Images {");
                 resourcesCpp.Add("void Resources::LoadImages(Image_Manager & Images_Manager) {");
 
+                foreach (var spell in summoners)
+                {
+                    resourcesCpp.Add("Images_Manager.AddImage(\"" + spell.Name + "\", (char*)&Images::" + spell.ImageName + ", sizeof(Images::" + spell.ImageName + "));");
+                    ImagesH.Add("const unsigned char " + spell.Name + "[] = {");
+                    ImagesH.Add(String.Join(", ", spell.ImageBytes.Select((x) => { return "0x" + x.ToString("X2"); })));
+                    ImagesH.Add("};");
+                }
+
                 foreach (var character in characters)
                 {
                     foreach (var spell in character.spells)
                     {
                         resourcesCpp.Add("Images_Manager.AddImage(\"" + spell.Name + "\", (char*)&Images::" + spell.ImageName + ", sizeof(Images::" + spell.ImageName + "));");
                         ImagesH.Add("const unsigned char " + spell.Name + "[] = {");
-                        ImagesH.Add(String.Join(", ", spell.ImageBytes.Select((x) => { return "0x" +  x.ToString("X2"); })));
+                        ImagesH.Add(String.Join(", ", spell.ImageBytes.Select((x) => { return "0x" + x.ToString("X2"); })));
                         ImagesH.Add("};");
                     }
                 }
