@@ -80,14 +80,17 @@ public:
 		return ObjectList;
 	}
 
-	static std::list<MissileObject*> MissileList() {
-		std::list<MissileObject*> ObjectList;
-		auto Object_list = *reinterpret_cast<SEntityList<MissileObject>**>(DEFINE_RVA(Offset::Data::ManagerTemplate_Missiles));
+	static std::list<MissileSpellInfo*> MissileList() {
+		std::list<MissileSpellInfo*> ObjectList;
+		auto Object_list = *reinterpret_cast<SEntityList<MissileSpellInfo>**>(DEFINE_RVA(Offset::Data::ManagerTemplate_Missiles));
 		for (size_t i = 0; i < Object_list->size; i++) {
 			auto Object = Object_list->entities[i];
-			
-			if ((int)Object > 1024)
-				ObjectList.push_back(*(MissileObject**)((int)Object + 0x14));
+
+			if ((int)Object > 1024) {
+				auto obj = *(MissileSpellInfo**)((int)Object + 0x14);
+				if (obj != 0)
+					ObjectList.push_back(obj);
+			}
 		}
 		return ObjectList;
 	}

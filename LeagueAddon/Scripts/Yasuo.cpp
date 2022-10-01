@@ -112,8 +112,7 @@ void Yasuo::OnDraw() {
 	if (Yasuo::Q_Aim)
 		for (auto obj : ObjectManager::HeroList()) {
 			if (obj->IsEnemyTo(Local) && Function::IsAlive(obj)) {
-				AIManager* aiManager = obj->GetAIManager();
-				//MessageBoxA(0, to_hex((int)aiManager).c_str(), "ai_manager", 0);
+				AIManager* aiManager = obj->GetAIManager();				
 				Vector3 pos = obj->Position;
 				//Vector3 w2sPos = obj.GetHpBarPosition();
 				//Vector3 HpBarPosition = obj.GetHpBarPosition();

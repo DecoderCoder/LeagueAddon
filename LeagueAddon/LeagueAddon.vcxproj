@@ -144,6 +144,7 @@
     <ClInclude Include="Render.h" />
     <ClInclude Include="Scripts.h" />
     <ClInclude Include="Scripts\Akali.h" />
+    <ClInclude Include="Scripts\Draven.h" />
     <ClInclude Include="Scripts\Garen.h" />
     <ClInclude Include="Scripts\OrbWalker.h" />
     <ClInclude Include="Scripts\Twitch.h" />
@@ -186,6 +187,7 @@
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="Scripts\Akali.cpp" />
+    <ClCompile Include="Scripts\Draven.cpp" />
     <ClCompile Include="Scripts\Garen.cpp" />
     <ClCompile Include="Scripts\OrbWalker.cpp" />
     <ClCompile Include="Scripts\Twitch.cpp" />

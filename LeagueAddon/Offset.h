@@ -92,6 +92,7 @@ namespace Offset {
 		static constexpr int Slot = 0x4;
 		static constexpr int StartTime = 0x8;
 		static constexpr int SpellIndex = 0xC;
+		static constexpr int Index = 0x70;
 		static constexpr int Level = 0x58;
 		static constexpr int source_id = 0x64;
 		static constexpr int SourceNetworkID = 0x6C;
@@ -107,7 +108,7 @@ namespace Offset {
 		static constexpr int SrcIdx = 0x2C4; //0x2DC;
 		static constexpr int DestCheck = 0x31C;
 		static constexpr int DestIdx = 0x318;// 0x330;
-		static constexpr int StartPos = 0x02DC;
+		static constexpr int StartPos = 0x2DC;
 		static constexpr int EndPos = 0x02E8;
 	}
 

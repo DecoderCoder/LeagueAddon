@@ -77,6 +77,20 @@ void Debug::OnMenu() {
 			}
 		}
 
+		if (ImGui::CollapsingHeader("Missiles")) {
+			auto missiles = ObjectManager::MissileList();
+			ImGui::Text(to_string(missiles.size()).c_str());
+			for (auto obj : missiles) {				
+				if (!IsBadReadPtr(obj, 1)) {
+					Vector3 w2s;
+					Vector3* spellPos = (Vector3*)((int)obj + 0xD8);
+					//Vector3* spellEndPos = (Vector3*)((int)obj + 0x2DC);
+					Function::World2Screen(spellPos, &w2s);
+					ImGui::Text(GetStr((DWORD)obj + 0x54));
+				}
+			}
+		}
+
 		if (ImGui::CollapsingHeader("Champions")) {
 			for (auto hero : ObjectManager::HeroList()) {
 				if (ImGui::TreeNode(hero->GetChampionName().c_str())) {
@@ -220,7 +234,7 @@ void Debug::OnMenu() {
 		}
 
 		ImGui::Text(("IsWall: " + string((Function::IsWall(Function::GetMouseWorldPosition()) ? "true" : "false"))).c_str());
-		
+
 		ImGui::Text(("GameTime    : " + to_string(Function::GameTime())).c_str());
 		ImGui::Text(("GameTick    : " + to_string(Function::GameTimeTick())).c_str());
 		ImGui::Text(("GetTickCount: " + to_string(GetTickCount())).c_str());

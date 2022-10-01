@@ -91,6 +91,9 @@
     <Filter Include="League\SpellBook">
       <UniqueIdentifier>{7336683b-c1df-4d3c-984f-18b222181e61}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\Draven">
+      <UniqueIdentifier>{36c82272-546e-4897-81b0-6eff3cdd0ced}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utils.h">
@@ -242,6 +245,9 @@
     <ClInclude Include="SkinChanger.h">
       <Filter>SkinChanger</Filter>
     </ClInclude>
+    <ClInclude Include="Scripts\Draven.h">
+      <Filter>Scripts\Draven</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utils.cpp">
@@ -347,6 +353,9 @@
     </ClCompile>
     <ClCompile Include="SkinChanger.cpp">
       <Filter>SkinChanger</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Draven.cpp">
+      <Filter>Scripts\Draven</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

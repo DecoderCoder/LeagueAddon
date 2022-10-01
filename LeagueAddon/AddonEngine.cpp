@@ -34,6 +34,7 @@ void DrawMenu() {
 		//	}
 		//}	
 
+		
 
 		EventManager::Trigger(EventManager::EventType::OnMenu);
 
@@ -149,6 +150,8 @@ bool AddonEngine::Initialize() {
 		Akali::Initialize();
 	if (Local->GetChampionName() == "Yasuo")
 		Yasuo::Initialize();
+	if (Local->GetChampionName() == "Draven")
+		Draven::Initialize();
 
 	//// Main code
 

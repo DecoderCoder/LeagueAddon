@@ -31,7 +31,12 @@ bool OrbWalker::CanAttack() {
 			return false;
 		}
 	}
-
+	//if (dravenMode) {
+	//	if (!Local->BuffManager.hasBuff("DravenSpinning"))
+	//	{
+	//		return false;
+	//	}
+	//}
 	return Function::GameTimeTick() + Function::GetPing() / 2.f >= LastAttackCommandT + Function::GetAttackDelay(Local) * 1000.f;
 }
 

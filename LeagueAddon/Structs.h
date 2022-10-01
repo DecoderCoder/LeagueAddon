@@ -26,14 +26,19 @@ public:
 		DEFINE_MEMBER_N(std::string Name, 0x18)
 		DEFINE_MEMBER_N(SpellDataResource* Resource, 0x40)
 	};
+
+	SpellData() {
+
+	}
 };
 
 class SpellInfo {
 public:
 	union {
-			DEFINE_MEMBER_0(SpellData* BasicAttackSpellData)
+			DEFINE_MEMBER_0(SpellData*		BasicAttackSpellData)
 			DEFINE_MEMBER_N(kSpellSlot		Slot, Offset::SpellInfo::Slot)
 			DEFINE_MEMBER_N(float			StartTime, Offset::SpellInfo::StartTime)
+				DEFINE_MEMBER_N(int				Index, 0x70)
 			DEFINE_MEMBER_N(int				SpellIndex, Offset::SpellInfo::SpellIndex)
 			DEFINE_MEMBER_N(unsigned int	Level, Offset::SpellInfo::Level)
 			DEFINE_MEMBER_N(int	source_id, Offset::SpellInfo::source_id)
@@ -46,12 +51,45 @@ public:
 			DEFINE_MEMBER_N(DWORD			TargetSize, 0xC0)
 	};
 
+	SpellInfo() {
+
+
+	}
+
 	unsigned int targetIndex()
 	{
 		auto target_info = this->TargetArray + 0x10 * this->TargetSize;
 		//console.Print("%d", target_info);
 		return *(int*)((DWORD)target_info - 0x10);
 	}
+
+};
+
+class MissileSpellInfo {
+public:
+	union {
+		DEFINE_MEMBER_N(int	Index, 0xB4)
+			DEFINE_MEMBER_N(SpellData*		BasicAttackSpellData, Offset::MissileData::SpellInfo)
+			DEFINE_MEMBER_N(kSpellSlot		Slot, Offset::SpellInfo::Slot)
+			DEFINE_MEMBER_N(float			StartTime, Offset::SpellInfo::StartTime)
+			DEFINE_MEMBER_N(int				SpellIndex, Offset::SpellInfo::SpellIndex)
+			DEFINE_MEMBER_N(unsigned int	Level, Offset::SpellInfo::Level)
+			DEFINE_MEMBER_N(int				source_id, Offset::MissileData::SrcIdx)
+			DEFINE_MEMBER_N(unsigned int	SourceNetworkID, 0xB4)
+			DEFINE_MEMBER_N(Vector3			StartPosition, Offset::MissileData::StartPos)
+			DEFINE_MEMBER_N(Vector3			EndPosition, Offset::MissileData::EndPos)
+			DEFINE_MEMBER_N(Vector3			EndPosition2, Offset::MissileData::EndPos + 0xC)
+			DEFINE_MEMBER_N(bool			HasTarget, Offset::MissileData::DestCheck)
+			//DEFINE_MEMBER_N(DWORD			TargetArray, 0xB8)
+			//DEFINE_MEMBER_N(DWORD			TargetSize, 0xC0)
+	};
+
+	//unsigned int targetIndex()
+	//{
+	//	auto target_info = this->TargetArray + 0x10 * this->TargetSize;
+	//	//console.Print("%d", target_info);
+	//	return *(int*)((DWORD)target_info - 0x10);
+	//}
 
 };
 
@@ -236,7 +274,7 @@ public:
 	union {
 		DEFINE_MEMBER_N(int				DestIdx, Offset::MissileData::DestIdx);
 
-		DEFINE_MEMBER_N(CSpellInfo			SpellInfo, Offset::MissileData::SpellInfo);
+		DEFINE_MEMBER_N(SpellInfo*			SpellInfo, Offset::MissileData::SpellInfo);
 		DEFINE_MEMBER_N(int					SrcIdx, Offset::MissileData::SrcIdx);
 		DEFINE_MEMBER_N(Vector3				CurrentPos, 0xD8);
 		DEFINE_MEMBER_N(Vector3				StartPos, Offset::MissileData::StartPos);		

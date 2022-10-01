@@ -318,11 +318,11 @@ bool DirectXHook::HookDX11() {
 	Sleep(500);
 	//std::this_thread::sleep_for(500ms);
 
-	while (!Inited) {
+	/*while (!Inited) {
 		Beep(50, 10);
 		Utils::Log(" > Renderer: Rehook");
 		detour->reHook();
-	}
+	}*/
 
 	Utils::Log(" > Renderer: Hook OK");
 	Utils::Log(" > Renderer: Ok");

@@ -55,41 +55,41 @@ LONG CALLBACK TopLevelHandler(EXCEPTION_POINTERS* info)
 			Utils::Log("Error Addr : " + to_hex((int)((int)info->ExceptionRecord->ExceptionAddress - cheatAddr)));
 			Utils::Log("IDA   Addr : " + to_hex((int)((int)info->ExceptionRecord->ExceptionAddress - cheatAddr + 0x10000000)));
 		}
-		Utils::Log("Global Error Addr : " + to_hex((int)info->ExceptionRecord->ExceptionAddress));
-		{
-			HMODULE hMods[1024];
-			DWORD cbNeeded;
-			unsigned int i;
+		//Utils::Log("Global Error Addr : " + to_hex((int)info->ExceptionRecord->ExceptionAddress));
+		//{
+		//	HMODULE hMods[1024];
+		//	DWORD cbNeeded;
+		//	unsigned int i;
 
-			if (EnumProcessModules(GetCurrentProcess(), hMods, sizeof(hMods), &cbNeeded))
-			{
-				for (i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
-				{
-					CHAR szModName[MAX_PATH];
+		//	if (EnumProcessModules(GetCurrentProcess(), hMods, sizeof(hMods), &cbNeeded))
+		//	{
+		//		for (i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
+		//		{
+		//			CHAR szModName[MAX_PATH];
 
-					// Get the full path to the module's file.
+		//			// Get the full path to the module's file.
 
-					if (GetModuleFileNameExA(GetCurrentProcess(), hMods[i], szModName,
-						sizeof(szModName) / sizeof(TCHAR)))
-					{
-						MODULEINFO mInfo = GetModuleInfo(hMods[i]);
+		//			if (GetModuleFileNameExA(GetCurrentProcess(), hMods[i], szModName,
+		//				sizeof(szModName) / sizeof(TCHAR)))
+		//			{
+		//				MODULEINFO mInfo = GetModuleInfo(hMods[i]);
 
-						string str;
-						str.append(szModName);
-						if (mInfo.EntryPoint < info->ExceptionRecord->ExceptionAddress && (DWORD)mInfo.EntryPoint + mInfo.SizeOfImage >(DWORD)info->ExceptionRecord->ExceptionAddress) {
+		//				string str;
+		//				str.append(szModName);
+		//				if (mInfo.EntryPoint < info->ExceptionRecord->ExceptionAddress && (DWORD)mInfo.EntryPoint + mInfo.SizeOfImage >(DWORD)info->ExceptionRecord->ExceptionAddress) {
 
-							Utils::Log("GetModuleFileNameExA : " + str);
-							Utils::Log("EntryPoint           : " + to_hex((int)mInfo.EntryPoint));
-							Utils::Log("ErrorAddress         : " + to_hex((int)((DWORD)info->ExceptionRecord->ExceptionAddress)));
-							Utils::Log("IDA ErrorAddress         : " + to_hex((int)((DWORD)info->ExceptionRecord->ExceptionAddress - (int)mInfo.EntryPoint + 0x10000000)));
-							Utils::Log("EndPoint             : " + to_hex((int)((DWORD)mInfo.EntryPoint + mInfo.SizeOfImage)));
-						}
+		//					Utils::Log("GetModuleFileNameExA : " + str);
+		//					Utils::Log("EntryPoint           : " + to_hex((int)mInfo.EntryPoint));
+		//					Utils::Log("ErrorAddress         : " + to_hex((int)((DWORD)info->ExceptionRecord->ExceptionAddress)));
+		//					Utils::Log("IDA ErrorAddress         : " + to_hex((int)((DWORD)info->ExceptionRecord->ExceptionAddress - (int)mInfo.EntryPoint + 0x10000000)));
+		//					Utils::Log("EndPoint             : " + to_hex((int)((DWORD)mInfo.EntryPoint + mInfo.SizeOfImage)));
+		//				}
 
 
-					}
-				}
-			}
-		}
+		//			}
+		//		}
+		//	}
+		//}
 		
 	}
 

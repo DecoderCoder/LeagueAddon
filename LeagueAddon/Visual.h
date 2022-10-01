@@ -11,6 +11,7 @@ namespace Visual {
 
 	inline bool SpellTrackerMenu = false;
 	inline bool RecallTracker = true;
+	inline bool RecallTrackerMenu = true;
 
 	inline bool HighlightSelected = true;
 

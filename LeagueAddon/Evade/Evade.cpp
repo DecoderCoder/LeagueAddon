@@ -4,6 +4,9 @@ using namespace std;
 
 namespace Evade
 {
+	std::list<int> addedSpells;
+
+
 	void Core::Initalize() {
 		InitSpells();
 		//InitEvadeSpells();
@@ -34,7 +37,7 @@ namespace Evade
 		if (ImGui::CollapsingHeader("Evade")) {
 			ImGui::Checkbox("Draw spells", &DrawSpells);
 			ImGui::Checkbox("Evade spells", &EvadeSpells);
-
+			ImGui::Checkbox("Use missiles", &UseMissiles);
 			ImGui::Separator();
 			ImGui::Text("Evading spells");
 			for (int champ_c = 0; champ_c < ChampsInGame.size(); champ_c++)
@@ -61,6 +64,56 @@ namespace Evade
 	{
 		if (!DrawSpells)
 			return;
+
+		if (UseMissiles)
+			for (MissileSpellInfo* missile : ObjectManager::MissileList()) {
+				for (Champ& champ : ChampsInGame)
+				{
+					for (Spell& s : champ.spells)
+					{
+						if (StringContains(missile->BasicAttackSpellData->Name, s.missileName, true))
+						{
+							auto it = addedSpells.begin();
+							bool found = false;
+							while (it != addedSpells.end()) {
+								if ((*it) == missile->Index) {
+									found = true;
+									break;
+								}
+								else {
+									++it;  // go to next
+								}
+							}
+							if (!found) {
+
+								s.startTime = GameTimer;
+								s.obj = champ.obj;
+
+								SpellInfo spellInfo;
+								spellInfo.SpellIndex = missile->Index;
+								spellInfo.BasicAttackSpellData = missile->BasicAttackSpellData;
+
+								spellInfo.StartPosition = missile->StartPosition;
+								spellInfo.EndPosition = missile->EndPosition;
+								spellInfo.EndPosition2 = missile->EndPosition2;
+								spellInfo.SourceNetworkID = missile->SourceNetworkID;
+								spellInfo.source_id = missile->source_id;
+
+								s.spell = &spellInfo;
+								s.radiusRes = spellInfo.BasicAttackSpellData->Resource->Radius;
+								s.speed = spellInfo.BasicAttackSpellData->Resource->MissileSpeed == 0 ? MathHuge : spellInfo.BasicAttackSpellData->Resource->MissileSpeed;
+
+
+								OnSpellCast(s);
+
+								addedSpells.push_back(missile->Index);
+
+							}
+
+						}
+					}
+				}
+			}
 
 		Vector3 lpPos;
 		Function::World2Screen(&Local->Position, &lpPos);
@@ -561,9 +614,9 @@ namespace Evade
 
 	void Core::OnSpellCast(Spell& spell)
 	{
+
 		if (!spell.obj || !spell.spell || !spell.enabled)
 			return;
-
 
 
 
@@ -1149,12 +1202,15 @@ namespace Evade
 			/*if (castInfo->Slot != kSpellSlot::SpellSlot_SpecialAttack && ObjectManager::FindObjectByIndex(ObjectManager::HeroList(), castInfo->source_id) && ObjectManager::FindObjectByIndex(ObjectManager::HeroList(), castInfo->source_id)->IsEnemyTo(Local))
 				console.Print("%s", castInfo->BasicAttackSpellData->Name.c_str());
 			*/
+
 		for (Champ& champ : ChampsInGame)
 		{
 			for (Spell& s : champ.spells)
 			{
-				if (StringContains(castInfo->BasicAttackSpellData->Name, s.name, true))
+				if (StringContains(castInfo->BasicAttackSpellData->Name, s.name, true) && !StringContains(castInfo->BasicAttackSpellData->Name, s.missileName, true))
 				{
+
+					addedSpells.push_back(castInfo->Index);
 					s.startTime = GameTimer;
 					s.obj = champ.obj;
 					s.spell = castInfo;
@@ -4485,7 +4541,8 @@ namespace Evade
 			Q.radius = 55;
 			Q.danger = 2;
 			Q.cc = true;
-			Q.collision = false;
+			Q.collision = true;
+			Q.collisionWC = true;
 			Q.windwall = true;
 			Q.hitbox = false;
 			Q.fow = true;

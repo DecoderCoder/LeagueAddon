@@ -291,6 +291,7 @@ namespace Evade
 
 		inline bool DrawSpells = false;
 		inline bool EvadeSpells = false;
+		inline bool UseMissiles = false;
 		inline float NewTimer = 0;
 		inline float OldTimer = 0;
 		inline bool Evading;

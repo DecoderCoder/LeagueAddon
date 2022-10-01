@@ -12,7 +12,19 @@ void Misc::OnThread() {
 
 void Misc::OnMenu() {
 	if (ImGui::CollapsingHeader("Misc")) {
-		ImGui::Checkbox("Anti AFK", &AntiAFK);
+		if (ImGui::TreeNode("Anti AFK")) {
+			ImGui::Checkbox("Enabled", &AntiAFK);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Auto smite")) {
+			ImGui::Checkbox("Enabled", &AutoSmite);
+			ImGui::Checkbox("Smite Dragon", &AutoSmite);
+			ImGui::Checkbox("Smite Baron", &AutoSmite);
+			ImGui::Checkbox("Smite buff if enemy jungler is near", &AutoSmite);
+			ImGui::Checkbox("Smite crab if enemy jungler is near", &AutoSmite);
+
+			ImGui::TreePop();
+		}
 		//ImGui::Checkbox("Autosmite", &AutoSmite);
 	}
 }

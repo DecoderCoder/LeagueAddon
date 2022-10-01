@@ -42,6 +42,8 @@ namespace OrbWalker {
 	inline float LastAttackCommandT;
 	inline float LastMoveCommandT;
 
+	inline bool dravenMode = false;
+
 	float GetMyProjectileSpeed();
 
 	bool ShouldWait();

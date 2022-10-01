@@ -19,10 +19,10 @@ void Visual::Initialize() {
 
 	for (auto obj : ObjectManager::HeroList()) {
 		if (obj->IsEnemyTo(Local)) {
-			distanceToHero.insert({ obj->NetworkID, 0 });
-			alwaysVisible.insert({ obj, false });
-			recallState.insert({ obj, false });
-			spellTrackerHeroes.push_back(obj);
+		distanceToHero.insert({ obj->NetworkID, 0 });
+		alwaysVisible.insert({ obj, false });
+		recallState.insert({ obj, false });
+		spellTrackerHeroes.push_back(obj);
 		}
 	}
 }
@@ -43,7 +43,6 @@ void Visual::OnThread() {
 
 void Visual::OnMenu() {
 	if (ImGui::CollapsingHeader("Visual")) {
-		ImGui::Checkbox("Recall Tracker", &RecallTracker);
 		if (ImGui::TreeNode("ESP")) {
 			ImGui::Checkbox("ESP", &ESP);
 			if (ESP) {
@@ -68,8 +67,13 @@ void Visual::OnMenu() {
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Spell Tracker")) {
-			ImGui::Checkbox("Enabled MENU", &SpellTrackerMenu);
-			ImGui::Checkbox("Enabled OVERLAY", &SpellTrackerMenu);
+			ImGui::Checkbox("Enabled Menu", &SpellTrackerMenu);
+			ImGui::Checkbox("Enabled Overlay", &SpellTrackerMenu);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Recall Tracker")) {
+			ImGui::Checkbox("Enabled Menu", &RecallTrackerMenu);
+			ImGui::Checkbox("Enabled Overlay", &RecallTracker);
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Vision Tracker")) {
@@ -110,7 +114,7 @@ void Visual::OnMenu() {
 				CSpellSlot* spell = hero->SpellBook.GetSpellSlotByID(spellNum);
 				if (!spell)
 					continue;
-				ImVec2 imagePos = ImVec2(ImGui::GetWindowPos().x + 10 + ((spellNum - 3) * 30), ImGui::GetWindowPos().y + yOffset);				
+				ImVec2 imagePos = ImVec2(ImGui::GetWindowPos().x + 10 + ((spellNum - 3) * size.x), ImGui::GetWindowPos().y + yOffset);
 				string Image = spell->GetSpellInfo()->GetSpellData()->GetSpellName();
 
 				if (spell->GetLevel() > 0) {
@@ -126,7 +130,7 @@ void Visual::OnMenu() {
 					else
 						if (Render::Images_Manager.HasImage(Image)) {
 							Render::Draw_Image(imagePos, size, Render::Images_Manager.GetImageByName(Image.c_str()));
-							Render::Draw_FilledRectangle(imagePos, size, ImColor::ImColor(0, 0, 0, 128));
+							Render::Draw_FilledRectangle(imagePos, size, ImColor::ImColor(0, 0, 0, 170));
 							Render::Draw_Text_Centered(imagePos, size, to_string((int)spell->GetCD()).c_str());
 							Render::Draw_FilledRectangle(imagePos, size, ImColor::ImColor(0, 0, 0, 0), ImColor::ImColor(0, 0, 0, 255));
 						}
@@ -134,6 +138,10 @@ void Visual::OnMenu() {
 							Render::Draw_FilledRectangle(imagePos, size, ImColor::ImColor(192, 57, 43), ImColor::ImColor(0, 0, 0));
 							Render::Draw_Text_Centered(imagePos, size, to_string((int)spell->GetCD()).c_str());
 						}
+					int charges = spell->GetCharges();
+					if (charges > 0) {
+						Render::Draw_Text(ImVec2(imagePos.x + 2, imagePos.y + 2), to_string(charges));
+					}
 				}
 			}
 			yOffset += size.y + 4;
@@ -142,7 +150,7 @@ void Visual::OnMenu() {
 		Render::EndOverlayTab();
 	}
 
-	if (RecallTracker) {
+	if (RecallTrackerMenu) {
 		int yOffset = 10;
 		Render::BeginOverlayTab("RecallTracker");
 		for (auto obj : recallState) {
