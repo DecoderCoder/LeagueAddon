@@ -28,6 +28,12 @@ bool Helper::isValidUnit(GameObject* unit, float range, bool checkTeam, Vector3 
 	return !(range < FLT_MAX) || (from.IsValid() ? from : Local->Position).DistanceSquared(unit->Position) > range * range;
 }
 
+float Helper::CalcDamage(GameObject* from, GameObject* to, bool isAA, float damage, DamageType damageType) {
+
+	float totalDamage;
+
+}
+
 float Helper::calcReducedDamage(float rawDamage, float armor, float penetration, float lethality, bool calc0armor)
 {
 	//1. Armor reduction, flat

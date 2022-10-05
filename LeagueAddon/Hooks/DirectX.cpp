@@ -156,6 +156,16 @@ void* HookVTableFunction(void* pVTable, void* fnHookFunc, int nOffset) // https:
 	VirtualProtect(mbi.BaseAddress, mbi.RegionSize, mbi.Protect, &mbi.Protect);
 	return (void*)ptrOriginal;
 }
+
+void* HookFunction(void* target, void* hFunc) {
+
+	//void* trampoline = calloc();
+}
+
+void* UnhookFunction(void* target, void* origFunc) {
+
+}
+
 LPDIRECTINPUT8 pDirectInput = NULL;
 LPDIRECTINPUTDEVICE8 lpdiMouse;
 
@@ -303,6 +313,7 @@ bool DirectXHook::HookDX11() {
 	::memcpy(g_methodsTable + 18, *(uint32_t**)device, 43 * sizeof(uint32_t));
 	::memcpy(g_methodsTable + 18 + 43, *(uint32_t**)context, 144 * sizeof(uint32_t));
 	void* target = (void*)g_methodsTable[8]; // [8]   Present
+
 	Utils::Log(" > Renderer: Starting hooking");
 	PLH::CapstoneDisassembler dis(PLH::Mode::x86);
 	detour.reset(new PLH::x86Detour((char*)target, (char*)&DirectXHook::Hooked_PresentDX11, &oPresentDX11, dis));
@@ -318,7 +329,7 @@ bool DirectXHook::HookDX11() {
 	Sleep(500);
 	//std::this_thread::sleep_for(500ms);
 
-	/*while (!Inited) {
+	/*while (!Inited) { 
 		Beep(50, 10);
 		Utils::Log(" > Renderer: Rehook");
 		detour->reHook();

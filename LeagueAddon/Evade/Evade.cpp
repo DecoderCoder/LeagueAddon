@@ -166,11 +166,10 @@ namespace Evade
 				}
 				else {
 					DetectedSkillshots[i].endPos = DetectedSkillshots[i].obj->Position;
-					DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
 				}
 				//DetectedSkillshots[i].startPos = DetectedSkillshots[i].obj->Position;
-
 			}
+			DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
 			//
 			//
 		}
@@ -1207,7 +1206,7 @@ namespace Evade
 		{
 			for (Spell& s : champ.spells)
 			{
-				if (StringContains(castInfo->BasicAttackSpellData->Name, s.name, true) && !StringContains(castInfo->BasicAttackSpellData->Name, s.missileName, true))
+				if (StringContains(castInfo->BasicAttackSpellData->Name, s.name, true))
 				{
 
 					addedSpells.push_back(castInfo->Index);

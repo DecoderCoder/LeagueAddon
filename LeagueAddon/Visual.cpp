@@ -18,12 +18,12 @@ void Visual::Initialize() {
 	EventManager::AddEventHandler(EventManager::EventType::OnUnload, Unload);
 
 	for (auto obj : ObjectManager::HeroList()) {
-		if (obj->IsEnemyTo(Local)) {
+	//	if (obj->IsEnemyTo(Local)) {
 		distanceToHero.insert({ obj->NetworkID, 0 });
 		alwaysVisible.insert({ obj, false });
 		recallState.insert({ obj, false });
 		spellTrackerHeroes.push_back(obj);
-		}
+		//}
 	}
 }
 
@@ -252,8 +252,13 @@ void Visual::OnDraw() {
 
 					float width = (((GetTickCount() - obj.second - recallTime) * 140) / (obj.second - obj.second - recallTime));
 
+					float hpWidth = obj.first->Health / obj.first->MaxHealth * 140;
+
 					Render::Draw_FilledRectangle(drawX, drawY, drawX + 140, drawY + 10, ImColor(0, 0, 0));
 					Render::Draw_FilledRectangle(drawX, drawY, drawX + abs(140 - width), drawY + 10, ImColor(41, 128, 185));
+
+					Render::Draw_FilledRectangle(drawX, drawY + 10, drawX + 140, drawY + 20, ImColor(0, 0, 0));
+					Render::Draw_FilledRectangle(drawX, drawY + 10, drawX + hpWidth, drawY + 20, (hpWidth > 70 ? ImColor(46, 204, 113) : ImColor(231, 76, 60)));
 				}
 			}
 

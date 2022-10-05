@@ -7,6 +7,9 @@
 #include "../Input.h"
 #include "winternl.h"
 #include "makesyscall.h"
+//#include "minhook.h"
+//
+//#pragma comment(lib, "minhook.x32.lib")
 
 typedef BOOL(__stdcall* fGetCursorPos) (LPPOINT lpPoint);
 uint64_t oGetCursorPos = NULL;
@@ -25,6 +28,7 @@ std::unique_ptr<PLH::x86Detour> detourQIP; // NtQueryInformationProcess
 
 int __fastcall hOnProcessSpell(void* spellBook, void* edx, SpellInfo* CastInfo)
 {
+	//MH_Initialize();
 	if (spellBook == nullptr || CastInfo == nullptr)
 		return oOnProcessSpell(spellBook, CastInfo);
 	EventManager::Trigger(EventManager::EventType::OnProcessSpell, spellBook, CastInfo);

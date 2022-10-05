@@ -88,7 +88,7 @@ public:
 
 			if ((int)Object > 1024) {
 				auto obj = *(MissileSpellInfo**)((int)Object + 0x14);
-				if (obj != 0)
+				if (obj != 0 && obj->BasicAttackSpellData != 0)
 					ObjectList.push_back(obj);
 			}
 		}

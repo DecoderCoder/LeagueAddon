@@ -9,7 +9,7 @@ void Twitch::OnDraw()
 			float baseDmg = 20 + (10 * (spellE->GetLevel() - 1));
 			float baseStackDmg = 15 + (5 * (spellE->GetLevel() - 1));
 			float baseStackAddPhysDmg = Local->BonusAttackDamage * 0.35; // Base stack additional Physical damage
-			float baseStackAddMagDmg = Local->BaseAbilityDamage * 0.33;
+			float baseStackAddMagDmg = Local->BaseAbilityDamage * 0.35;
 
 			for (auto obj : ObjectManager::HeroList()) {
 				if (obj->IsEnemyTo(Local) && Function::IsAlive(obj) && obj->Position.Distance(Local->Position) < 1200) {
