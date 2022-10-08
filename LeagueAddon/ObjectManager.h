@@ -81,18 +81,38 @@ public:
 	}
 
 	static std::list<MissileSpellInfo*> MissileList() {
-		std::list<MissileSpellInfo*> ObjectList;
-		auto Object_list = *reinterpret_cast<SEntityList<MissileSpellInfo>**>(DEFINE_RVA(Offset::Data::ManagerTemplate_Missiles));
-		for (size_t i = 0; i < Object_list->size; i++) {
-			auto Object = Object_list->entities[i];
 
-			if ((int)Object > 1024) {
-				auto obj = *(MissileSpellInfo**)((int)Object + 0x14);
-				if (obj != 0 && obj->BasicAttackSpellData != 0)
-					ObjectList.push_back(obj);
-			}
+		std::list<MissileSpellInfo*> ObjectList;
+		auto missiles_mgr = *(MissileManager**)(*(int*)DEFINE_RVA(Offset::Data::ManagerTemplate_Missiles) + 0x4);
+		for (auto& i : missiles_mgr->missile_map)
+		{
+			DWORD network_id = i.first;
+			ObjectList.push_back(i.second);
 		}
 		return ObjectList;
+
+		////std::list<MissileSpellInfo*> ObjectList;
+		//auto Object_list = *reinterpret_cast<SEntityList<MissileSpellInfo>**>(DEFINE_RVA(Offset::Data::ManagerTemplate_Missiles));
+		//for (size_t i = 0; i < Object_list->size; i++) {
+		//	auto Object = Object_list->entities[i];
+		//	Utils::Log("[" + to_string(i) + "] + [" + to_string(Object_list->size) + "] Obj1: " + to_hex((int)Object));
+		//	if ((int)Object > 1024) {
+		//		if (IsBadReadPtr(Object, 4)) {
+		//			MessageBoxA(0, to_hex((int)Object).c_str(), to_hex((int)&Object_list->entities[i]).c_str(), 0);
+		//		}
+		//		else {
+		//			Utils::Log("[" + to_string(i) + "] + [" + to_string(Object_list->size) + "] Obj2: " + to_hex((int)(int*)((int)Object + 0x14)));
+		//			auto obj = *(MissileSpellInfo**)((int)Object + 0x14);
+		//			Utils::Log("[" + to_string(i) + "] Obj3: " + to_hex((int)obj));
+		//			if (obj != 0 && obj->Index > 0 && obj->BasicAttackSpellData != 0) {
+		//				ObjectList.push_back(obj);
+		//			}
+		//		}
+
+
+		//	}
+		//}
+		//return ObjectList;
 	}
 
 	static GameObject* GetLocalPlayer() {
