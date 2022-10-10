@@ -24,6 +24,8 @@ std::string OrbWalker::AttackResets[] =
 };
 
 bool OrbWalker::CanAttack() {
+	//if (Reseted)
+	//	return true;
 	if (Local->GetChampionName() == "Jhin")
 	{
 		if (Local->BuffManager.hasBuff("JhinPassiveReload"))
@@ -37,6 +39,13 @@ bool OrbWalker::CanAttack() {
 	//		return false;
 	//	}
 	//}
+	if (vayneQMode) {
+		// vaynetumblebonus  vaynetumblefade
+		if (Local->BuffManager.hasBuff("vaynetumblefade"))
+		{
+			return false;
+		}
+	}
 	return Function::GameTimeTick() + Function::GetPing() / 2.f >= LastAttackCommandT + Function::GetAttackDelay(Local) * 1000.f;
 }
 
@@ -45,7 +54,7 @@ bool OrbWalker::CanMove(float extraWindup) {
 }
 
 void OrbWalker::Orbwalk(GameObject* target, float extraWindup) {
-	if (Function::GameTimeTick() - LastAttackCommandT < 70 + Function::GetPing())
+	if (Function::GameTimeTick() - LastAttackCommandT < 70 + min(60, Function::GetPing()))
 	{
 		return;
 	}
@@ -116,7 +125,7 @@ void OrbWalker::OnUpdate()
 	if (Function::IsChatOpen() || !IsLeagueInForeground())
 		_mode = OrbwalkingMode::None;
 
-	if(_mode == OrbwalkingMode::Combo && lockCamera)
+	if (_mode == OrbwalkingMode::Combo && lockCamera)
 		Function::LockCamera(true);
 
 	if (_mode == OrbwalkingMode::None) {
@@ -333,8 +342,17 @@ void OrbWalker::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
 		return;
 	}
 
+	for (auto obj : AttackResets) {
+		if (StringContains(castInfo->BasicAttackSpellData->Name, obj, true)) {
+			Reseted = true;
+			LastAttackCommandT = 0;
+			return;
+		}
+	}
+
 	if (castInfo->BasicAttackSpellData != nullptr)
 	{
+		Reseted = false;
 		LastAttackCommandT = Function::GameTimeTick() - Function::GetPing() / 2;
 		LastMoveCommandT = 0;
 	}

@@ -6,6 +6,7 @@
 #include "League/SpellBook.h"
 #include "BuffManager.h"
 #include "League/HeroInventory.h"
+#include <map>
 
 class SpellDataResource
 {
@@ -68,7 +69,7 @@ public:
 class MissileSpellInfo {
 public:
 	union {
-		DEFINE_MEMBER_N(int	Index, 0xB4)
+			DEFINE_MEMBER_N(int	Index, 0xB4)
 			DEFINE_MEMBER_N(SpellData*		BasicAttackSpellData, Offset::MissileData::SpellInfo)
 			DEFINE_MEMBER_N(kSpellSlot		Slot, Offset::SpellInfo::Slot)
 			DEFINE_MEMBER_N(float			StartTime, Offset::SpellInfo::StartTime)
@@ -261,6 +262,18 @@ public:
 
 };
 
+class Ward {
+public:
+	float EndTime;
+	WardType Type;
+	Vector3 Position;
+	float BoundingRadius = 65;
+	float VisionRadius = 0;
+	bool Danger = false;
+	GameObject* GameObject;
+	int NetworkdId;
+};
+
 template<typename T>
 struct SEntityList {
 	char pad[0x4];
@@ -280,4 +293,11 @@ public:
 		DEFINE_MEMBER_N(Vector3				StartPos, Offset::MissileData::StartPos);		
 		DEFINE_MEMBER_N(Vector3				EndPos, Offset::MissileData::EndPos);
 	};
+};
+
+struct MissileManager
+{
+public:
+	DWORD* vtable;
+	std::map<DWORD, void*> missile_map;
 };

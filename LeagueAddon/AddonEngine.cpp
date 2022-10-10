@@ -152,6 +152,8 @@ bool AddonEngine::Initialize() {
 		Yasuo::Initialize();
 	if (Local->GetChampionName() == "Draven")
 		Draven::Initialize();
+	if (Local->GetChampionName() == "Vayne")
+		Vayne::Initialize();
 
 	//// Main code
 

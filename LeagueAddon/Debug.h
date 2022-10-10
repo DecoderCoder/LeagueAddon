@@ -6,10 +6,11 @@
 #include "Functions.h"
 #include "Scripts.h"
 #include "SkinChanger.h"
+#include "Visual.h"
 
 namespace Debug {
 	inline bool Enabled = false;
-	inline float addonTime = 0;
+
 	inline std::vector<SpellInfo> detectedSpells;
 	inline std::vector<uintptr_t> detectedSpellsPtr;
 

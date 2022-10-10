@@ -94,6 +94,8 @@ template <typename Function> Function CallVirtual(PVOID Base, DWORD Index)
 
 bool StringContains(std::string strA, std::string strB, bool ignore_case = false);
 bool StringContains(std::wstring strA, std::wstring strB, bool ignore_case = false);
+bool StringCompare(std::string strA, std::string strB, bool ignore_case = false);
+bool StringCompare(std::wstring strA, std::wstring strB, bool ignore_case = false);
 
 template <typename Type>
 struct encrypted_buffer

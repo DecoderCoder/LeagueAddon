@@ -2,6 +2,9 @@
 
 using namespace std;
 
+
+//#define Compare(x, y, z) StringContains(x, y, z)
+#define Compare(x, y, z) StringCompare(x, y, z)
 namespace Evade
 {
 	std::list<int> addedSpells;
@@ -71,7 +74,7 @@ namespace Evade
 				{
 					for (Spell& s : champ.spells)
 					{
-						if (StringContains(missile->BasicAttackSpellData->Name, s.missileName, true))
+						if (Compare(missile->BasicAttackSpellData->Name, s.missileName, true))
 						{
 							auto it = addedSpells.begin();
 							bool found = false;
@@ -316,7 +319,7 @@ namespace Evade
 	{
 		if (!EvadeSpells)
 			return;
-		Vector3 p = pos.Extend(MyHeroPos, -BoundingRadius + 25);
+		Vector3 p = pos.Extend(MyHeroPos, -BoundingRadius );
 		//Vector2 path = riot_render->WorldToScreen();
 		if (Function::GameTimeTick() - LastClick > 1000 / 80) {
 			LastClick = Function::GameTimeTick();
@@ -1206,7 +1209,7 @@ namespace Evade
 		{
 			for (Spell& s : champ.spells)
 			{
-				if (StringContains(castInfo->BasicAttackSpellData->Name, s.name, true))
+				if (Compare(castInfo->BasicAttackSpellData->Name, s.name, true) )
 				{
 
 					addedSpells.push_back(castInfo->Index);
@@ -6953,6 +6956,7 @@ namespace Evade
 			Champ Zyra;
 			Zyra.hero = "Zyra";
 			Spell Q;
+			Q.nameStrictly = true;
 			Q.name = "ZyraQ";
 			Q.icon = "ZyraQ";
 			Q.displayName = "Deadly Spines";

@@ -94,6 +94,9 @@
     <Filter Include="Scripts\Draven">
       <UniqueIdentifier>{36c82272-546e-4897-81b0-6eff3cdd0ced}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts\Vayne">
+      <UniqueIdentifier>{5ece39f1-1a01-4c34-ae2e-9f65673af1e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utils.h">
@@ -248,6 +251,9 @@
     <ClInclude Include="Scripts\Draven.h">
       <Filter>Scripts\Draven</Filter>
     </ClInclude>
+    <ClInclude Include="Scripts\Vayne.h">
+      <Filter>Scripts\Vayne</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utils.cpp">
@@ -356,6 +362,9 @@
     </ClCompile>
     <ClCompile Include="Scripts\Draven.cpp">
       <Filter>Scripts\Draven</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Vayne.cpp">
+      <Filter>Scripts\Vayne</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

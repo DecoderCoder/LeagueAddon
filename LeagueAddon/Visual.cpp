@@ -5,12 +5,9 @@
 std::map<int, float> distanceToHero;
 std::map<GameObject*, bool> alwaysVisible;
 std::map<GameObject*, float> recallState;
-std::map<GameObject*, float> trackableObjects;
+bool showTrackableModel = true;
 
 std::vector<GameObject*> spellTrackerHeroes;
-
-bool lastSelectedHighlightChangeColorChanged = false;
-float lastSelectedHighlightChange = 0;
 
 void Visual::Initialize() {
 	EventManager::AddEventHandler(EventManager::EventType::OnMenu, OnMenu);
@@ -18,12 +15,12 @@ void Visual::Initialize() {
 	EventManager::AddEventHandler(EventManager::EventType::OnUnload, Unload);
 
 	for (auto obj : ObjectManager::HeroList()) {
-	//	if (obj->IsEnemyTo(Local)) {
-		distanceToHero.insert({ obj->NetworkID, 0 });
-		alwaysVisible.insert({ obj, false });
-		recallState.insert({ obj, false });
-		spellTrackerHeroes.push_back(obj);
-		//}
+		if (obj->IsEnemyTo(Local)) {
+			distanceToHero.insert({ obj->NetworkID, 0 });
+			alwaysVisible.insert({ obj, false });
+			recallState.insert({ obj, false });
+			spellTrackerHeroes.push_back(obj);
+		}
 	}
 }
 
@@ -77,7 +74,11 @@ void Visual::OnMenu() {
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Vision Tracker")) {
-
+			ImGui::Checkbox("Wards and traps##VisionTracker", &VisionTracker);
+			ImGui::Checkbox("Clones##VisionTracker", &VisionTracker);
+			if (ImGui::TreeNode("Settings")) {
+				ImGui::Checkbox("Show model", &showTrackableModel);
+			}
 			ImGui::TreePop();
 		}
 	}
@@ -203,7 +204,77 @@ bool IsAlwaysVisible(GameObject* obj) {
 	return false;
 }
 
+bool HasTrackable(int netId) {
+	for (auto& obj : Visual::trackableObjects) {
+		if (obj.NetworkdId == netId)
+			return true;
+	}
+	return false;
+}
+
+bool AddTrackable(GameObject* obj, WardType type) {
+	if (HasTrackable(obj->NetworkID))
+		return false;
+	Ward ward;
+	ward.NetworkdId = obj->NetworkID;
+	ward.EndTime = Function::GameTime() + obj->Mana;
+	ward.Type = type;
+	ward.Position = obj->Position;
+	ward.GameObject = obj;
+
+	switch (ward.Type) {
+	case WardType::ShacoBox:
+		ward.BoundingRadius = 300;
+		ward.Danger = true;
+		break;
+	case WardType::JhinTrap:
+		ward.BoundingRadius = 140;
+		ward.Danger = true;
+		break;
+	case WardType::JinxTrap:
+		ward.BoundingRadius = 50;
+		ward.Danger = true;
+		break;
+	case WardType::TeemoTrap:
+		ward.BoundingRadius = 75;
+		ward.Danger = true;
+		break;
+	case WardType::MaokaiTrap:
+		ward.BoundingRadius = 50;
+		ward.Danger = true;
+		break;
+	case WardType::NidaliTrap:
+		ward.BoundingRadius = 50;
+		ward.Danger = true;
+		break;
+	case WardType::CaytlinTrap:
+		ward.BoundingRadius = 50;
+		ward.Danger = true;
+		break;
+
+	case WardType::Yellow:
+		ward.VisionRadius = 900;
+		break;
+	case WardType::Blue:
+		ward.VisionRadius = 900;
+		break;
+	case WardType::JammerDevice:
+		ward.VisionRadius = 900;
+		break;
+	}
+
+
+	Visual::trackableObjects.push_back(ward);
+	return true;
+}
+
 void Visual::OnDraw() {
+	if (GetTickCount() > blinkTimer) {
+		// changeColor
+		blink = !blink;
+		blinkTimer = GetTickCount() + 500;
+	}
+
 	Vector3 lw2s; // Local World 2 Screen
 	Function::World2Screen(&Local->Position, &lw2s);
 
@@ -335,20 +406,65 @@ void Visual::OnDraw() {
 		int selected = Function::GetSelected();
 
 		if (selected != 0) {
-			if (GetTickCount() > lastSelectedHighlightChange) {
-				// changeColor
-				lastSelectedHighlightChangeColorChanged = !lastSelectedHighlightChangeColorChanged;
-				lastSelectedHighlightChange = GetTickCount() + 500;
-			}
 			GameObject* selectedObj = ObjectManager::GetObjectByIndex(selected);
 			if (selectedObj != nullptr)
-				if (lastSelectedHighlightChangeColorChanged) {
+				if (blink) {
 					Render::Draw_Circle3D(selectedObj->Position, Function::GetBoundingRadius(selectedObj), ImColor(52, 152, 219), 2);
 				}
 				else {
 					Render::Draw_Circle3D(selectedObj->Position, Function::GetBoundingRadius(selectedObj), ImColor(236, 240, 241), 2);
 				}
 		}
+	}
+
+	if (VisionTracker) {
+		auto it = trackableObjects.begin();
+		while (it != trackableObjects.end()) {
+			if (it->EndTime > Function::GameTime() || !Function::IsAlive(it->GameObject)) {
+				it = trackableObjects.erase(it);// erase and go to next
+			}
+			else {
+				++it;  // go to next
+			}
+		}
+
+		for (auto obj : ObjectManager::MinionList()) {
+			if (obj->IsEnemyTo(Local))
+				if (obj->GetChampionName() == "YellowTrinket")
+					AddTrackable(obj, WardType::Yellow);
+				else if (obj->GetChampionName() == "BlueTrinket")
+					AddTrackable(obj, WardType::Blue);
+				else if (obj->GetChampionName() == "JammerDevice")
+					AddTrackable(obj, WardType::JammerDevice);
+				else if (obj->GetChampionName() == "ShacoBox")
+					AddTrackable(obj, WardType::ShacoBox);
+				else if (obj->GetChampionName() == "JinxMine")
+					AddTrackable(obj, WardType::JinxTrap);
+				else if (obj->GetChampionName() == "JhinTrap")
+					AddTrackable(obj, WardType::JhinTrap);
+				else if (obj->GetChampionName() == "NidaleeSpear")
+					AddTrackable(obj, WardType::NidaliTrap);
+				else if (obj->GetChampionName() == "MaokaiSproutling")
+					AddTrackable(obj, WardType::MaokaiTrap);
+				else if (obj->GetChampionName() == "TeemoMushroom")
+					AddTrackable(obj, WardType::TeemoTrap);
+				else if (obj->GetChampionName() == "CaytlinTrap")
+					AddTrackable(obj, WardType::TeemoTrap);
+		}
+
+		for (auto ward : trackableObjects) {
+			if (showTrackableModel)
+				*(*BYTE)(& ward.GameObject->IsVisible) = ;
+
+			ImColor blinkColor = ward.Danger ? (blink ? ImColor(231, 76, 60) : ImColor(192, 57, 43)) : (blink ? ImColor(241, 196, 15) : ImColor(243, 156, 18));
+
+			Render::Draw_Circle3D(ward.Position, ward.BoundingRadius, blinkColor, 2);
+
+			if (ward.VisionRadius > 0)
+				Render::Draw_Circle3D(ward.Position, ward.VisionRadius, ImColor(241, 196, 15), 4);
+		}
+
+
 	}
 
 	Render::EndOverlay();

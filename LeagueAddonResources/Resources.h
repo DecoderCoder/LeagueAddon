@@ -7,6 +7,7 @@
 #include "vector"
 #include <map>
 #include <string>
+
 //#include "Structs.h"
 
 #pragma comment(lib, "d3d11.lib")
@@ -19,6 +20,8 @@
 #endif
 
 using namespace std;
+
+
 
 extern "C" class EXPORT Skin {
 public:
@@ -86,7 +89,5 @@ private:
 
 namespace  Resources {
 	extern "C" EXPORT void LoadImages(Image_Manager & Images_Manager);
-
-
 	extern "C" EXPORT void LoadSkinsDB(std::map<string, std::vector<Skin>>&SkinsDB);
 }

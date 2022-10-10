@@ -180,6 +180,7 @@ namespace Evade
 			std::string icon;
 			std::string displayName;
 			std::string missileName;
+			bool nameStrictly = false;
 			std::list<std::string> extraMissileNames;
 			int slot = 0;
 			int type = 0;

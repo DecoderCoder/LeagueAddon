@@ -25,6 +25,26 @@ void Misc::OnMenu() {
 
 			ImGui::TreePop();
 		}
+		if (ImGui::TreeNode("Fun")) {
+			if (ImGui::Button("Toggle \"Ping 0\"+")) {
+				BYTE* ping = (BYTE*)(*(int*)DEFINE_RVA(Offset::Data::PingObject) + (DWORD)0x1A7);
+				*ping += 0x1;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Toggle \"Ping 0\"-")) {
+				bool* ping = (bool*)(*(int*)DEFINE_RVA(Offset::Data::PingObject) + (DWORD)0x1A7);
+				*ping -= 0x1;
+			}
+			int i = 0;
+			for (auto obj : ObjectManager::HeroList()) {
+				if (i++ == (int)(*(BYTE*)(*(int*)DEFINE_RVA(Offset::Data::PingObject) + (DWORD)0x1A7))) {
+					ImGui::Text(obj->GetChampionName().c_str());
+					break;
+				}
+			}
+
+			ImGui::TreePop();
+		}
 		//ImGui::Checkbox("Autosmite", &AutoSmite);
 	}
 }
@@ -38,6 +58,6 @@ void Misc::OnDraw() {
 
 	if (AntiAFK && !IsLeagueInForeground() && lastAAFK < GetTickCount()) {
 		Function::IssueOrder(Local, 2, &Local->Position, NULL, false, false, NULL);
-		lastAAFK = GetTickCount() + 1000;		
+		lastAAFK = GetTickCount() + 1000;
 	}
 }

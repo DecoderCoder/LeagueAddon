@@ -2,6 +2,9 @@
 
 //const char* qwerdf[] = { "Q", "W", "E", "R", "D", "F" };
 
+bool drawSpellDirection = false;
+bool drawObjectInfo = false;
+bool drawObjectInfoBuffs = false;
 
 void Debug::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
 	if (!Enabled)
@@ -18,36 +21,52 @@ void Debug::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
 void Debug::OnDraw() {
 	if (Enabled) {
 		Render::BeginOverlay();
-		Vector3 bdp; // BaseDrawPosition
-		Function::GetHPBarPosition(Local, &bdp);
-		Render::Draw_Line(bdp.x, bdp.y, bdp.x + 1, bdp.y, ImColor(255, 0, 0), 3);
 
+		Render::Draw_Text(100, 100, "GameTime  : " + to_string(Function::GameTime()));
+		Render::Draw_Text(100, 115, "Ping      : " + to_string(Function::GetPing()));
 
-		Render::Draw_Text(100, 100, "Addon time~: " + to_string(addonTime - GetTickCount()));
-
-		for (int i = 0; i < detectedSpells.size(); i++)
-		{
-			//if(spell)
-
-			Vector3 w2sStartPos;
-			Vector3 w2sEndPos;
-			Function::World2Screen(&detectedSpells[i].StartPosition, &w2sStartPos);
-			Function::World2Screen(&detectedSpells[i].EndPosition, &w2sEndPos);
-			if (detectedSpells[i].EndPosition2.x != 0 && detectedSpells[i].EndPosition2.y != 0) {
-				Vector3 w2sEndPos2;
-				Function::World2Screen(&detectedSpells[i].EndPosition2, &w2sEndPos2);
-				Render::Draw_Line(w2sEndPos2.x, w2sEndPos2.y, w2sEndPos.x, w2sEndPos.y, ImColor(255, 0, 0), 1);
+		if (drawSpellDirection)
+			for (int i = 0; i < detectedSpells.size(); i++)
+			{
+				Vector3 w2sStartPos;
+				Vector3 w2sEndPos;
+				Function::World2Screen(&detectedSpells[i].StartPosition, &w2sStartPos);
+				Function::World2Screen(&detectedSpells[i].EndPosition, &w2sEndPos);
+				if (detectedSpells[i].EndPosition2.x != 0 && detectedSpells[i].EndPosition2.y != 0) {
+					Vector3 w2sEndPos2;
+					Function::World2Screen(&detectedSpells[i].EndPosition2, &w2sEndPos2);
+					Render::Draw_Line(w2sEndPos2.x, w2sEndPos2.y, w2sEndPos.x, w2sEndPos.y, ImColor(255, 0, 0), 1);
+				}
+				Render::Draw_Line(w2sStartPos.x, w2sStartPos.y, w2sEndPos.x, w2sEndPos.y, ImColor(0, 0, 255), 1);
+				Render::Draw_Text(w2sStartPos.x, w2sStartPos.y, "StartPos of " + detectedSpells[i].BasicAttackSpellData->Name + " [ " + to_hex((int)detectedSpellsPtr[i]) + " ]");
+				Render::Draw_Text(w2sEndPos.x, w2sEndPos.y, "EndPos");
 			}
 
+		if (drawObjectInfo)
+			for (auto obj : ObjectManager::GetAllObjects()) {
+				Vector3 w2s;
+				Function::World2Screen(&obj->Position, &w2s);
+				int offsetY = 0;
+				const int offsetYStep = 15;
 
-			Render::Draw_Line(w2sStartPos.x, w2sStartPos.y, w2sEndPos.x, w2sEndPos.y, ImColor(0, 0, 255), 1);
+				Render::Draw_Text(w2s.x, w2s.y + offsetY, "Name: " + obj->GetChampionName());
+				offsetY += offsetYStep;
+				Render::Draw_Text(w2s.x, w2s.y + offsetY, "Ptr: " + to_hex((int)obj));
+				offsetY += offsetYStep;
+				Render::Draw_Text(w2s.x, w2s.y + offsetY, "IsAlive: " + string(Function::IsAlive(obj) ? "true" : "false"));
+				offsetY += offsetYStep;
+				Render::Draw_Text(w2s.x, w2s.y + offsetY, "IsVisible: " + string(obj->IsVisible ? "true" : "false"));
+				offsetY += offsetYStep;
 
-
-
-			Render::Draw_Text(w2sStartPos.x, w2sStartPos.y, "StartPos of " + detectedSpells[i].BasicAttackSpellData->Name + " [ " + to_hex((int)detectedSpellsPtr[i]) + " ]");
-			Render::Draw_Text(w2sEndPos.x, w2sEndPos.y, "EndPos of " + detectedSpells[i].BasicAttackSpellData->Name + " [ " + to_hex((int)detectedSpellsPtr[i]) + " ]");
-		}
-
+				if (drawObjectInfoBuffs) {
+					for (auto buff : obj->BuffManager.entries()) {
+						Render::Draw_Text(w2s.x + offsetYStep, w2s.y + offsetY, "BuffName    : " + buff->name());
+						offsetY += offsetYStep;
+						Render::Draw_Text(w2s.x + offsetYStep, w2s.y + offsetY, "BuffEndTime : " + to_string(buff->endTime));
+						offsetY += offsetYStep;
+					}
+				}
+			}
 		Render::EndOverlay();
 	}
 }
@@ -58,9 +77,17 @@ void Debug::OnMenu() {
 	if (Enabled) {
 		ImGui::Begin("Debug");
 
+		ImGui::Checkbox("Draw objects info", &drawObjectInfo);
+		if (ImGui::TreeNode("Object info")) {
+			ImGui::Checkbox("Buffs", &drawObjectInfoBuffs);
+			ImGui::TreePop();
+		}
+		ImGui::Checkbox("Draw spells direction", &drawSpellDirection);
+
 		if (ImGui::CollapsingHeader("OrbWalker")) {
 			ImGui::Text(("LastAA  : " + to_string(OrbWalker::LastAttackCommandT)).c_str());
 			ImGui::Text(("LastMove: " + to_string(OrbWalker::LastMoveCommandT)).c_str());
+			ImGui::Text(("Reseted : " + string(OrbWalker::Reseted ? "TRUE" : "FALSE")).c_str());
 		}
 
 		if (ImGui::CollapsingHeader("OnProcessSpell")) {
@@ -80,14 +107,12 @@ void Debug::OnMenu() {
 		if (ImGui::CollapsingHeader("Missiles")) {
 			auto missiles = ObjectManager::MissileList();
 			ImGui::Text(to_string(missiles.size()).c_str());
-			for (auto obj : missiles) {				
-				if (!IsBadReadPtr(obj, 1)) {
-					Vector3 w2s;
-					Vector3* spellPos = (Vector3*)((int)obj + 0xD8);
-					//Vector3* spellEndPos = (Vector3*)((int)obj + 0x2DC);
-					Function::World2Screen(spellPos, &w2s);
-					ImGui::Text(GetStr((DWORD)obj + 0x54));
-				}
+			for (auto obj : missiles) {
+				Vector3 w2s;
+				Vector3* spellPos = (Vector3*)((int)obj + 0xD8);
+				//Vector3* spellEndPos = (Vector3*)((int)obj + 0x2DC);
+				Function::World2Screen(spellPos, &w2s);
+				ImGui::Text(GetStr((DWORD)obj + 0x54));
 			}
 		}
 
@@ -199,6 +224,16 @@ void Debug::OnMenu() {
 			}
 		}
 
+		if (ImGui::CollapsingHeader("Trackable Objects")) {
+			for (auto obj : Visual::trackableObjects) {
+				ImGui::Text(("-- " + string(WardTypeName[(int)obj.Type])).c_str());
+				ImGui::Text(("NetId : " + to_string(obj.NetworkdId)).c_str());
+				ImGui::Text(("Bounding radius : " + to_string(obj.BoundingRadius)).c_str());
+				ImGui::Text(("Vision radius   : " + to_string(obj.VisionRadius)).c_str());
+				ImGui::Separator();
+			}
+		}
+
 		if (ImGui::CollapsingHeader("Render")) {
 			{
 				Vector3 bdp; // BaseDrawPosition
@@ -233,13 +268,26 @@ void Debug::OnMenu() {
 
 		}
 
+		if (ImGui::CollapsingHeader("Hero scripts")) {
+			if (ImGui::Button("Twitch"))
+				Twitch::Initialize();
+			if (ImGui::Button("Garen"))
+				Garen::Initialize();
+			if (ImGui::Button("Akali"))
+				Akali::Initialize();
+			if (ImGui::Button("Yasuo"))
+				Yasuo::Initialize();
+			if (ImGui::Button("Draven"))
+				Draven::Initialize();
+			if (ImGui::Button("Vayne"))
+				Vayne::Initialize();
+		}
+
 		ImGui::Text(("IsWall: " + string((Function::IsWall(Function::GetMouseWorldPosition()) ? "true" : "false"))).c_str());
 
 		ImGui::Text(("GameTime    : " + to_string(Function::GameTime())).c_str());
 		ImGui::Text(("GameTick    : " + to_string(Function::GameTimeTick())).c_str());
 		ImGui::Text(("GetTickCount: " + to_string(GetTickCount())).c_str());
-
-
 
 		ImGui::End();
 	}

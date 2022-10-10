@@ -148,6 +148,7 @@
     <ClInclude Include="Scripts\Garen.h" />
     <ClInclude Include="Scripts\OrbWalker.h" />
     <ClInclude Include="Scripts\Twitch.h" />
+    <ClInclude Include="Scripts\Vayne.h" />
     <ClInclude Include="Scripts\Yasuo.h" />
     <ClInclude Include="SkinChanger.h" />
     <ClInclude Include="Structs.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="Scripts\Garen.cpp" />
     <ClCompile Include="Scripts\OrbWalker.cpp" />
     <ClCompile Include="Scripts\Twitch.cpp" />
+    <ClCompile Include="Scripts\Vayne.cpp" />
     <ClCompile Include="Scripts\Yasuo.cpp" />
     <ClCompile Include="SkinChanger.cpp" />
     <ClCompile Include="TargetSelector.cpp" />

@@ -151,3 +151,27 @@ bool StringContains(std::wstring strA, std::wstring strB, bool ignore_case)
 
 	return false;
 } 
+
+bool StringCompare(std::string strA, std::string strB, bool ignore_case) {
+	if (strA.empty() && strB.empty())
+		return false;
+	if (ignore_case)
+	{
+		strA = ToLower(strA);
+		strB = ToLower(strB);
+	}
+
+	return strA.compare(strB) == 0;
+}
+
+bool StringCompare(std::wstring strA, std::wstring strB, bool ignore_case) {
+	if (strA.empty() && strB.empty())
+		return false;
+	if (ignore_case)
+	{
+		strA = ToLower(strA);
+		strB = ToLower(strB);
+	}
+
+	return strA.compare(strB) == 0;
+}

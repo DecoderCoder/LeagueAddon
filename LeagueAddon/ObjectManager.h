@@ -32,6 +32,21 @@ public:
 		return nullptr;
 	}
 
+	static std::list<GameObject*> GetAllObjects() {
+		std::list<GameObject*> ObjectList;
+		for (auto obj : HeroList()) {
+			ObjectList.push_back(obj);
+		}
+		for (auto obj : TurretList()) {
+			ObjectList.push_back(obj);
+		}
+		for (auto obj : MinionList()) {
+			ObjectList.push_back(obj);
+		}
+
+		return ObjectList;
+	}
+
 	static GameObject* GetObjectByNetworkID(int NetworkID)
 	{
 		for (auto obj : HeroList()) {
@@ -83,11 +98,19 @@ public:
 	static std::list<MissileSpellInfo*> MissileList() {
 
 		std::list<MissileSpellInfo*> ObjectList;
+
+		int missiles_count = *(int*)(*(int*)DEFINE_RVA(Offset::Data::ManagerTemplate_Missiles) + 0x8);
+		if (missiles_count == 1) {
+			auto obj = *(MissileSpellInfo**)(**(int**)(*(int*)DEFINE_RVA(Offset::Data::ManagerTemplate_Missiles) + 0x4) + 0x14);
+			//MessageBoxA(0, to_hex((int)obj).c_str(), "", 0);
+			ObjectList.push_back(obj);
+			return ObjectList;
+		}
 		auto missiles_mgr = *(MissileManager**)(*(int*)DEFINE_RVA(Offset::Data::ManagerTemplate_Missiles) + 0x4);
 		for (auto& i : missiles_mgr->missile_map)
 		{
 			DWORD network_id = i.first;
-			ObjectList.push_back(i.second);
+			ObjectList.push_back((MissileSpellInfo*)i.second);
 		}
 		return ObjectList;
 

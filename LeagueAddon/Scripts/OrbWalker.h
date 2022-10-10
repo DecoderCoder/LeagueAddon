@@ -39,10 +39,12 @@ namespace OrbWalker {
 	inline bool useIssueOrder = true;
 	inline bool lockCamera = true;
 
+	inline bool Reseted = false;
 	inline float LastAttackCommandT;
 	inline float LastMoveCommandT;
 
 	inline bool dravenMode = false;
+	inline bool vayneQMode = false;
 
 	float GetMyProjectileSpeed();
 

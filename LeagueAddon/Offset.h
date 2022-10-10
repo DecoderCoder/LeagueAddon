@@ -24,7 +24,7 @@ namespace Offset {
 
 		static constexpr int PingObject = 0x3143770; // ida v23, what is that - idk
 		static constexpr int ChatInstance = 0x313AE7C; // 8B 0D ? ? ? ? 8A D8 85 C9
-		static constexpr int IsChatOpenOffset = 0x760;
+		static constexpr int IsChatOpenOffset = 0x6D8;
 
 		static constexpr int W2SInstance = 0x24EBAC0; // https://imgur.com/a/UB8EeBO
 		static constexpr int W2SInstanceOffset = 0x268; // OFFSET, W2SInstanceOffset, "FF 74 24 3C 8D 89 ? ? ? ?", 6, 2

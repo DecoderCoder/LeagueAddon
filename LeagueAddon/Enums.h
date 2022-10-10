@@ -82,3 +82,18 @@ enum class IsNotWallFlags {
 	Bush2 = 0x810000,
 	Structure = 0x460000
 };
+
+static const char* WardTypeName[] = { "YellowTrinket", "BlueTrinket", "JammerDevice", "ShacoBox", "TeemoShroom", "NidaliTrap", "CaytlinTrap", "JinxTrap", "JhinTrap", "MaokaiTrap"};
+
+enum class WardType {
+	Yellow = 0,
+	Blue = 1,
+	JammerDevice = 2,
+	ShacoBox = 3,
+	TeemoTrap = 4, // no 
+	NidaliTrap = 5, // no
+	CaytlinTrap = 6, // no
+	JinxTrap = 7,
+	JhinTrap = 8,
+	MaokaiTrap = 9,
+};

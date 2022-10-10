@@ -6,3 +6,4 @@
 #include "Scripts/Akali.h"
 #include "Scripts/Yasuo.h"
 #include "Scripts/Draven.h"
+#include "Scripts/Vayne.h"
