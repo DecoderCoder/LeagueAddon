@@ -454,7 +454,7 @@ void Visual::OnDraw() {
 
 		for (auto ward : trackableObjects) {
 			if (showTrackableModel)
-				*(*BYTE)(& ward.GameObject->IsVisible) = ;
+				ward.GameObject->IsVisible = true;
 
 			ImColor blinkColor = ward.Danger ? (blink ? ImColor(231, 76, 60) : ImColor(192, 57, 43)) : (blink ? ImColor(241, 196, 15) : ImColor(243, 156, 18));
 
