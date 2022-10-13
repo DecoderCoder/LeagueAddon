@@ -7,6 +7,7 @@
 #include <dinput.h>
 #include "../Scripts/OrbWalker.h"
 #include "../Debug.h"
+#include "ultimate_hooks.h"
 
 #pragma comment(lib, "Dinput8.lib")
 #pragma comment(lib, "Dxguid.lib")
@@ -15,10 +16,6 @@ PresentDX9 oPresentDX9 = NULL;
 uint64_t oPresentDX11 = NULL;
 ID3D11Device* pDevice = NULL;
 ID3D11DeviceContext* pContext = NULL;
-
-
-std::unique_ptr<PLH::VTableSwapHook> h;
-std::unique_ptr<PLH::x86Detour> detour;
 
 
 HWND window = NULL;
@@ -105,7 +102,7 @@ HRESULT __stdcall hookGetDeviceState(IDirectInputDevice8* pThis, DWORD cbData, L
 Utils::Log("lpvData->rgbButtons[1]: " + to_string(((LPDIMOUSESTATE)lpvData)->rgbButtons[1]));
 Utils::Log("lpvData2->rgbButtons[0]: " + to_string(((LPDIMOUSESTATE2)lpvData)->rgbButtons[0]));
 Utils::Log("lpvData2->rgbButtons[1]: " + to_string(((LPDIMOUSESTATE2)lpvData)->rgbButtons[1]));*/
-	//MessageBoxA(0, to_string(0).c_str(), "hookGetDeviceState", 0);
+//MessageBoxA(0, to_string(0).c_str(), "hookGetDeviceState", 0);
 	return ((fGetDeviceState)oGetDeviceState)(pThis, cbData, lpvData);
 	HRESULT result = ((fGetDeviceState)oGetDeviceState)(pThis, cbData, lpvData);
 	if (OrbWalker::enabled && GetAsyncKeyState(VK_SPACE)) {
@@ -315,7 +312,10 @@ bool DirectXHook::HookDX11() {
 	void* target = (void*)g_methodsTable[8]; // [8]   Present
 
 	Utils::Log(" > Renderer: Starting hooking");
-	PLH::CapstoneDisassembler dis(PLH::Mode::x86);
+
+	oPresentDX11 = UltHook.AddEzHook((DWORD)target, 5, (DWORD)&DirectXHook::Hooked_PresentDX11);
+
+	/*PLH::CapstoneDisassembler dis(PLH::Mode::x86);
 	detour.reset(new PLH::x86Detour((char*)target, (char*)&DirectXHook::Hooked_PresentDX11, &oPresentDX11, dis));
 	Utils::Log(" > Renderer: hooking...");
 	if (detour->hook()) {
@@ -323,13 +323,13 @@ bool DirectXHook::HookDX11() {
 	}
 	else {
 		Utils::Log(" > Renderer: Smth went wrong");
-	}
+	}*/
 
 
 	Sleep(500);
 	//std::this_thread::sleep_for(500ms);
 
-	/*while (!Inited) { 
+	/*while (!Inited) {
 		Beep(50, 10);
 		Utils::Log(" > Renderer: Rehook");
 		detour->reHook();
@@ -350,7 +350,7 @@ bool DirectXHook::unHook() {
 
 	if (pDirectInput)
 		pDirectInput->Release();
-	return detour->unHook() && h->unHook();
+	return false;
 }
 
 HRESULT __stdcall DirectXHook::Hooked_PresentDX11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) {
@@ -367,7 +367,7 @@ HRESULT __stdcall DirectXHook::Hooked_PresentDX11(IDXGISwapChain* pSwapChain, UI
 			pDevice->GetImmediateContext(&pContext);
 			DXGI_SWAP_CHAIN_DESC sd;
 			pSwapChain->GetDesc(&sd);
-			window = sd.OutputWindow; 
+			window = sd.OutputWindow;
 			RECT rect;
 			GetWindowRect(window, &rect);
 			Render::RenderWidth = rect.right - rect.left;
@@ -384,12 +384,12 @@ HRESULT __stdcall DirectXHook::Hooked_PresentDX11(IDXGISwapChain* pSwapChain, UI
 		else
 			return ((PresentDX11)oPresentDX11)(pSwapChain, SyncInterval, Flags);
 		Utils::Log(" > DX11Present: Init: ResizeBuffer");
-		PLH::VFuncMap redirect = { {13, (uint64_t)&DirectXHook::Hooked_ResizeBufferDX11} };
+		/*PLH::VFuncMap redirect = { {13, (uint64_t)&DirectXHook::Hooked_ResizeBufferDX11} };
 
 		h.reset(new PLH::VTableSwapHook((uint64_t)pSwapChain, redirect));
 		if (!h->hook()) {
 			MessageBoxA(0, "Failed to hook", "", 0);
-		}
+		}*/
 		Utils::Log(" > DX11Present: Init: ResizeBuffer ok");
 		//HookVTableFunction(pSwapChain, &DirectXHook::Hooked_ResizeBufferDX11, 13);
 
@@ -477,7 +477,7 @@ HRESULT  __stdcall DirectXHook::Hooked_ResizeBufferDX11(IDXGISwapChain* pSwapCha
 		mainRenderTargetView->Release();
 		Utils::Log("DX11ResizeBuffer: Release");
 	}
-	HRESULT hr = h->origFunc<PLH::VFunc<13, ResizeBuffer>>(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+	/*HRESULT hr = h->origFunc<PLH::VFunc<13, ResizeBuffer>>(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);*/
 	ID3D11Texture2D* pBuffer;
 	pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBuffer);
 	// Perform error handling here!
@@ -494,5 +494,5 @@ HRESULT  __stdcall DirectXHook::Hooked_ResizeBufferDX11(IDXGISwapChain* pSwapCha
 	vp.TopLeftY = 0;
 	pContext->RSSetViewports(1, &vp);
 	Utils::Log("DX11ResizeBuffer: End");
-	return hr;
+	//return hr;
 }

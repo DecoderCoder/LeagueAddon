@@ -1,10 +1,10 @@
 #pragma once
-#include "../../ObjectManager.h"
-#include "../../EventManager/EventManager.h"
-#include "../../Render.h"
+#include "../ObjectManager.h"
+#include "../EventManager/EventManager.h"
+#include "../Render.h"
 //#include "../Console/Console.h"
-#include "../../Geometry.h"
-#include "../../Hooks/DirectX.h"
+#include "../Geometry.h"
+#include "../Hooks/DirectX.h"
 #include <unordered_map>
 #define MathHuge 999999.f
 

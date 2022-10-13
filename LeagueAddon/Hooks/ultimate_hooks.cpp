@@ -4,10 +4,54 @@
 #include "../Utils.h"
 #include "psapi.h"
 #include "winternl.h"
+#include "Zydis/Zydis.h"
 
 std::vector<HookEntries> hookEntries;
 UltimateHooks UltHook;
 DWORD RtlInterlockedCompareExchange64Offst;
+std::vector<EzHook> EzHooks;
+
+//относительная кодировка E9 jmp используется следующим образом :
+//
+//CURRENT_RVA: jmp(DESTINATION_RVA - CURRENT_RVA - 5[sizeof(E9 xx xx xx xx)])
+
+
+DWORD UltimateHooks::AddEzHook(DWORD target, size_t hookSize, DWORD hook) {
+	if (hookSize > 1024 || hookSize < 5)
+		return -1;
+	DWORD oldProt;
+
+	EzHook ezHook;
+	ezHook.hooked = false;
+	ezHook.hookSize = hookSize;
+	ezHook.hookFunction = hook;
+
+	DWORD allocation = (DWORD)VirtualAlloc(NULL, 1024, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	if (allocation == 0)
+		return -1;
+
+	ezHook.origFunc = allocation;
+
+	VirtualProtect((void*)target, hookSize, PAGE_EXECUTE_READWRITE, &oldProt);
+	memcpy((void*)allocation, (void*)target, hookSize);
+	
+	*(BYTE*)(allocation + hookSize) = 0xE9;
+	*(DWORD*)(allocation + hookSize + 0x1) = (target + hookSize) - (allocation + hookSize) - 5; // if jmp is 5 byte size
+
+	*(BYTE*)(target) = 0xE9;
+	*(DWORD*)(target + 0x1) = hook - target - 5;
+
+	ezHook.hooked = true;
+	ezHook.address = target;
+	//MessageBoxA(0, to_hex((int)allocation).c_str(), to_hex((int)hook).c_str(), 0);
+	VirtualProtect((void*)target, hookSize, oldProt, &oldProt);
+	return allocation;
+	
+}
+
+DWORD UltimateHooks::RemoveEzHook(DWORD target) {
+
+}
 
 bool inRange(unsigned low, unsigned high, unsigned x)
 {
@@ -323,6 +367,19 @@ check:
 
 void UltimateHooks::FixFuncRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DWORD NewFnAddress, size_t size)
 {
+	//tried without zydis, but its very big work
+	//for (int i = 0; i < size; i++) {
+	//	if (*(BYTE*)(NewFnAddress + i) == 0xE8) { // Very Bad realisation of searching CALL instruction
+	//		DWORD oldOffset = 0xFFFFFFFF - *(DWORD*)(NewFnAddress + i + 1) - 4;
+	//		DWORD funcPtr = (OldFnAddress + i) - oldOffset;
+	//		DWORD newOffset = funcPtr - (NewFnAddress + i) - 5;
+	//		*(DWORD*)(NewFnAddress + i + 1) = newOffset;
+	//		//MessageBoxA(0, to_hex((int)funcPtr).c_str(), "funcPtr", 0);
+	//		//MessageBoxA(0, to_hex((int)newOffset).c_str(), "newOffset", 0);
+	//		break;
+	//	}
+	//}
+
 	Utils::Log("> FixFuncRellocation");
 	ZydisDecoder decoder;
 	ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_COMPAT_32, ZYDIS_ADDRESS_WIDTH_32);
@@ -537,7 +594,8 @@ bool UltimateHooks::Hook(DWORD original_fun, DWORD hooked_fun, size_t offset)
 
 	Utils::Log("> Hook: CopyRegion: Ok");
 	Utils::Log("> Hook: FixRellocation");
-	FixRellocation(((DWORD)mbi.BaseAddress - 0x1000), ((DWORD)mbi.BaseAddress - 0x1000) + 0x3000, (DWORD)NewRegionPVOID, 0x3000, offset);
+
+	//FixRellocation(((DWORD)mbi.BaseAddress - 0x1000), ((DWORD)mbi.BaseAddress - 0x1000) + 0x3000, (DWORD)NewRegionPVOID, 0x3000, offset);
 	Utils::Log("> Hook: FixRellocation: Ok");
 	Utils::Log("> Hook: Allocating: Ok");
 	hs.allocatedAddressStart = NewRegion;
@@ -557,7 +615,7 @@ bool UltimateHooks::Hook(DWORD original_fun, DWORD hooked_fun, size_t offset)
 	if (!IsDoneInit)
 	{
 		Utils::Log("> Hook: IsDoneInit");
-		VEH_Handle = AddVectoredExceptionHandler(true, static_cast<PTOP_LEVEL_EXCEPTION_FILTER>(LeoHandler));
+	//	VEH_Handle = AddVectoredExceptionHandler(true, static_cast<PTOP_LEVEL_EXCEPTION_FILTER>(LeoHandler));
 		IsDoneInit = true;
 		Utils::Log("> Hook: IsDoneInit: Ok");
 	}

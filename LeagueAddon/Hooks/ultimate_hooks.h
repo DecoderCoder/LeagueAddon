@@ -2,7 +2,6 @@
 #include <Windows.h>
 #include <vector>
 #include <VersionHelpers.h>
-#include <Zydis/Zydis.h>
 #include "../Utils.h"
 
 #pragma warning(4:4596)
@@ -30,6 +29,15 @@ struct HookEntries
 	DWORD addressToHookoffsetFromStart;
 };
 
+struct EzHook {
+	bool hooked;
+	DWORD address;
+	size_t hookSize;
+
+	DWORD hookFunction;
+	DWORD origFunc;
+};
+
 LONG WINAPI LeoHandler(EXCEPTION_POINTERS* pExceptionInfo);
 
 class UltimateHooks {
@@ -42,12 +50,13 @@ public:
 		Utils::Log("> DEPAddHook: VAllocate: Ok");
 		Utils::Log("> DEPAddHook: FFAllocate");
 		CopyRegion((DWORD)Allocation, Address, Size);
-		Utils::Log("> DEPAddHook: FFAllocate: CopyRegion: Ok");
+		Utils::Log("> DEPAddHook: FFAllocate: CopyRegion: Ok");		
 		FixFuncRellocation(Address, (Address + Size), (DWORD)Allocation, Size);
 		Utils::Log("> DEPAddHook: FFAllocate: Ok");
 		OldAddress = (fnType)(NewOnprocessSpellAddr);
 		auto res = addHook(Address, (DWORD)hk_Address, Offset);
 		Utils::Log("> DEPAddHook: Ok");
+		MessageBoxA(0, to_hex((int)Allocation).c_str(), to_hex((int)Address).c_str(), 0);
 		return res;
 	}
 	bool deinit();
@@ -56,6 +65,9 @@ public:
 	DWORD RestoreNtProtectVirtualMemory();
 	bool RestoreSysDll(string name);
 	
+	DWORD AddEzHook(DWORD target, size_t hookSize, DWORD hook);
+	DWORD RemoveEzHook(DWORD target);
+
 	ULONG ProtectVirtualMemory(PVOID addr, PSIZE_T size, ULONG protect, PULONG old);
 private:
 	bool IsDoneInit = false;

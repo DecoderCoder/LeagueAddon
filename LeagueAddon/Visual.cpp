@@ -75,9 +75,10 @@ void Visual::OnMenu() {
 		}
 		if (ImGui::TreeNode("Vision Tracker")) {
 			ImGui::Checkbox("Wards and traps##VisionTracker", &VisionTracker);
-			ImGui::Checkbox("Clones##VisionTracker", &VisionTracker);
+			//ImGui::Checkbox("Clones##VisionTracker", &VisionTracker);
 			if (ImGui::TreeNode("Settings")) {
 				ImGui::Checkbox("Show model", &showTrackableModel);
+				ImGui::TreePop();
 			}
 			ImGui::TreePop();
 		}
@@ -432,6 +433,10 @@ void Visual::OnDraw() {
 			if (obj->IsEnemyTo(Local))
 				if (obj->GetChampionName() == "YellowTrinket")
 					AddTrackable(obj, WardType::Yellow);
+				else if (obj->GetChampionName() == "YellowTrinketUpgrade")
+					AddTrackable(obj, WardType::Yellow);
+				else if (obj->GetChampionName() == "Ward")
+					AddTrackable(obj, WardType::Yellow);
 				else if (obj->GetChampionName() == "BlueTrinket")
 					AddTrackable(obj, WardType::Blue);
 				else if (obj->GetChampionName() == "JammerDevice")
@@ -461,7 +466,7 @@ void Visual::OnDraw() {
 			Render::Draw_Circle3D(ward.Position, ward.BoundingRadius, blinkColor, 2);
 
 			if (ward.VisionRadius > 0)
-				Render::Draw_Circle3D(ward.Position, ward.VisionRadius, ImColor(241, 196, 15), 4);
+				Render::Draw_Circle3D(ward.Position, ward.VisionRadius, ImColor(52, 152, 219, 1.0), 4);
 		}
 
 

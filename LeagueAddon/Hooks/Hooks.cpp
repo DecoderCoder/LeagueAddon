@@ -1,7 +1,5 @@
 #include "Hooks.h"
 #include "DirectX.h"
-#include "polyhook2/CapstoneDisassembler.hpp"
-#include "polyhook2/Detour/x86Detour.hpp"
 #include "../EventManager/EventManager.h"
 #include "../Structs.h"
 #include "../Input.h"
@@ -22,9 +20,9 @@ PVOID new_on_process_spell;
 bool OnProcessSpellHooked = false;
 
 
-PLH::CapstoneDisassembler dis(PLH::Mode::x86);
-std::unique_ptr<PLH::x86Detour> detourGCP; // GetCursorPos
-std::unique_ptr<PLH::x86Detour> detourQIP; // NtQueryInformationProcess 
+//PLH::CapstoneDisassembler dis(PLH::Mode::x86);
+//std::unique_ptr<PLH::x86Detour> detourGCP; // GetCursorPos
+//std::unique_ptr<PLH::x86Detour> detourQIP; // NtQueryInformationProcess 
 
 int __fastcall hOnProcessSpell(void* spellBook, void* edx, SpellInfo* CastInfo)
 {
@@ -288,10 +286,6 @@ BOOL WINAPI hIsDebuggerPresent() {
 	return false;
 }
 
-
-
-std::unique_ptr<PLH::x86Detour> ddd;
-
 int __fastcall  hGetPing(void* This, void* edx) {
 
 	return 90;
@@ -308,8 +302,8 @@ void Hooks::ApplyHooks() {
 	//Hooks::DirectX::HookInput();
 
 	void* targetGCP = &GetCursorPos;
-	detourGCP.reset(new PLH::x86Detour((char*)targetGCP, (char*)&hGetCursorPos, &Input::oGetCursorPos, dis));
-	detourGCP->hook();
+	/*detourGCP.reset(new PLH::x86Detour((char*)targetGCP, (char*)&hGetCursorPos, &Input::oGetCursorPos, dis));
+	detourGCP->hook();*/
 	//MessageBoxA(0, "before", ("ddd: " + to_hex(DEFINE_RVA(Offset::Function::GetPing))).c_str(), 0);
 	//UltHook.DEPAddHook(DEFINE_RVA(Offset::Function::GetPing), reinterpret_cast<DWORD>(hGetPing), oGetPing, 0x59, new_oGetPing, 1);
 	//ddd.reset(new PLH::x86Detour((char*)DEFINE_RVA(Offset::Function::GetPing), (char*)&hGetPing, &oGetPing, dis));
@@ -319,7 +313,7 @@ void Hooks::ApplyHooks() {
 		UltHook.RestoreRtlAddVectoredExceptionHandler();
 		//UltHook.RestoreNtProtectVirtualMemory();
 		//UltHook.RestoreZwQueryInformationProcess();
-		OnProcessSpellHooked = UltHook.DEPAddHook(reinterpret_cast<DWORD>(GetModuleHandle(NULL)) + Offset::Function::OnProcessSpell, reinterpret_cast<DWORD>(hOnProcessSpell), oOnProcessSpell, 0x59, new_on_process_spell, 1);
+		OnProcessSpellHooked = UltHook.DEPAddHook(DEFINE_RVA(Offset::Function::OnProcessSpell), reinterpret_cast<DWORD>(hOnProcessSpell), oOnProcessSpell, 0x59, new_on_process_spell, 1);
 		//UltHook.RestoreSysDll("ntdll.dll");
 		//auto ntdll = GetModuleHandleA("ntdll.dll");
 		//auto ntq = GetProcAddress(ntdll, "NtQueryInformationProcess");
@@ -347,7 +341,7 @@ void Hooks::ApplyHooks() {
 
 void Hooks::RemoveHooks() {
 	//Utils::Log("ddd->unHook: " + string(ddd->unHook() ? "Ok" : "Error"));
-	Utils::Log("detourGCP->unHook: " + string(detourGCP->unHook() ? "Ok" : "Error"));
+	//Utils::Log("detourGCP->unHook: " + string(detourGCP->unHook() ? "Ok" : "Error"));
 	Utils::Log("Hooks::DirectX::UnHookDX: " + string(Hooks::DirectX::UnHookDX() ? "Ok" : "Error"));
 	Utils::Log("UltHook.deinit: " + string(UltHook.deinit() ? "Ok" : "Error"));
 	Hooked = false;

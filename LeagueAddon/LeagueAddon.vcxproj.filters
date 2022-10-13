@@ -97,6 +97,9 @@
     <Filter Include="Scripts\Vayne">
       <UniqueIdentifier>{5ece39f1-1a01-4c34-ae2e-9f65673af1e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Zydis">
+      <UniqueIdentifier>{a7ff35d5-4e3d-4f5a-934b-3c6e5d1de517}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utils.h">

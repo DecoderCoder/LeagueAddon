@@ -3,7 +3,7 @@
 #pragma warning (disable : 4244 4018)
 
 #include "clipper.hpp"
-#include "../../Vector.h"
+#include "Vector.h"
 
 #define CircleLineSegmentN 16
 
