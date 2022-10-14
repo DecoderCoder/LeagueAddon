@@ -61,7 +61,7 @@ void Utils::Log(string text) {
 		myfile.open("Log.txt", ios_base::app);
 	}
 
-	myfile << "[" + string(strtok(ctime(&time_t), "\n")) + "] " + text + "\n";
+	myfile << text + "\n";
 	myfile.close();
 
 	//lastLog = text;

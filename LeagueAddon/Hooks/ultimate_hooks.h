@@ -31,6 +31,7 @@ struct HookEntries
 
 struct EzHook {
 	bool hooked;
+	bool JMP;
 	DWORD address;
 	size_t hookSize;
 
@@ -56,7 +57,7 @@ public:
 		OldAddress = (fnType)(NewOnprocessSpellAddr);
 		auto res = addHook(Address, (DWORD)hk_Address, Offset);
 		Utils::Log("> DEPAddHook: Ok");
-		MessageBoxA(0, to_hex((int)Allocation).c_str(), to_hex((int)Address).c_str(), 0);
+		//MessageBoxA(0, to_hex((int)Allocation).c_str(), to_hex((int)Address).c_str(), 0);
 		return res;
 	}
 	bool deinit();

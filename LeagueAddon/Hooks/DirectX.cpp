@@ -313,17 +313,20 @@ bool DirectXHook::HookDX11() {
 
 	Utils::Log(" > Renderer: Starting hooking");
 
-	oPresentDX11 = UltHook.AddEzHook((DWORD)target, 5, (DWORD)&DirectXHook::Hooked_PresentDX11);
-
-	/*PLH::CapstoneDisassembler dis(PLH::Mode::x86);
-	detour.reset(new PLH::x86Detour((char*)target, (char*)&DirectXHook::Hooked_PresentDX11, &oPresentDX11, dis));
-	Utils::Log(" > Renderer: hooking...");
-	if (detour->hook()) {
-		Utils::Log(" > Renderer: Hook complete");
+	//if (*(BYTE*)target != 0xE9) // for hook with saving overlay hooks
+	//oPresentDX11 = UltHook.AddEzHook((DWORD)target, 5, (DWORD)&DirectXHook::Hooked_PresentDX11);
+	//else
+	//	oPresentDX11 = UltHook.AddEzHook((DWORD)((int)target + 5), 6, (DWORD)&DirectXHook::Hooked_PresentDX11);
+	//MessageBoxA(0, to_hex((int)oPresentDX11).c_str(), "opresentDX11", 0);
+	if (*(BYTE*)(target) == 0xE9) {
+		target = (void*)((DWORD)target + *(DWORD*)((DWORD)target + 1) + 5);
+		oPresentDX11 = UltHook.AddEzHook((DWORD)target, 6, (DWORD)&DirectXHook::Hooked_PresentDX11);
 	}
-	else {
-		Utils::Log(" > Renderer: Smth went wrong");
-	}*/
+	else
+		oPresentDX11 = UltHook.AddEzHook((DWORD)target, 5, (DWORD)&DirectXHook::Hooked_PresentDX11);
+
+
+
 
 
 	Sleep(500);
@@ -342,6 +345,9 @@ bool DirectXHook::HookDX11() {
 
 bool DirectXHook::unHook() {
 	SetWindowLongPtr(GetHwndProc(), GWLP_WNDPROC, (LONG_PTR)oWndProc);
+	if (oPresentDX11)
+		UltHook.RemoveEzHook(oPresentDX11);
+
 	if (oGetDeviceState)
 		HookVTableFunction(lpdiMouse, oGetDeviceState, 9);
 

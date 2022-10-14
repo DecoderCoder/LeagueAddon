@@ -1,11 +1,15 @@
+#define USE_ZIDYS 0
+#define DEBUG_RELLOCATION 0
+
 #include "ultimate_hooks.h"
 #include "makesyscall.h"
 #include <thread>
 #include "../Utils.h"
 #include "psapi.h"
 #include "winternl.h"
+#if USE_ZIDYS || DEBUG_RELLOCATION
 #include "Zydis/Zydis.h"
-
+#endif
 std::vector<HookEntries> hookEntries;
 UltimateHooks UltHook;
 DWORD RtlInterlockedCompareExchange64Offst;
@@ -26,6 +30,12 @@ DWORD UltimateHooks::AddEzHook(DWORD target, size_t hookSize, DWORD hook) {
 	ezHook.hookSize = hookSize;
 	ezHook.hookFunction = hook;
 
+	//if (*(BYTE*)(target) == 0xE9) {
+	//	target = target + *(DWORD*)(target + 1) + 5;
+	//	ezHook.JMP = true;
+	//	hookSize = 6;
+	//}
+
 	DWORD allocation = (DWORD)VirtualAlloc(NULL, 1024, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	if (allocation == 0)
 		return -1;
@@ -34,7 +44,7 @@ DWORD UltimateHooks::AddEzHook(DWORD target, size_t hookSize, DWORD hook) {
 
 	VirtualProtect((void*)target, hookSize, PAGE_EXECUTE_READWRITE, &oldProt);
 	memcpy((void*)allocation, (void*)target, hookSize);
-	
+
 	*(BYTE*)(allocation + hookSize) = 0xE9;
 	*(DWORD*)(allocation + hookSize + 0x1) = (target + hookSize) - (allocation + hookSize) - 5; // if jmp is 5 byte size
 
@@ -42,15 +52,27 @@ DWORD UltimateHooks::AddEzHook(DWORD target, size_t hookSize, DWORD hook) {
 	*(DWORD*)(target + 0x1) = hook - target - 5;
 
 	ezHook.hooked = true;
+
+
 	ezHook.address = target;
+	EzHooks.push_back(ezHook);
 	//MessageBoxA(0, to_hex((int)allocation).c_str(), to_hex((int)hook).c_str(), 0);
 	VirtualProtect((void*)target, hookSize, oldProt, &oldProt);
 	return allocation;
-	
+
 }
 
-DWORD UltimateHooks::RemoveEzHook(DWORD target) {
-
+DWORD UltimateHooks::RemoveEzHook(DWORD origFunction) {
+	for (auto obj : EzHooks) {
+		if (obj.origFunc == origFunction) {
+			DWORD oldProt;
+			VirtualProtect((void*)obj.address, obj.hookSize, PAGE_EXECUTE_READWRITE, &oldProt);
+			memcpy((void*)obj.address, (void*)obj.origFunc, obj.hookSize);
+			VirtualProtect((void*)obj.address, obj.hookSize, oldProt, &oldProt);
+			return true;
+		}
+	}
+	return false;
 }
 
 bool inRange(unsigned low, unsigned high, unsigned x)
@@ -194,7 +216,7 @@ bool UltimateHooks::RestoreSysDll(string name)
 	for (WORD i = 0; i < hookedNtHeader->FileHeader.NumberOfSections; i++) {
 		PIMAGE_SECTION_HEADER hookedSectionHeader = (PIMAGE_SECTION_HEADER)((DWORD_PTR)IMAGE_FIRST_SECTION(hookedNtHeader) + ((DWORD_PTR)IMAGE_SIZEOF_SECTION_HEADER * i));
 
-		if (!strcmp((char*)hookedSectionHeader->Name, (char*)".text")) {			
+		if (!strcmp((char*)hookedSectionHeader->Name, (char*)".text")) {
 			DWORD oldProtection = 0;
 			bool isProtected = VirtualProtect((LPVOID)((DWORD_PTR)ntdllBase + (DWORD_PTR)hookedSectionHeader->VirtualAddress), hookedSectionHeader->Misc.VirtualSize, PAGE_EXECUTE_READWRITE, &oldProtection);
 			memcpy((LPVOID)((DWORD_PTR)ntdllBase + (DWORD_PTR)hookedSectionHeader->VirtualAddress), (LPVOID)((DWORD_PTR)ntdllMappingAddress + (DWORD_PTR)hookedSectionHeader->VirtualAddress), hookedSectionHeader->Misc.VirtualSize);
@@ -368,19 +390,28 @@ check:
 void UltimateHooks::FixFuncRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DWORD NewFnAddress, size_t size)
 {
 	//tried without zydis, but its very big work
-	//for (int i = 0; i < size; i++) {
-	//	if (*(BYTE*)(NewFnAddress + i) == 0xE8) { // Very Bad realisation of searching CALL instruction
-	//		DWORD oldOffset = 0xFFFFFFFF - *(DWORD*)(NewFnAddress + i + 1) - 4;
-	//		DWORD funcPtr = (OldFnAddress + i) - oldOffset;
-	//		DWORD newOffset = funcPtr - (NewFnAddress + i) - 5;
-	//		*(DWORD*)(NewFnAddress + i + 1) = newOffset;
-	//		//MessageBoxA(0, to_hex((int)funcPtr).c_str(), "funcPtr", 0);
-	//		//MessageBoxA(0, to_hex((int)newOffset).c_str(), "newOffset", 0);
-	//		break;
-	//	}
-	//}
+	for (int i = 0; i < size; i++) {
+		if (*(BYTE*)(NewFnAddress + i) == 0xE8) { // Very Bad realisation of searching CALL instruction
+			DWORD oldOffset = 0xFFFFFFFF - *(DWORD*)(NewFnAddress + i + 1) - 4;
+			DWORD funcPtr = (OldFnAddress + i) - oldOffset;
+			DWORD newOffset = funcPtr - (NewFnAddress + i) - 5;
+			*(DWORD*)(NewFnAddress + i + 1) = newOffset;
+			Utils::Log("FixFuncRellocation: " + to_string(i));
+			i += 4;
+		}
+	}
+	for (int i = 0; i < size; i++) {
+		if (*(BYTE*)(NewFnAddress + i) == 0xE9) { // Very Bad realisation of searching JMP instruction
+			DWORD oldOffset = 0xFFFFFFFF - *(DWORD*)(NewFnAddress + i + 1) - 4;
+			DWORD funcPtr = (OldFnAddress + i) - oldOffset;
+			DWORD newOffset = funcPtr - (NewFnAddress + i) - 5;
 
-	Utils::Log("> FixFuncRellocation");
+			Utils::Log("FixFuncRellocation: " + to_string(i));
+			i += 4;
+		}
+	}
+
+	/* Utils::Log("> FixFuncRellocation");
 	ZydisDecoder decoder;
 	ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_COMPAT_32, ZYDIS_ADDRESS_WIDTH_32);
 	ZydisFormatter formatter;
@@ -521,7 +552,7 @@ void UltimateHooks::FixFuncRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd
 
 		offset += instruction.length;
 		runtime_address += instruction.length;
-	}
+	}*/
 }
 
 bool UltimateHooks::addHook(DWORD address, DWORD hkAddress, size_t offset)
@@ -595,7 +626,7 @@ bool UltimateHooks::Hook(DWORD original_fun, DWORD hooked_fun, size_t offset)
 	Utils::Log("> Hook: CopyRegion: Ok");
 	Utils::Log("> Hook: FixRellocation");
 
-	//FixRellocation(((DWORD)mbi.BaseAddress - 0x1000), ((DWORD)mbi.BaseAddress - 0x1000) + 0x3000, (DWORD)NewRegionPVOID, 0x3000, offset);
+	FixRellocation(((DWORD)mbi.BaseAddress - 0x1000), ((DWORD)mbi.BaseAddress - 0x1000) + 0x3000, (DWORD)NewRegionPVOID, 0x3000, offset);
 	Utils::Log("> Hook: FixRellocation: Ok");
 	Utils::Log("> Hook: Allocating: Ok");
 	hs.allocatedAddressStart = NewRegion;
@@ -615,7 +646,7 @@ bool UltimateHooks::Hook(DWORD original_fun, DWORD hooked_fun, size_t offset)
 	if (!IsDoneInit)
 	{
 		Utils::Log("> Hook: IsDoneInit");
-	//	VEH_Handle = AddVectoredExceptionHandler(true, static_cast<PTOP_LEVEL_EXCEPTION_FILTER>(LeoHandler));
+		VEH_Handle = AddVectoredExceptionHandler(true, static_cast<PTOP_LEVEL_EXCEPTION_FILTER>(LeoHandler));
 		IsDoneInit = true;
 		Utils::Log("> Hook: IsDoneInit: Ok");
 	}
@@ -638,8 +669,95 @@ bool UltimateHooks::Hook(DWORD original_fun, DWORD hooked_fun, size_t offset)
 	return false;
 }
 
+MODULEINFO GetModuleInfo2(HMODULE m)
+{
+	MODULEINFO modinfo = { 0 };
+	HMODULE hModule;
+	if (m)
+		hModule = m;
+	else
+		hModule = GetModuleHandle(NULL);
+	if (hModule == 0)
+		return modinfo;
+	GetModuleInformation(GetCurrentProcess(), hModule, &modinfo, sizeof(MODULEINFO));
+	return modinfo;
+}
+
+
+
 void UltimateHooks::FixRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DWORD NewFnAddress, size_t size, size_t _offset)
 {
+	Utils::Log("FixRellocation: OldFnAddress: " + to_hex(OldFnAddress));
+	Utils::Log("FixRellocation: NewFnAddress: " + to_hex(NewFnAddress));
+
+#if (!(USE_ZIDYS) || DEBUG_RELLOCATION)
+	long RellocationOffset = OldFnAddress - NewFnAddress;
+	Utils::Log("RellocationOffset: " + to_string(RellocationOffset));
+
+	OldFnAddress += (DWORD)_offset;
+	for (int i = 0; i < size; i++) {
+		DWORD runtime_addr = (NewFnAddress + i);
+		BYTE* runtime = (BYTE*)runtime_addr;
+		bool isCall = *(BYTE*)runtime_addr == 0xE8;
+		bool isJmp = *(BYTE*)runtime_addr == 0xE9;
+
+		if (isCall || isJmp) { // Very Bad realisation of searching CALL instruction
+			long oldOffset = *(long*)(runtime_addr + 1);
+			//Utils::Log("Old offset: " + to_string(oldOffset));
+			//if (oldOffset >= 0x1000 || oldOffset <= -1000) {
+			DWORD funcPtr = (OldFnAddress + i) + oldOffset + 5;
+			DWORD calcx = funcPtr - (OldFnAddress);
+
+			//if ((long)(OldFnAddress + i) - oldOffset <= 0)
+			//	continue;
+
+			BYTE* function = (BYTE*)funcPtr;
+
+
+
+			if (runtime[-1] == 0x80) // if sub instruction
+				continue;
+			if (runtime[-1] == 0x83) // if sub instruction
+				continue;
+			if (runtime[-1] == 0x8B) // if mov instruction
+				continue;
+			if (runtime[-2] == 0x8D) // if lea instruction
+				continue;
+			if (runtime[-2] == 0x81) // if add instruction
+				continue;
+			if (runtime[-2] == 0x0F) // if subps instruction
+				continue;
+			if (runtime[-4] == 0xF3) // if movss instruction
+				continue;
+			if (runtime[-1] == 0xC1) // if shr instruction
+				continue;
+			if (runtime[-1] == 0xD0) // if shr instruction
+				continue;
+
+			long newOffset = funcPtr - runtime_addr - 6;
+
+			Utils::Log("FixRellocation: " + to_hex(runtime_addr) + "  |  " + string(*(BYTE*)runtime_addr == 0xE9 ? "JMP" : "CALL") + "  |  oldOffset: " + to_string(oldOffset) + "  |  newOffset: " + to_string(newOffset));
+			
+			if ((funcPtr >= OldFnAddress + 0x1000) && (funcPtr <= OldFnAddressEnd - 0x1000)) {
+				//MessageBoxA(0, ("oldOffset: " + to_hex(runtime_addr) + "\n\noldOffset: " + to_string(oldOffset)).c_str(), "My Rellocation", 0);
+				Utils::Log("FixRellocation: " + to_hex(runtime_addr) + "  |  " + string(isCall ? "CALL1" : "JMP1"));
+				continue;
+			}
+
+
+
+#if !(DEBUG_RELLOCATION)
+			* (DWORD*)(NewFnAddress + i + 1) = newOffset;
+#endif
+			i += 3;
+		}
+	}
+	OldFnAddress -= (DWORD)_offset;
+#endif
+
+#if USE_ZIDYS || DEBUG_RELLOCATION
+	Utils::Log("\n\nZydis Rellocation: " + to_hex(RellocationOffset));
+
 	ZydisDecoder decoder;
 	ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_COMPAT_32, ZYDIS_ADDRESS_WIDTH_32);
 	ZydisFormatter formatter;
@@ -683,12 +801,14 @@ void UltimateHooks::FixRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DW
 				}
 			}
 			{
+
 				DWORD calc1 = (runtime_address - originalCall + 4);
 				DWORD calc = 0xFFFFFFFF - calc1;
+				long oldOffset = *(DWORD*)(runtime_address + 1);
+				long newOffset = calc;
 				*(DWORD*)(runtime_address + 1) = calc;
-
+				Utils::Log("FixRellocation: " + to_hex(runtime_address) + "  |  CALL" + "  |  oldOffset: " + to_string(oldOffset) + "  |  newOffset: " + to_string(newOffset));
 				if (ZYAN_SUCCESS(ZydisDecoderDecodeBuffer(&decoder, (PVOID)(NewFnAddress + offset), length - offset, &instruction))) {
-
 					char buffer[256];
 					ZydisFormatterFormatInstruction(&formatter, &instruction, buffer, sizeof(buffer), runtime_address);
 
@@ -696,12 +816,13 @@ void UltimateHooks::FixRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DW
 					{
 						DWORD hex = std::strtoul((mnemonic.substr(5, 10)).c_str(), NULL, 16);
 						if ((hex >= OldFnAddress + 0x1000) && (hex <= OldFnAddressEnd - 0x1000)) {
+							//MessageBoxA(0, to_hex(runtime_address + 1).c_str(), "JMP Before", 0);
 							DWORD calc1 = (runtime_address - hex + 4);
 							DWORD calc = 0xFFFFFFFF - calc1;
 							*(DWORD*)(runtime_address + 1) = calc;
-
+							//MessageBoxA(0, to_hex(runtime_address + 1).c_str(), "JMP After", 0);
+							Utils::Log("FixRellocation: " + to_hex(runtime_address) + "  |  CALL1");
 							if (ZYAN_SUCCESS(ZydisDecoderDecodeBuffer(&decoder, (PVOID)(NewFnAddress + offset), length - offset, &instruction))) {
-
 								char buffer[256];
 								ZydisFormatterFormatInstruction(&formatter, &instruction, buffer, sizeof(buffer), runtime_address);
 
@@ -744,12 +865,14 @@ void UltimateHooks::FixRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DW
 				}
 			}
 			{
+
 				DWORD calcx = originalCall - (OldFnAddress + offset);
 				DWORD calcy = calcx + (OldFnAddress + offset);
 				DWORD calc = calcy - runtime_address - 0x5;
-
+				long oldOffset = *(DWORD*)(runtime_address + 1);
+				long newOffset = calc;
 				*(DWORD*)(runtime_address + 1) = calc;
-
+				Utils::Log("FixRellocation: " + to_hex(runtime_address) + "  |  JMP" + "  |  oldOffset: " + to_string(oldOffset) + "  |  newOffset: " + to_string(newOffset));
 				if (ZYAN_SUCCESS(ZydisDecoderDecodeBuffer(&decoder, (PVOID)(NewFnAddress + offset), length - offset, &instruction))) {
 
 					char buffer[256];
@@ -759,20 +882,24 @@ void UltimateHooks::FixRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DW
 					{
 						DWORD hex = std::strtoul((mnemonic.substr(4, 10)).c_str(), NULL, 16);
 						if ((hex >= OldFnAddress + 0x1000) && (hex <= OldFnAddressEnd - 0x1000)) {
+							//MessageBoxA(0, to_hex(runtime_address).c_str(), "JMP Before", 0);
 							DWORD calc = calcx - 0x5;
 							*(DWORD*)(runtime_address + 1) = calc;
-
+							//MessageBoxA(0, to_hex(runtime_address).c_str(), "JMP After", 0);
+							//Utils::Log("FixRellocation JMP2 - " + to_hex(runtime_address));
+							Utils::Log("FixRellocation: " + to_hex(runtime_address) + "  |  JMP1");
+							MessageBoxA(0, ("oldOffset: " + to_hex(runtime_address)).c_str(), "UltHook", 0);
 							if (ZYAN_SUCCESS(ZydisDecoderDecodeBuffer(&decoder, (PVOID)(NewFnAddress + offset), length - offset, &instruction))) {
-
 								char buffer[256];
-								ZydisFormatterFormatInstruction(&formatter, &instruction, buffer, sizeof(buffer), runtime_address);
 
+								ZydisFormatterFormatInstruction(&formatter, &instruction, buffer, sizeof(buffer), runtime_address);
 								std::string mnemonic(buffer);
 							}
 
 						}
 					}
 				}
+
 			}
 			fixedAddressesCount++;
 
@@ -781,4 +908,7 @@ void UltimateHooks::FixRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DW
 		offset += instruction.length;
 		runtime_address += instruction.length;
 	}
+#endif
+
+	MessageBoxA(0, "finished", "Relloc", 0);
 }

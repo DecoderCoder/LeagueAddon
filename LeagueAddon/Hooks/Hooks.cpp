@@ -298,7 +298,7 @@ void Hooks::ApplyHooks() {
 	if (GetSystemDEPPolicy() != DEP_SYSTEM_POLICY_TYPE::DEPPolicyAlwaysOff)
 		SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 
-	Hooks::DirectX::HookDX();
+
 	//Hooks::DirectX::HookInput();
 
 	void* targetGCP = &GetCursorPos;
@@ -313,7 +313,9 @@ void Hooks::ApplyHooks() {
 		UltHook.RestoreRtlAddVectoredExceptionHandler();
 		//UltHook.RestoreNtProtectVirtualMemory();
 		//UltHook.RestoreZwQueryInformationProcess();
+		//MessageBoxA(0, to_hex((int)DEFINE_RVA(Offset::Function::OnProcessSpell)).c_str(), "", 0);
 		OnProcessSpellHooked = UltHook.DEPAddHook(DEFINE_RVA(Offset::Function::OnProcessSpell), reinterpret_cast<DWORD>(hOnProcessSpell), oOnProcessSpell, 0x59, new_on_process_spell, 1);
+		Hooks::DirectX::HookDX();
 		//UltHook.RestoreSysDll("ntdll.dll");
 		//auto ntdll = GetModuleHandleA("ntdll.dll");
 		//auto ntq = GetProcAddress(ntdll, "NtQueryInformationProcess");
@@ -340,7 +342,7 @@ void Hooks::ApplyHooks() {
 }
 
 void Hooks::RemoveHooks() {
-	//Utils::Log("ddd->unHook: " + string(ddd->unHook() ? "Ok" : "Error"));
+	//Utils::Log("ddd->unHook: " + string(UltHook.RemoveEzHook(oPresentDX11) ? "Ok" : "Error"));
 	//Utils::Log("detourGCP->unHook: " + string(detourGCP->unHook() ? "Ok" : "Error"));
 	Utils::Log("Hooks::DirectX::UnHookDX: " + string(Hooks::DirectX::UnHookDX() ? "Ok" : "Error"));
 	Utils::Log("UltHook.deinit: " + string(UltHook.deinit() ? "Ok" : "Error"));
