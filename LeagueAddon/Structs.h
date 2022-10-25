@@ -13,9 +13,10 @@ class SpellDataResource
 public:
 	union
 	{
-		DEFINE_MEMBER_N(float MissileSpeed, 0x460)
-			DEFINE_MEMBER_N(float Width, 0x49C)
+			DEFINE_MEMBER_N(float MissileSpeed, 0x460)
+			DEFINE_MEMBER_N(float Width, 0x494)
 			DEFINE_MEMBER_N(float Radius, 0x40C)
+			DEFINE_MEMBER_N(float Range, 0x3D8);
 	};
 };
 
@@ -39,17 +40,22 @@ public:
 			DEFINE_MEMBER_0(SpellData*		BasicAttackSpellData)
 			DEFINE_MEMBER_N(kSpellSlot		Slot, Offset::SpellInfo::Slot)
 			DEFINE_MEMBER_N(float			StartTime, Offset::SpellInfo::StartTime)
-				DEFINE_MEMBER_N(int				Index, 0x70)
+			DEFINE_MEMBER_N(int				Index, 0x70)
 			DEFINE_MEMBER_N(int				SpellIndex, Offset::SpellInfo::SpellIndex)
 			DEFINE_MEMBER_N(unsigned int	Level, Offset::SpellInfo::Level)
 			DEFINE_MEMBER_N(int	source_id, Offset::SpellInfo::source_id)
 			DEFINE_MEMBER_N(unsigned int	SourceNetworkID, Offset::SpellInfo::SourceNetworkID)
 			DEFINE_MEMBER_N(Vector3			StartPosition, Offset::SpellInfo::StartPosition)
 			DEFINE_MEMBER_N(Vector3			EndPosition, Offset::SpellInfo::EndPosition)
-				DEFINE_MEMBER_N(Vector3			EndPosition2, Offset::SpellInfo::EndPosition2)
+			DEFINE_MEMBER_N(Vector3			EndPosition2, Offset::SpellInfo::EndPosition2)
 			DEFINE_MEMBER_N(bool			HasTarget, Offset::SpellInfo::HasTarget)
 			DEFINE_MEMBER_N(DWORD			TargetArray, 0xB8)
 			DEFINE_MEMBER_N(DWORD			TargetSize, 0xC0)
+
+			DEFINE_MEMBER_N(bool IsSpell, 0xE0);
+			DEFINE_MEMBER_N(bool IsBasicAttack, 0xE4);
+			DEFINE_MEMBER_N(bool IsSpecialAttack, 0xE5);
+			DEFINE_MEMBER_N(bool IsHeadshotAttack, 0xE6);
 	};
 
 	SpellInfo() {

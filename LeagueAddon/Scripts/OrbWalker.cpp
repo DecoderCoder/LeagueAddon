@@ -342,15 +342,15 @@ void OrbWalker::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
 		return;
 	}
 
-	for (auto obj : AttackResets) {
-		if (StringContains(castInfo->BasicAttackSpellData->Name, obj, true)) {
-			Reseted = true;
-			LastAttackCommandT = 0;
-			return;
-		}
-	}
+	//for (auto obj : AttackResets) {
+	//	if (StringContains(castInfo->BasicAttackSpellData->Name, obj, true)) {
+	//		Reseted = true;
+	//		LastAttackCommandT = 0;
+	//		return;
+	//	}
+	//}
 
-	if (castInfo->BasicAttackSpellData != nullptr)
+	if (castInfo->BasicAttackSpellData != nullptr && (castInfo->IsBasicAttack || castInfo->IsSpecialAttack || castInfo->IsHeadshotAttack))
 	{
 		Reseted = false;
 		LastAttackCommandT = Function::GameTimeTick() - Function::GetPing() / 2;
