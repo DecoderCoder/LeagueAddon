@@ -10,6 +10,7 @@
 #include <ranges>
 #include <sstream>
 #include "xorstr.h"
+#include <iomanip>
 
 using namespace std;
 
@@ -25,7 +26,15 @@ using namespace std;
 bool IsLeagueInForeground();
 HWND GetHwndProc();
 
-std::string to_hex(int i);
+template< typename T >
+std::string to_hex(T i)
+{
+	std::stringstream stream;
+	stream
+		<< std::setfill('0') << std::setw(sizeof(T) * 2)
+		<< std::hex << i;
+	return stream.str();
+}
 
 template <class Functor>
 class Not

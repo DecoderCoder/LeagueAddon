@@ -39,13 +39,15 @@ HWND GetHwndProc()
 	return NULL;
 }
 
-std::string to_hex(int i) {
-	std::stringstream stream;
-	stream << std::hex << i;
-	std::string result(stream.str());
 
-	return result;
-}
+
+//std::string to_hex(int i) {
+//	std::stringstream stream;
+//	stream << std::hex << i;
+//	std::string result(stream.str());
+//
+//	return result;
+//}
 
 bool firstTime = true;
 
@@ -61,7 +63,7 @@ void Utils::Log(string text) {
 		myfile.open("Log.txt", ios_base::app);
 	}
 
-	myfile << text + "\n";
+	myfile << "[" + string(strtok(ctime(&time_t), "\n")) + "] " + text + "\n";
 	myfile.close();
 
 	//lastLog = text;
