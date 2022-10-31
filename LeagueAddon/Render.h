@@ -19,6 +19,7 @@ namespace Render {
 
 	void Draw_Line(ImVec2 pos1, ImVec2 pos2, ImColor color, float thickness);
 	void Draw_Line(float_t x1, float_t y1, float_t x2, float_t y2, ImColor color, float thickness);
+	void Draw_Line3D(Vector3 pos1, Vector3 pos2, ImColor color, float thickness);
 
 	void Draw_FilledRectangle(ImVec2 pos, ImVec2 size, ImColor color, ImColor borderColor = ImColor::ImColor(0, 0, 0, 0), float thickness = 1);
 	void Draw_FilledRectangle(float_t x1, float_t y1, float_t x2, float_t y2, ImColor color, ImColor borderColor = ImColor::ImColor(0, 0, 0, 0), float thickness = 1);

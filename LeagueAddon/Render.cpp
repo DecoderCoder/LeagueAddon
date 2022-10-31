@@ -27,7 +27,7 @@ void Render::BeginOverlayTab(string name) {
 
 	else
 		ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoTitleBar);
-	
+
 }
 void Render::EndOverlayTab() {
 	ImGui::End();
@@ -84,13 +84,57 @@ void Render::Draw_Circle3D(Vector3 center, float radius, ImColor color, float th
 	}
 }
 
+void Render::Draw_Line3D(Vector3 pos1, Vector3 pos2, ImColor color, float thickness) {
+	Vector3 w2s1, w2s2;
+
+	Function::World2Screen(&pos1, &w2s1);
+	Function::World2Screen(&pos2, &w2s2);
+	Render::Draw_Line(w2s1.x, w2s1.y, w2s2.x, w2s2.y, color, thickness);
+}
+
 
 void Render::Draw_Line(ImVec2 pos1, ImVec2 pos2, ImColor color, float thickness) {
 	Render::Draw_Line(pos1.x, pos1.y, pos2.x, pos2.y, color, thickness);
 }
 
+int random(int min, int max) //range : [min, max]
+{
+	static bool first = true;
+	if (first)
+	{
+		srand(time(NULL)); //seeding for the first time only!
+		first = false;
+	}
+	return min + rand() % ((max + 1) - min);
+}
+
 void Render::Draw_Line(float_t x1, float_t y1, float_t x2, float_t y2, ImColor color, float thickness) {
-	ImGui::GetWindowDrawList()->AddLine(ImVec2(x1, y1), ImVec2(x2, y2), color, thickness);
+
+	//Vector3 vec1;
+	//Vector3 vec2;
+
+	//vec1.x = x1;
+	//vec1.y = y1;
+
+	//vec2.x = x2;
+	//vec2.y = y2;
+
+	//float distance = vec1.distanceTo(vec2);
+
+
+
+	//if (distance > 1000) {
+	//	Vector3 lastVec = vec1;
+	//	Vector3 newVec;
+	//	for (int i = 0; i < distance / 200; i++) {
+	//		color = ImColor(random(0, 255), random(0, 255), random(0, 255));
+	//		newVec = lastVec.Extend(vec2, min(200, lastVec.distanceTo(vec2)));
+	//		ImGui::GetWindowDrawList()->AddLine(ImVec2(lastVec.x, lastVec.y), ImVec2(newVec.x, newVec.y), color, thickness);
+	//		lastVec = newVec;
+	//	}
+	//}
+	//else
+		ImGui::GetWindowDrawList()->AddLine(ImVec2(x1, y1), ImVec2(x2, y2), color, thickness);
 }
 
 void Render::Draw_FilledRectangle(ImVec2 pos, ImVec2 size, ImColor color, ImColor borderColor, float thickness) {

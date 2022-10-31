@@ -5,9 +5,11 @@ VisualStudioVersion = 17.3.32519.111
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeagueAddon", "LeagueAddon\LeagueAddon.vcxproj", "{0FAAFD3D-40F9-49EC-974F-87E12657B1C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeagueParser", "SkinNameParser\LeagueParser.csproj", "{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeagueParser", "LeagueParser\LeagueParser.csproj", "{D90484B1-4E5F-4E93-B58A-A9A2C7415C69}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeagueAddonResources", "LeagueAddonResources\LeagueAddonResources.vcxproj", "{0F1686AC-EE4B-44B0-8827-8DD333F13801}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeagueAddonLoader", "LeagueAddonLoader\LeagueAddonLoader.csproj", "{9DFB58DA-F246-4C08-9207-2EB3689025AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +57,18 @@ Global
 		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Release|x64.Build.0 = Release|x64
 		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Release|x86.ActiveCfg = Release|Win32
 		{0F1686AC-EE4B-44B0-8827-8DD333F13801}.Release|x86.Build.0 = Release|Win32
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Debug|x64.Build.0 = Debug|Any CPU
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Debug|x86.Build.0 = Debug|Any CPU
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Release|x64.ActiveCfg = Release|Any CPU
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Release|x64.Build.0 = Release|Any CPU
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Release|x86.ActiveCfg = Release|Any CPU
+		{9DFB58DA-F246-4C08-9207-2EB3689025AE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

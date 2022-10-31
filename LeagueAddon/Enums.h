@@ -1,4 +1,14 @@
 #pragma once
+#include "Vector.h"
+
+namespace GameLocation {
+	inline const Vector3 RadiantBase = Vector3(394, 182, 462);
+	inline const Vector3 DireBase = Vector3(14340, 172, 14390);
+
+	//inline const Vector3 RadiantBaseARAM = Vector3();
+	//inline const Vector3 DireBaseARAM = Vector3();
+}
+
 enum class kSpellSlot
 {
 	SpellSlot_Unknown = -1,
