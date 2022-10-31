@@ -1,5 +1,6 @@
 #pragma once
 #include "../Utils.h"
+#include "../Structs.h"
 class CSpellData
 {
 public:
@@ -13,7 +14,7 @@ public:
 		return *(float*)((DWORD)this + Offset::SpellData::CooldownTime + (lvl - 1) * sizeof(float));
 	}
 
-	CSpellData* GetSpellData() {
-		return *(CSpellData**)((DWORD)this + 0x44);
-	}
+	//SpellData* GetSpellData() {
+	//	return (SpellData*)(DWORD)this;
+	//}
 };

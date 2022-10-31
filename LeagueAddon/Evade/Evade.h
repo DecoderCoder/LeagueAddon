@@ -209,6 +209,9 @@ namespace Evade
 			bool followEnemy2 = false; // Follow enemy like TaliyahQ
 			bool followEnemy3 = false; // Follow enemy like PykeE
 
+			bool ToEnemy = false;
+			bool FromEnemy = false;
+
 			// After detection
 			float startTime = 0.0f;
 			float endTime = 0.0f;

@@ -5,6 +5,8 @@ using namespace std;
 
 //#define Compare(x, y, z) StringContains(x, y, z)
 #define Compare(x, y, z) StringCompare(x, y, z)
+#define _DEBUGEVADE 0
+#define _DEBUGMISSILES 0
 namespace Evade
 {
 	std::list<int> addedSpells;
@@ -15,9 +17,11 @@ namespace Evade
 		//InitEvadeSpells();
 		for (GameObject* hero : ObjectManager::HeroList())
 		{
+#if !_DEBUGEVADE
 			if (Local->IsAllyTo(hero) || hero->NetworkID == Local->NetworkID)
 				continue;
-
+#endif
+			ChampsInGame.push_back((Champ)SpellDB.back());
 			for (Champ spell : SpellDB)
 			{
 				if (hero->GetChampionName() == spell.hero)
@@ -25,6 +29,34 @@ namespace Evade
 					spell.obj = hero;
 					ChampsInGame.emplace_back(spell);
 				}
+			}
+
+
+		}
+
+		for (auto& hero : ChampsInGame)
+		{
+			if (Local->IsAllyTo(hero.obj) || hero.obj->NetworkID == Local->NetworkID)
+				continue;
+			if (hero.obj->GetChampionName() == "Sylas") {
+				for (GameObject* teamate : ObjectManager::HeroList())
+				{
+					//if (Local->IsEnemyTo(teamate))
+					//	continue;
+
+					for (Champ cham : SpellDB)
+					{
+						if (teamate->GetChampionName() == cham.hero)
+						{
+							for (auto spell : cham.spells) {
+								if (spell.slot == _R) {
+									hero.spells.push_back(spell);
+								}
+							}
+						}
+					}
+				}
+				break;
 			}
 		}
 
@@ -50,7 +82,7 @@ namespace Evade
 				if (ImGui::TreeNode(champ->hero.c_str())) {
 					for (int spell_c = 0; spell_c < champ->spells.size(); spell_c++) {
 						auto spell = &champ->spells[spell_c];
-						ImGui::Checkbox(("[ " + QWERDF[spell->slot] + " ] " + spell->name + "##" + to_string(spell_c)).c_str(), &spell->enabled);
+						ImGui::Checkbox(("[ " + QWERDF[spell->slot] + " ] " + spell->name + " | " + spell->displayName + "##" + to_string(spell_c)).c_str(), &spell->enabled);
 						//ImGui::SameLine();						
 					}
 					ImGui::NewLine();
@@ -70,52 +102,59 @@ namespace Evade
 
 		if (UseMissiles)
 			for (MissileSpellInfo* missile : ObjectManager::MissileList()) {
-				for (Champ& champ : ChampsInGame)
-				{
-					for (Spell& s : champ.spells)
+#if !_DEBUGEVADE
+				auto source = ObjectManager::FindObjectByIndex(ObjectManager::HeroList(), missile->source_id);
+				if (source && source->IsEnemyTo(Local)) // for sylas
+#endif
+					for (Champ& champ : ChampsInGame)
 					{
-						if (Compare(missile->BasicAttackSpellData->Name, s.missileName, true))
+						for (Spell& s : champ.spells)
 						{
-							auto it = addedSpells.begin();
-							bool found = false;
-							while (it != addedSpells.end()) {
-								if ((*it) == missile->Index) {
-									found = true;
-									break;
+
+							if (Compare(missile->BasicAttackSpellData->Name, s.missileName, true)) // && missile->source_id
+							{
+
+								auto it = addedSpells.begin();
+								bool found = false;
+								while (it != addedSpells.end()) {
+									if ((*it) == missile->Index) {
+										found = true;
+										break;
+									}
+									else {
+										++it;  // go to next
+									}
 								}
-								else {
-									++it;  // go to next
+								if (!found) {
+
+									s.startTime = GameTimer;
+									s.obj = champ.obj;
+
+									SpellInfo spellInfo;
+									spellInfo.SpellIndex = missile->Index;
+									spellInfo.BasicAttackSpellData = missile->BasicAttackSpellData;
+
+									spellInfo.StartPosition = missile->StartPosition;
+									spellInfo.EndPosition = missile->EndPosition;
+									spellInfo.EndPosition2 = missile->EndPosition2;
+									spellInfo.SourceNetworkID = missile->SourceNetworkID;
+									spellInfo.source_id = missile->source_id;
+
+									s.spell = &spellInfo;
+									s.radiusRes = spellInfo.BasicAttackSpellData->Resource->Radius;
+									if (s.radius == 0 && spellInfo.BasicAttackSpellData->Resource->Radius != 0)
+										s.radius = s.radiusRes;
+									s.speed = spellInfo.BasicAttackSpellData->Resource->MissileSpeed == 0 ? MathHuge : spellInfo.BasicAttackSpellData->Resource->MissileSpeed;
+
+									OnSpellCast(s);
+
+									addedSpells.push_back(missile->Index);
+
 								}
-							}
-							if (!found) {
-
-								s.startTime = GameTimer;
-								s.obj = champ.obj;
-
-								SpellInfo spellInfo;
-								spellInfo.SpellIndex = missile->Index;
-								spellInfo.BasicAttackSpellData = missile->BasicAttackSpellData;
-
-								spellInfo.StartPosition = missile->StartPosition;
-								spellInfo.EndPosition = missile->EndPosition;
-								spellInfo.EndPosition2 = missile->EndPosition2;
-								spellInfo.SourceNetworkID = missile->SourceNetworkID;
-								spellInfo.source_id = missile->source_id;
-
-								s.spell = &spellInfo;
-								s.radiusRes = spellInfo.BasicAttackSpellData->Resource->Radius;
-								s.speed = spellInfo.BasicAttackSpellData->Resource->MissileSpeed == 0 ? MathHuge : spellInfo.BasicAttackSpellData->Resource->MissileSpeed;
-
-
-								OnSpellCast(s);
-
-								addedSpells.push_back(missile->Index);
 
 							}
-
 						}
 					}
-				}
 			}
 
 		Vector3 lpPos;
@@ -153,12 +192,12 @@ namespace Evade
 				DetectedSkillshots[i].endPos = DetectedSkillshots[i].obj->Position;
 				//DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
 			}
-			if (DetectedSkillshots[i].followEnemy2) {
+			else if (DetectedSkillshots[i].followEnemy2) {
 				//DetectedSkillshots[i].startPos = DetectedSkillshots[i].obj->Position;
 				//DetectedSkillshots[i].endPos = DetectedSkillshots[i].endPos;
 				//DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
 			}
-			if (DetectedSkillshots[i].followEnemy3) {
+			else if (DetectedSkillshots[i].followEnemy3) {
 				if (DetectedSkillshots[i].delayBR > 0) {
 					if (DetectedSkillshots[i].startTime + DetectedSkillshots[i].delay + DetectedSkillshots[i].delayBR < GameTimer && !DetectedSkillshots[i].directionChanged) {
 						DetectedSkillshots[i].startPos = DetectedSkillshots[i].endPos;
@@ -172,9 +211,21 @@ namespace Evade
 				}
 				//DetectedSkillshots[i].startPos = DetectedSkillshots[i].obj->Position;
 			}
+
+
+			//if (DetectedSkillshots[i].useMissile) {
+			//	auto Missiles = ObjectManager::MissileList();
+			//	bool found = false;
+			//	for (auto mis : Missiles) {
+			//		if (Compare(mis->BasicAttackSpellData->Name, DetectedSkillshots[i].missileName, true)) {
+			//			DetectedSkillshots[i].currPos = mis->CurrentPosition;
+			//			break;
+			//			//	
+			//		}
+			//	}
+			//}
+
 			DetectedSkillshots[i].path = GetPath(DetectedSkillshots[i]);
-			//
-			//
 		}
 
 		for (Spell& spell : DetectedSkillshots) {
@@ -212,6 +263,9 @@ namespace Evade
 					Render::Draw_Circle3D(spell.endPos, spell.radius, ImColor(255, 255, 255), 1);
 				//render.draw_circle(spell.endPos, spell.radius);
 				else if (spell.type == SpellType::linear)
+					/*if (spell.useMissile)
+						Render::Rect(spell.currPos, spell.endPos, spell.radius, 1, ImColor(255, 255, 255));
+					else*/
 					Render::Rect(spell.startPos, spell.endPos, spell.radius, 1, ImColor(255, 255, 255));
 				else
 					Render::Polygon(spell.path, ImColor(255, 255, 255), 1);
@@ -319,7 +373,7 @@ namespace Evade
 	{
 		if (!EvadeSpells)
 			return;
-		Vector3 p = pos.Extend(MyHeroPos, -BoundingRadius );
+		Vector3 p = pos.Extend(MyHeroPos, -BoundingRadius);
 		//Vector2 path = riot_render->WorldToScreen();
 		if (Function::GameTimeTick() - LastClick > 1000 / 80) {
 			LastClick = Function::GameTimeTick();
@@ -422,7 +476,8 @@ namespace Evade
 						ints = FindIntersections(poly, MyHeroPos, movePath);
 					}
 				}
-				ints = filter(ints, [&](const Vector3& pos) { return !IsDangerous(pos); });
+
+				ints = filter(ints, [&](const Vector3& pos) { return !IsDangerous(pos) && !Function::IsWall(pos); });
 				if (ints.size() > 0)
 				{
 					ints.sort([&](Vector3 const& a, Vector3 const& b)
@@ -616,11 +671,9 @@ namespace Evade
 
 	void Core::OnSpellCast(Spell& spell)
 	{
-
 		if (!spell.obj || !spell.spell || !spell.enabled)
 			return;
-
-
+		//MessageBoxA(0, (to_string(spell.startPos.x) + "\n" + to_string(spell.startPos.y) + "\n" + to_string(spell.startPos.z) + "\n\n\n\n" + to_string(spell.endPos.x) + "\n" + to_string(spell.endPos.y) + "\n" + to_string(spell.endPos.z)).c_str(), "1", 0);
 
 		if (spell.exception && spell.spell->EndPosition2.x != 0 && spell.spell->EndPosition2.y != 0) {
 			spell.startPos = spell.spell->EndPosition;
@@ -630,9 +683,11 @@ namespace Evade
 			spell.startPos = spell.spell->StartPosition;
 			spell.endPos = spell.spell->EndPosition;
 		}
-
+		//MessageBoxA(0, (to_string(spell.spell->StartPosition.x) + "\n" + to_string(spell.spell->StartPosition.y) + "\n" + to_string(spell.spell->StartPosition.z) + "\n\n\n\n" + to_string(spell.spell->EndPosition.x) + "\n" + to_string(spell.spell->EndPosition.y) + "\n" + to_string(spell.spell->EndPosition.z)).c_str(), "2", 0);
 
 		spell.endPos = CalculateEndPos(spell);
+		//MessageBoxA(0, (to_string(spell.spell->StartPosition.x) + "\n" + to_string(spell.spell->StartPosition.y) + "\n" + to_string(spell.spell->StartPosition.z) + "\n\n\n\n" + to_string(spell.spell->EndPosition.x) + "\n" + to_string(spell.spell->EndPosition.y) + "\n" + to_string(spell.spell->EndPosition.z)).c_str(), "3", 0);
+
 		if (spell.followEnemy)
 			spell.startPos = spell.obj->Position;
 		spell.path = GetPath(spell);
@@ -1070,6 +1125,7 @@ namespace Evade
 
 		Vector3 startPos1 = spellInfo.startPos;
 		Vector3 placementPos = spellInfo.endPos;
+		//MessageBoxA(0, (to_string(startPos1.x) + "\n" + to_string(startPos1.y) + "\n" + to_string(startPos1.z) + "\n\n\n\n" + to_string(placementPos.x) + "\n" + to_string(placementPos.y) + "\n" + to_string(placementPos.z)).c_str(), "", 0);
 		Vector3 unitPos = spellInfo.obj->Position;
 		float range = spellInfo.range;
 		Vector3 endPos = startPos1.Extend(placementPos, range);
@@ -1196,36 +1252,59 @@ namespace Evade
 	}
 
 	void Core::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
+#if _DEBUGMISSILES
+		return;
+#endif
+
 		auto Caster = ObjectManager::FindObjectByIndex(ObjectManager::MinionList(), castInfo->source_id);
 		if (Caster)
 			return;
+#if !_DEBUGEVADE
+		auto caster2 = ObjectManager::FindObjectByIndex(ObjectManager::HeroList(), castInfo->source_id);
+		if (caster2 && Local->IsAllyTo(caster2))
+			return;
+#endif
 		/*if (ObjectManager::FindObjectByIndex(ObjectManager::HeroList(), castInfo->source_id)->Index == Local->Index)
 			return;*/
 			/*if (castInfo->Slot != kSpellSlot::SpellSlot_SpecialAttack && ObjectManager::FindObjectByIndex(ObjectManager::HeroList(), castInfo->source_id) && ObjectManager::FindObjectByIndex(ObjectManager::HeroList(), castInfo->source_id)->IsEnemyTo(Local))
 				console.Print("%s", castInfo->BasicAttackSpellData->Name.c_str());
 			*/
 
+			//MessageBoxA(0, to_hex((int)castInfo).c_str(), to_hex((int)castInfo->BasicAttackSpellData->Resource->Range).c_str(), 0);
+
 		for (Champ& champ : ChampsInGame)
 		{
 			for (Spell& s : champ.spells)
 			{
-				if (Compare(castInfo->BasicAttackSpellData->Name, s.name, true) )
+				if (Compare(castInfo->BasicAttackSpellData->Name, s.name, true))
 				{
 
 					addedSpells.push_back(castInfo->Index);
 					s.startTime = GameTimer;
 					s.obj = champ.obj;
 					s.spell = castInfo;
+					if (s.type != circular && s.range == 0 && (&castInfo->BasicAttackSpellData->Resource->Range)[castInfo->Level] != 0)
+						s.range = (&castInfo->BasicAttackSpellData->Resource->Range)[castInfo->Level];
 					s.radiusRes = castInfo->BasicAttackSpellData->Resource->Radius;
-					//s.speed = castInfo->BasicAttackSpellData->Resource->MissileSpeed == 0 ? MathHuge : castInfo->BasicAttackSpellData->Resource->MissileSpeed;
+					if (s.radius == 0 && castInfo->BasicAttackSpellData->Resource->Radius != 0)
+						s.radius = s.radiusRes;
+					//s.speed = castInfo->BasicAttackSpellData->Resource->MissileSpeed;
+					if (s.type != circular)
+						s.speed = castInfo->BasicAttackSpellData->Resource->MissileSpeed == 0 ? MathHuge : castInfo->BasicAttackSpellData->Resource->MissileSpeed;
 					OnSpellCast(s);
 				}
 			}
 		}
-	}
+}
 
 	void Core::InitSpells()
 	{
+		{
+			Champ Items;
+			Items.hero = "Items";
+
+		}
+
 		{
 			Champ Belveth;
 			Belveth.hero = "Belveth";
@@ -1718,6 +1797,7 @@ namespace Evade
 			R.fow = true;
 			R.exception = false;
 			R.extend = true;
+			R.useMissile = true;
 			Ashe.spells.emplace_back(R);
 
 			/*Spell W;
@@ -2222,7 +2302,7 @@ namespace Evade
 			Cassiopeia.spells.emplace_back(W);
 
 			Spell R;
-			R.name = "CassiopeiaR";
+			/*R.name = "CassiopeiaR";
 			R.icon = "CassiopeiaR";
 			R.displayName = "Petrifying Gaze";
 			R.missileName = "";
@@ -2241,6 +2321,29 @@ namespace Evade
 			R.fow = false;
 			R.exception = false;
 			R.extend = true;
+			R.FromEnemy = true;
+			Cassiopeia.spells.emplace_back(R);*/
+
+			R.name = "CassiopeiaR";
+			R.icon = "CassiopeiaR";
+			R.displayName = "Petrifying Gaze";
+			R.missileName = "";
+			R.slot = _R;
+			R.type = linear;
+			R.speed = MathHuge;
+			R.range = 825;
+			R.delay = 0.5;
+			R.radius = 790;
+			R.angle = 80;
+			R.danger = 5;
+			R.cc = true;
+			R.collision = false;
+			R.windwall = false;
+			R.hitbox = false;
+			R.fow = false;
+			R.exception = false;
+			R.extend = true;
+			R.FromEnemy = true;
 			Cassiopeia.spells.emplace_back(R);
 
 			SpellDB.emplace_back(Cassiopeia);
@@ -2271,7 +2374,7 @@ namespace Evade
 			E.fow = true;
 			E.exception = false;
 			E.extend = true;
-			E.useMissile = true;
+			//E.useMissile = true;
 			Yorick.spells.emplace_back(E);
 
 
@@ -3186,12 +3289,14 @@ namespace Evade
 			R.radius = 140;
 			R.danger = 4;
 			R.cc = false;
-			R.collision = true;
+			R.collision = false;
+			R.collisionWC = true;
 			R.windwall = true;
 			R.hitbox = true;
 			R.fow = true;
 			R.exception = false;
 			R.extend = true;
+			R.useMissile = true;
 			Jinx.spells.emplace_back(R);
 
 			SpellDB.emplace_back(Jinx);
@@ -4372,7 +4477,7 @@ namespace Evade
 			Varus.hero = "Varus";
 
 			Spell Q;
-			Q.name = "VarusQ";
+			Q.name = "VarusQ1";
 			Q.icon = "VarusQ";
 			Q.displayName = "Piercing Arrow";
 			Q.missileName = "VarusQMissile";
@@ -4387,7 +4492,7 @@ namespace Evade
 			Q.collision = false;
 			Q.windwall = true;
 			Q.fow = true;
-			Q.exception = true;
+			Q.exception = false;
 			Q.extend = false;
 
 			Spell E;
@@ -4643,6 +4748,60 @@ namespace Evade
 			Vi.spells.emplace_back(Q);
 			SpellDB.emplace_back(Vi);
 		}*/
+
+		{
+			Champ Vex;
+			Vex.hero = "Vex";
+
+			Spell Q;
+			Q.name = "VexQ";
+			Q.icon = "VexQ";
+			Q.displayName = "VexQ";
+			Q.slot = _Q;
+			Q.radius = 180;
+			Q.type = linear;
+			//	Q.range = 1200;
+			Q.extend = true;
+			Q.collision = false;
+			Q.danger = 2;
+			Q.windwall = true;
+			Q.speed = 0;
+			Q.delay = 0;
+			Vex.spells.push_back(Q);
+
+			Spell E;
+			E.name = "VexE";
+			E.icon = "VexE";
+			E.displayName = "VexE";
+			E.slot = _E;
+			E.type = circular;
+			//	E.range = 800;
+			E.collision = false;
+			E.danger = 1;
+			E.windwall = false;
+			E.speed = 0;
+			E.delay = 0;
+			E.radius = 0;
+			Vex.spells.push_back(E);
+
+			Spell R;
+			R.name = "VexR";
+			R.icon = "VexR";
+			R.displayName = "VexR";
+			R.slot = _R;
+			R.type = linear;
+			R.range = 3000;
+			R.radius = 130;
+			R.collisionWC = true;
+			R.danger = 2;
+			//R.radius = 130;
+			R.windwall = true;
+			R.speed = 0;
+			R.delay = 0;
+			Vex.spells.push_back(R);
+
+			SpellDB.push_back(Vex);
+		}
 
 		{
 			Champ Viktor;
@@ -6108,6 +6267,33 @@ namespace Evade
 		}
 
 		{
+			Champ Zeri;
+			Zeri.hero = "Zeri";
+
+			Spell W;
+			W.name = "ZeriW";
+			W.icon = "ZeriW";
+			W.displayName = "Zeri W";
+			W.slot = _W;
+			W.type = circular;
+			W.speed = 2500;
+			W.range = 750;
+			W.delay = 0.25;
+			W.radius = 240;
+			W.danger = 1;
+			W.cc = false;
+			W.collision = false;
+			W.windwall = false;
+			W.hitbox = true;
+			W.fow = false;
+			W.exception = false;
+			W.extend = false;
+			Zeri.spells.emplace_back(W);
+
+			SpellDB.emplace_back(Zeri);
+		}
+
+		{
 			Champ Zed;
 			Zed.hero = "Zed";
 
@@ -6722,9 +6908,10 @@ namespace Evade
 			Viego.spells.emplace_back(Q);
 
 			Spell W;
-			W.name = "ViegoW";
-			W.icon = "ViegoW";
+			W.name = "ViegoW1";
+			W.icon = "ViegoW1";
 			W.displayName = "ViegoWCast";
+			W.missileName = "ViegoWMis";
 			W.slot = _W;
 			W.type = linear;
 			W.speed = 1500;

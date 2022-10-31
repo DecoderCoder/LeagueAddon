@@ -1,11 +1,17 @@
 #pragma once
 #include "./ObjectManager.h"
 #include <vector>
+#include "Geometry.h"
+#include "Evade/Evade.h"
 
 using namespace std;
 
 namespace TargetSelector
 {
+	inline int hasEnemyYasuo = 0;
+	inline GameObject* hasEnemySamira = nullptr;
+	inline bool IgnoreMissileShield = false;
+
 	inline const char* targetingModeLabels[] = { "AutoPriority", "LowHP", "LowEfficientHP", "MostAD", "MostAP", "Closest", "NearMouse", "LessAttack", "LessCast", "MostStack" };
 
 	inline std::vector<GameObject*> attackOrder;

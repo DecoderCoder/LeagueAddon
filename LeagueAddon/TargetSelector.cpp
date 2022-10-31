@@ -15,8 +15,16 @@ bool TargetSelector::checkUnit(GameObject* unit)
 void TargetSelector::Initialize() {
 	attackOrder.clear();
 	for (auto hero : ObjectManager::HeroList()) {
-		if (hero->IsEnemyTo(Local))
-			attackOrder.push_back(hero);
+		//if (hero->IsEnemyTo(Local)) {
+		attackOrder.push_back(hero);
+		if (hero->GetChampionName() == "Yasuo")
+			hasEnemyYasuo = hero->Index;
+		if (hero->GetChampionName() == "Samira")
+			hasEnemySamira = hero;
+
+		//}
+
+
 	}
 }
 
@@ -53,7 +61,58 @@ GameObject* TargetSelector::GetTarget(GameObject* champion, float range, DamageT
 	GameObject* first = nullptr;
 	int prevPriority = attackOrder.size();
 	TargetingMode prevTargetMode = mode;
-	std::list<GameObject*> objects = filter(ObjectManager::HeroList(), [&](GameObject* enemy) { return Helper::isValidUnit(enemy) && enemy->IsInRange(Local, Local->AttackRange, true); });
+	std::list<GameObject*> objects = filter(ObjectManager::HeroList(), [&](GameObject* enemy) { return Helper::isValidUnit(enemy) && enemy->IsInRange(Local, range, true); });
+
+	Render::BeginOverlay();
+	if (!IgnoreMissileShield && (hasEnemyYasuo || hasEnemySamira)) {
+		std::vector<Geometry::Polygon> shields;
+		if (hasEnemyYasuo) {
+			auto yasuoShields = filter(ObjectManager::MissileList(), [&](MissileSpellInfo* mis) { return StringCompare(mis->BasicAttackSpellData->Name, "YasuoW_VisualMis") && hasEnemyYasuo == mis->source_id; });
+			float shieldWidth = 250 + 70 * ObjectManager::FindObjectByIndex(hasEnemyYasuo)[0].SpellBook.GetSpellSlotByID(1)->GetLevel();
+
+			for (auto shield : yasuoShields) {
+				Geometry::Polygon area = Geometry::Rectangle(shield->EndPosition.Extend(shield->StartPosition, shield->BasicAttackSpellData->Resource->Radius * 2), shield->EndPosition, shieldWidth / 2).ToPolygon();
+				shields.push_back(area);
+			}
+		}
+
+		if (hasEnemySamira) {
+			if (hasEnemySamira->BuffManager.hasBuff("SamiraW")) {
+				auto area = Geometry::Circle(hasEnemySamira->Position, Function::GetBoundingRadius(hasEnemySamira) / 2 + 325).ToPolygon();
+				shields.push_back(area);
+			}
+		}
+		
+		for (auto shield : shields) {
+			Render::Polygon(shield, ImColor(255, 255, 255), 1);
+		}
+
+		if (shields.size() > 0) {
+			auto it = objects.begin();
+			while (it != objects.end()) {
+				bool intersec = false;
+				for (auto shield : shields) {
+					if (Evade::Core::FindIntersections(shield, Local->Position, (*it)->Position).size() > 0) {
+						intersec = true;
+						break;
+					}
+				}
+				if (intersec) {
+					it = objects.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+		}		
+	}
+
+	for (auto h : objects) {
+		Render::Draw_Line3D(Local->Position, h->Position, ImColor(255, 0, 0), 1);
+	}
+
+	Render::EndOverlay();
+
 	for (GameObject* next : objects)
 	{
 		switch (mode)
