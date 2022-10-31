@@ -45,6 +45,8 @@ namespace OrbWalker {
 
 	inline bool dravenMode = false;
 	inline bool vayneQMode = false;
+	inline float vayneQDelay = 0;
+	inline float vayneCanAttack = 0;
 
 	float GetMyProjectileSpeed();
 

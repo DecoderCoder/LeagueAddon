@@ -41,7 +41,7 @@ bool OrbWalker::CanAttack() {
 	//}
 	if (vayneQMode) {
 		// vaynetumblebonus  vaynetumblefade
-		if (Local->BuffManager.hasBuff("vaynetumblefade"))
+		if (vayneCanAttack > GetTickCount())
 		{
 			return false;
 		}
@@ -349,6 +349,12 @@ void OrbWalker::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
 	//		return;
 	//	}
 	//}
+
+	if (vayneQMode) {
+		if (StringCompare(castInfo->BasicAttackSpellData->Name, "VayneTumble", false) && Local->BuffManager.hasBuff("VayneInquisition")) {
+			vayneCanAttack = GetTickCount() + vayneQDelay * 1000;
+		}
+	}
 
 	if (castInfo->BasicAttackSpellData != nullptr && (castInfo->IsBasicAttack || castInfo->IsSpecialAttack || castInfo->IsHeadshotAttack))
 	{

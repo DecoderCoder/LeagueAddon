@@ -172,18 +172,18 @@ int* Function::IssueOrder(GameObject* Object, int Order, Vector3* Position, Game
 	memset(antiCheatCheck + 0x1, 0, 0x3);
 	return NULL;
 }
-
-int* Function::CastSpell(DWORD* spellbook, DWORD* spelldatainst, int spellslot, Vector3* Origin, Vector3* Target, DWORD networkid) {
-	FuncType::fnCastSpell castSpell = (FuncType::fnCastSpell)(baseAddr + Offset::Function::CastSpell);
-	bool Detected;
-	auto res = castSpell(spellbook, spelldatainst, spellslot, Origin, Target, networkid);
-	Detected = *reinterpret_cast<bool*>(reinterpret_cast<uintptr_t>(get_peb()) + 0xA00);
-	if (Detected == true) {
-		MessageBoxA(0, "Detected", "PEB", 0);
-	}
-
-	return res;
-}
+//
+//int* Function::CastSpell(DWORD* spellbook, DWORD* spelldatainst, int spellslot, Vector3* Origin, Vector3* Target, DWORD networkid) {
+//	FuncType::fnCastSpell castSpell = (FuncType::fnCastSpell)(baseAddr + Offset::Function::NewCastSpell);
+//	bool Detected;
+//	auto res = castSpell(spellbook, spelldatainst, spellslot, Origin, Target, networkid);
+//	Detected = *reinterpret_cast<bool*>(reinterpret_cast<uintptr_t>(get_peb()) + 0xA00);
+//	if (Detected == true) {
+//		MessageBoxA(0, "Detected", "PEB", 0);
+//	}
+//
+//	return res;
+//}
 
 
 
@@ -278,6 +278,10 @@ bool Function::IsWall(Vector3* position, unsigned __int16 uk)
 	return !((fnIsNotWall)(DEFINE_RVA(Offset::Function::IsNotWall)))(position, (unsigned __int16)uk);
 }
 
+bool Function::IsWall(Vector3 position) {
+	return IsWall(&position);
+}
+
 int Function::GetSelected() {
 	auto hudmgr = *(DWORD*)DEFINE_RVA(Offset::Data::HudInstance);
 	auto hud = *(DWORD*)(hudmgr + 0x30);
@@ -294,7 +298,7 @@ void Function::SetSelected(int SetSelected) {
 void Function::CharacterDataStack_Push(void* hero, const char* model, std::int32_t skin) noexcept
 {
 	static const auto Push{ reinterpret_cast<int(__thiscall*)(void*, const char* model, std::int32_t skinid, std::int32_t, bool update_spells, bool dont_update_hud, bool, bool, bool change_particle, bool, char, const char*, std::int32_t, const char*, std::int32_t, bool, std::int32_t)>(std::uintptr_t(::GetModuleHandle(nullptr)) + Offset::Function::CharacterDataStack__Push) };
-	Push(hero, model, skin, 0, false, false, false, false, true, false, -1, "\x00", 0, "\x00", 0, false, 1);
+	Push(hero, model, skin, 0, true, false, false, false, true, false, -1, "\x00", 0, "\x00", 0, false, 1);
 }
 
 void Function::CharacterDataStack_Update(void* hero, bool change) noexcept

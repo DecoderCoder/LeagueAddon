@@ -58,6 +58,7 @@ namespace Function {
 	void SendChat(string text, int color = 0xFFFFFF);
 
 	bool IsWall(Vector3* position, unsigned __int16 uk = 0);
+	bool IsWall(Vector3 position);
 
 	int* IssueOrder(GameObject* Object, int Order, Vector3* Position, GameObject* Target, bool IsAttackMove, bool IsMinion, DWORD Unknown);
 	int GetBaseDrawPosition(GameObject* Object, Vector3* Position);

@@ -50,13 +50,16 @@ GameObject* GetNearestToCursor(POINT cursorPos, std::vector<GameObject*>* object
 void Yasuo::MainThread() {
 
 	CSpellSlot* QSpell = Local->SpellBook.GetSpellSlotByID(0);
-	CSpellSlot* WSpell = Local->SpellBook.GetSpellSlotByID(1);
+	//CSpellSlot* WSpell = Local->SpellBook.GetSpellSlotByID(1);
 	CSpellSlot* ESpell = Local->SpellBook.GetSpellSlotByID(2);
-	CSpellSlot* RSpell = Local->SpellBook.GetSpellSlotByID(3);
+	//CSpellSlot* RSpell = Local->SpellBook.GetSpellSlotByID(3);
+	AIManager* localAIManager = Local->GetAIManager();
+
 	POINT cursorPos;
 	typedef BOOL(__stdcall* fGetCursorPos) (LPPOINT lpPoint);
-	if (Q_Aim && (QSpell->GetName() == "YasuoQ1Wrapper" || QSpell->GetName() == "YasuoQ2Wrapper") && GetAsyncKeyState('Q') && QSpell->IsReady()) {
-
+	if (Q_Aim && (QSpell->GetName() == "YasuoQ1Wrapper" || QSpell->GetName() == "YasuoQ2Wrapper") && GetAsyncKeyStateN('Q') && QSpell->IsReady()) {
+		if (Input::oGetCursorPos == 0)
+			return;
 		((fGetCursorPos)Input::oGetCursorPos)(&cursorPos);
 		std::list<GameObject*> nearPlayers;
 		for (auto obj : ObjectManager::HeroList()) {
@@ -86,13 +89,18 @@ void Yasuo::MainThread() {
 			}
 		}
 	}
+	/*if (UseQinEWhenFlash) {
+		if (GetAsyncKeyStateN('D')) {
+			Input::PressKey(HKey::Q);
+		}
+	}*/
 }
 
 void Yasuo::OnMenu() {
 	if (Local->NetworkID != -1 && Local->GetChampionName() == "Yasuo") {
 		if (ImGui::CollapsingHeader("Yasuo")) {
 			ImGui::Checkbox("Q Aim Assist", &Q_Aim);
-			//ImGui::Checkbox("Q last hit [Heroes]", &Q_Lasthit);
+			//ImGui::Checkbox("Use Q when Flash in E", &UseQinEWhenFlash);
 
 			//ImGui::Checkbox("Show skill damage", &SkillDamage);
 
@@ -112,7 +120,7 @@ void Yasuo::OnDraw() {
 	if (Yasuo::Q_Aim)
 		for (auto obj : ObjectManager::HeroList()) {
 			if (obj->IsEnemyTo(Local) && Function::IsAlive(obj)) {
-				AIManager* aiManager = obj->GetAIManager();				
+				AIManager* aiManager = obj->GetAIManager();
 				Vector3 pos = obj->Position;
 				//Vector3 w2sPos = obj.GetHpBarPosition();
 				//Vector3 HpBarPosition = obj.GetHpBarPosition();
