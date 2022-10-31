@@ -2,9 +2,6 @@
 
 //const char* qwerdf[] = { "Q", "W", "E", "R", "D", "F" };
 
-bool drawSpellDirection = false;
-bool drawObjectInfo = false;
-bool drawObjectInfoBuffs = false;
 
 void Debug::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
 	if (!Enabled)
@@ -77,12 +74,7 @@ void Debug::OnMenu() {
 	if (Enabled) {
 		ImGui::Begin("Debug");
 
-		ImGui::Checkbox("Draw objects info", &drawObjectInfo);
-		if (ImGui::TreeNode("Object info")) {
-			ImGui::Checkbox("Buffs", &drawObjectInfoBuffs);
-			ImGui::TreePop();
-		}
-		ImGui::Checkbox("Draw spells direction", &drawSpellDirection);
+		
 
 		if (ImGui::CollapsingHeader("OrbWalker")) {
 			ImGui::Text(("LastAA  : " + to_string(OrbWalker::LastAttackCommandT)).c_str());
@@ -94,12 +86,20 @@ void Debug::OnMenu() {
 			int counter = 0;
 			for (auto spell : detectedSpells)
 			{
-				ImGui::Text(to_string(counter).c_str());
-				ImGui::SameLine();
-				if (!spell.BasicAttackSpellData->Name.empty())
-					ImGui::Text(spell.BasicAttackSpellData->Name.c_str());
+				if (!spell.BasicAttackSpellData->Name.empty()) {
+					if (ImGui::TreeNode((to_string(counter) + " " + spell.BasicAttackSpellData->Name + "##DebugOnProcessSpell").c_str())) {
+						ImGui::Text(("Distance 1: " + to_string(spell.StartPosition.distanceTo(spell.EndPosition))).c_str());
+						ImGui::Text(("Distance 2: " + to_string(spell.StartPosition.distanceTo(spell.EndPosition2))).c_str());
+						ImGui::Text(("Radius: " + to_string(spell.BasicAttackSpellData->Resource->Radius)).c_str());
+						ImGui::Text(("Speed: " + to_string(spell.BasicAttackSpellData->Resource->MissileSpeed)).c_str());
+						//ImGui::Text(("Target: " + (spell.HasTarget ? to_string(spell.targetIndex()) : string("Empty"))).c_str());
+						//ImGui::Text(("Speed: " + to_string(spell.BasicAttackSpellData->Resource->MissileSpeed)).c_str());
+						ImGui::TreePop();
+					}
+				}
 				else
 					ImGui::Text("Empty");
+
 				counter++;
 			}
 		}
@@ -118,14 +118,16 @@ void Debug::OnMenu() {
 
 		if (ImGui::CollapsingHeader("Champions")) {
 			for (auto hero : ObjectManager::HeroList()) {
-				if (ImGui::TreeNode(hero->GetChampionName().c_str())) {
+				if (ImGui::TreeNode((hero->GetChampionName() + "##" + to_string(hero->Index)).c_str())) {
+					AIManager* aiManager = hero->GetAIManager();
 					bool isAlive = Function::IsAlive(hero);
 					bool isValid = hero->isValid();
-					bool IsInvulnearable = hero->IsInvulnearable();
+					bool IsInvulnearable = hero->IsInvulnearable(Local);
 					Vector3 pos = hero->Position;
 					ImGui::Text(("Index: " + to_string(hero->Index)).c_str());
 					ImGui::Text(("NetworkID: " + to_string(hero->NetworkID)).c_str());
 					ImGui::Text(("PTR: " + to_hex((int)hero)).c_str());
+					ImGui::Text(("AiManager PTR: " + to_hex((int)aiManager)).c_str());
 
 					ImGui::SliderFloat("Health", &hero->Health, 0, hero->MaxHealth);
 					ImGui::Text(("RecallState: " + to_string((int)hero->RecallState)).c_str());
@@ -136,7 +138,15 @@ void Debug::OnMenu() {
 					ImGui::Text(to_string(pos.y).c_str());
 					ImGui::SameLine();
 					ImGui::Text(to_string(pos.z).c_str());
+
+
+					ImGui::DragFloat("X", &hero->Position.x);
+					ImGui::DragFloat("Y", &hero->Position.y);
+					ImGui::DragFloat("Z", &hero->Position.z);
+
 					ImGui::Separator();
+
+
 					ImGui::Text("AD Damage: ");
 					ImGui::SameLine();
 					ImGui::Text(to_string(hero->BaseAttackDamage).c_str());
@@ -236,15 +246,15 @@ void Debug::OnMenu() {
 
 		if (ImGui::CollapsingHeader("Render")) {
 			{
-				Vector3 bdp; // BaseDrawPosition
-				Function::GetHPBarPosition(Local, &bdp);
+				//Vector3 bdp; // BaseDrawPosition
+				/*Function::GetHPBarPosition(Local, &bdp);
 				ImGui::Text("GetHPBarPosition: ");
 				ImGui::SameLine();
 				ImGui::Text(to_string(bdp.x).c_str());
 				ImGui::SameLine();
 				ImGui::Text(to_string(bdp.y).c_str());
 				ImGui::SameLine();
-				ImGui::Text(to_string(bdp.z).c_str());
+				ImGui::Text(to_string(bdp.z).c_str());*/
 
 				if (ImGui::TreeNode("Images Manager")) {
 					for (auto obj : *Render::Images_Manager.GetVector()) {
@@ -282,6 +292,15 @@ void Debug::OnMenu() {
 			if (ImGui::Button("Vayne"))
 				Vayne::Initialize();
 		}
+
+		Vector3 mousePos = *Function::GetMouseWorldPosition();
+		ImGui::Text("MousePosition: ");
+		ImGui::SameLine();
+		ImGui::Text(to_string(mousePos.x).c_str());
+		ImGui::SameLine();
+		ImGui::Text(to_string(mousePos.y).c_str());
+		ImGui::SameLine();
+		ImGui::Text(to_string(mousePos.z).c_str());
 
 		ImGui::Text(("IsWall: " + string((Function::IsWall(Function::GetMouseWorldPosition()) ? "true" : "false"))).c_str());
 

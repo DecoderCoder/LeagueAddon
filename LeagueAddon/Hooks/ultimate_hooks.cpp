@@ -1,4 +1,4 @@
-#define USE_ZIDYS 0
+#define USE_ZIDYS 1
 #define DEBUG_RELLOCATION 0
 
 #include "ultimate_hooks.h"
@@ -29,12 +29,6 @@ DWORD UltimateHooks::AddEzHook(DWORD target, size_t hookSize, DWORD hook) {
 	ezHook.hooked = false;
 	ezHook.hookSize = hookSize;
 	ezHook.hookFunction = hook;
-
-	//if (*(BYTE*)(target) == 0xE9) {
-	//	target = target + *(DWORD*)(target + 1) + 5;
-	//	ezHook.JMP = true;
-	//	hookSize = 6;
-	//}
 
 	DWORD allocation = (DWORD)VirtualAlloc(NULL, 1024, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	if (allocation == 0)
@@ -689,10 +683,11 @@ void UltimateHooks::FixRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DW
 {
 	Utils::Log("FixRellocation: OldFnAddress: " + to_hex(OldFnAddress));
 	Utils::Log("FixRellocation: NewFnAddress: " + to_hex(NewFnAddress));
-
-#if (!(USE_ZIDYS) || DEBUG_RELLOCATION)
 	long RellocationOffset = OldFnAddress - NewFnAddress;
 	Utils::Log("RellocationOffset: " + to_string(RellocationOffset));
+
+#if (!(USE_ZIDYS) || DEBUG_RELLOCATION)
+	
 
 	OldFnAddress += (DWORD)_offset;
 	for (int i = 0; i < size; i++) {
@@ -816,11 +811,9 @@ void UltimateHooks::FixRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DW
 					{
 						DWORD hex = std::strtoul((mnemonic.substr(5, 10)).c_str(), NULL, 16);
 						if ((hex >= OldFnAddress + 0x1000) && (hex <= OldFnAddressEnd - 0x1000)) {
-							//MessageBoxA(0, to_hex(runtime_address + 1).c_str(), "JMP Before", 0);
 							DWORD calc1 = (runtime_address - hex + 4);
 							DWORD calc = 0xFFFFFFFF - calc1;
 							*(DWORD*)(runtime_address + 1) = calc;
-							//MessageBoxA(0, to_hex(runtime_address + 1).c_str(), "JMP After", 0);
 							Utils::Log("FixRellocation: " + to_hex(runtime_address) + "  |  CALL1");
 							if (ZYAN_SUCCESS(ZydisDecoderDecodeBuffer(&decoder, (PVOID)(NewFnAddress + offset), length - offset, &instruction))) {
 								char buffer[256];
@@ -882,13 +875,10 @@ void UltimateHooks::FixRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DW
 					{
 						DWORD hex = std::strtoul((mnemonic.substr(4, 10)).c_str(), NULL, 16);
 						if ((hex >= OldFnAddress + 0x1000) && (hex <= OldFnAddressEnd - 0x1000)) {
-							//MessageBoxA(0, to_hex(runtime_address).c_str(), "JMP Before", 0);
 							DWORD calc = calcx - 0x5;
-							*(DWORD*)(runtime_address + 1) = calc;
-							//MessageBoxA(0, to_hex(runtime_address).c_str(), "JMP After", 0);
+							*(DWORD*)(runtime_address + 1) = calc;							
 							//Utils::Log("FixRellocation JMP2 - " + to_hex(runtime_address));
 							Utils::Log("FixRellocation: " + to_hex(runtime_address) + "  |  JMP1");
-							MessageBoxA(0, ("oldOffset: " + to_hex(runtime_address)).c_str(), "UltHook", 0);
 							if (ZYAN_SUCCESS(ZydisDecoderDecodeBuffer(&decoder, (PVOID)(NewFnAddress + offset), length - offset, &instruction))) {
 								char buffer[256];
 
@@ -909,6 +899,4 @@ void UltimateHooks::FixRellocation(DWORD OldFnAddress, DWORD OldFnAddressEnd, DW
 		runtime_address += instruction.length;
 	}
 #endif
-
-	MessageBoxA(0, "finished", "Relloc", 0);
 }

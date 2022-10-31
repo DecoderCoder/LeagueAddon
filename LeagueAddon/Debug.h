@@ -11,6 +11,11 @@
 namespace Debug {
 	inline bool Enabled = false;
 
+
+	inline bool drawSpellDirection = false;
+	inline bool drawObjectInfo = false;
+	inline bool drawObjectInfoBuffs = false;
+
 	inline std::vector<SpellInfo> detectedSpells;
 	inline std::vector<uintptr_t> detectedSpellsPtr;
 
