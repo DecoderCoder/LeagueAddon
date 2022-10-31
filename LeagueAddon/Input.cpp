@@ -4,7 +4,7 @@
 #include <chrono>
 #include "Vector.h"
 #include <ctime>
-
+#include "Utils.h"
 
 using namespace std::chrono;
 using namespace std::this_thread;
@@ -14,6 +14,8 @@ int Input::mMouseX = -1;
 int Input::mMouseY = -1;
 
 void Input::PressKey(HKey key) {
+	if (!IsLeagueInForeground())
+		return;
 	INPUT input;
 	input.type = INPUT_KEYBOARD;
 	input.ki.wScan = key;

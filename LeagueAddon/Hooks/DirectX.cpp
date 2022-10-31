@@ -14,7 +14,9 @@
 
 PresentDX9 oPresentDX9 = NULL;
 uint64_t oPresentDX11 = NULL;
+uint64_t oResizeBufferDX11 = NULL;
 ID3D11Device* pDevice = NULL;
+IDXGISwapChain* gpSwapChain = NULL;
 ID3D11DeviceContext* pContext = NULL;
 
 
@@ -152,15 +154,6 @@ void* HookVTableFunction(void* pVTable, void* fnHookFunc, int nOffset) // https:
 	*((intptr_t*)ptrFunction) = (intptr_t)fnHookFunc;
 	VirtualProtect(mbi.BaseAddress, mbi.RegionSize, mbi.Protect, &mbi.Protect);
 	return (void*)ptrOriginal;
-}
-
-void* HookFunction(void* target, void* hFunc) {
-
-	//void* trampoline = calloc();
-}
-
-void* UnhookFunction(void* target, void* origFunc) {
-
 }
 
 LPDIRECTINPUT8 pDirectInput = NULL;
@@ -309,9 +302,9 @@ bool DirectXHook::HookDX11() {
 	::memcpy(g_methodsTable, *(uint32_t**)swapChain, 18 * sizeof(uint32_t));
 	::memcpy(g_methodsTable + 18, *(uint32_t**)device, 43 * sizeof(uint32_t));
 	::memcpy(g_methodsTable + 18 + 43, *(uint32_t**)context, 144 * sizeof(uint32_t));
-	void* target = (void*)g_methodsTable[8]; // [8]   Present
+	DWORD target = g_methodsTable[8]; // [8]   Present
 
-	Utils::Log(" > Renderer: Starting hooking");
+	Utils::Log(" > Renderer: Starting hooking: " + to_hex(target));
 
 	//if (*(BYTE*)target != 0xE9) // for hook with saving overlay hooks
 	//oPresentDX11 = UltHook.AddEzHook((DWORD)target, 5, (DWORD)&DirectXHook::Hooked_PresentDX11);
@@ -319,8 +312,14 @@ bool DirectXHook::HookDX11() {
 	//	oPresentDX11 = UltHook.AddEzHook((DWORD)((int)target + 5), 6, (DWORD)&DirectXHook::Hooked_PresentDX11);
 	//MessageBoxA(0, to_hex((int)oPresentDX11).c_str(), "opresentDX11", 0);
 	if (*(BYTE*)(target) == 0xE9) {
-		target = (void*)((DWORD)target + *(DWORD*)((DWORD)target + 1) + 5);
-		oPresentDX11 = UltHook.AddEzHook((DWORD)target, 6, (DWORD)&DirectXHook::Hooked_PresentDX11);
+		target = ((DWORD)target + *(DWORD*)((DWORD)target + 1));
+		//if (*(BYTE*)target == 0xFF) {
+			target += 5;
+			oPresentDX11 = UltHook.AddEzHook((DWORD)target, 6, (DWORD)&DirectXHook::Hooked_PresentDX11);
+		//}
+		/*else {
+
+		}*/
 	}
 	else
 		oPresentDX11 = UltHook.AddEzHook((DWORD)target, 5, (DWORD)&DirectXHook::Hooked_PresentDX11);
@@ -347,6 +346,9 @@ bool DirectXHook::unHook() {
 	SetWindowLongPtr(GetHwndProc(), GWLP_WNDPROC, (LONG_PTR)oWndProc);
 	if (oPresentDX11)
 		UltHook.RemoveEzHook(oPresentDX11);
+
+	if(oResizeBufferDX11)
+		HookVTableFunction(gpSwapChain, (void*)oResizeBufferDX11, 13);
 
 	if (oGetDeviceState)
 		HookVTableFunction(lpdiMouse, oGetDeviceState, 9);
@@ -390,6 +392,8 @@ HRESULT __stdcall DirectXHook::Hooked_PresentDX11(IDXGISwapChain* pSwapChain, UI
 		else
 			return ((PresentDX11)oPresentDX11)(pSwapChain, SyncInterval, Flags);
 		Utils::Log(" > DX11Present: Init: ResizeBuffer");
+		gpSwapChain = pSwapChain;
+		oResizeBufferDX11 = (uintptr_t)HookVTableFunction(gpSwapChain, &DirectXHook::Hooked_ResizeBufferDX11, 13);
 		/*PLH::VFuncMap redirect = { {13, (uint64_t)&DirectXHook::Hooked_ResizeBufferDX11} };
 
 		h.reset(new PLH::VTableSwapHook((uint64_t)pSwapChain, redirect));
@@ -479,15 +483,35 @@ HRESULT  __stdcall DirectXHook::Hooked_ResizeBufferDX11(IDXGISwapChain* pSwapCha
 {
 	Utils::Log("DX11ResizeBuffer: Begin");
 	if (mainRenderTargetView) {
+		//ImGui::DestroyContext();
+		//SetWindowLongPtr(GetHwndProc(), GWLP_WNDPROC, (LONG_PTR)oWndProc);
 		pContext->OMSetRenderTargets(0, 0, 0);
 		mainRenderTargetView->Release();
+
+
 		Utils::Log("DX11ResizeBuffer: Release");
 	}
-	/*HRESULT hr = h->origFunc<PLH::VFunc<13, ResizeBuffer>>(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);*/
+	HRESULT hr = ((ResizeBuffer)oResizeBufferDX11)(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 	ID3D11Texture2D* pBuffer;
 	pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBuffer);
 	// Perform error handling here!
 	pDevice->CreateRenderTargetView(pBuffer, NULL, &mainRenderTargetView);
+
+	/*pDevice->GetImmediateContext(&pContext);
+	DXGI_SWAP_CHAIN_DESC sd;
+	pSwapChain->GetDesc(&sd);
+	window = sd.OutputWindow;
+	RECT rect;
+	GetWindowRect(window, &rect);
+	Render::RenderWidth = rect.right - rect.left;
+	Render::RenderHeight = rect.bottom - rect.top;
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
+	ImGui_ImplWin32_Init(window);
+	ImGui_ImplDX11_Init(pDevice, pContext);
+	(WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)WndProc);*/
+
 	// Perform error handling here!
 	pBuffer->Release();
 	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
@@ -500,5 +524,5 @@ HRESULT  __stdcall DirectXHook::Hooked_ResizeBufferDX11(IDXGISwapChain* pSwapCha
 	vp.TopLeftY = 0;
 	pContext->RSSetViewports(1, &vp);
 	Utils::Log("DX11ResizeBuffer: End");
-	//return hr;
+	return hr;
 }
