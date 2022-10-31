@@ -9,7 +9,7 @@ void Vayne::OnDraw()
 	if (autoE) {
 		auto eSpell = Local->SpellBook.GetSpellSlotByID(2);
 		if (true) {
-			GameObject* target = TargetSelector::GetTarget(550, DamageType::Physical, true);
+			GameObject* target = TargetSelector::GetTarget(550, DamageType::Physical, false);
 			//auto target = Local;
 			if (target) {
 				Vector3 targetPos = target->Position;

@@ -21,7 +21,7 @@ namespace Evade
 			if (Local->IsAllyTo(hero) || hero->NetworkID == Local->NetworkID)
 				continue;
 #endif
-			ChampsInGame.push_back((Champ)SpellDB.back());
+			/*ChampsInGame.push_back((Champ)SpellDB.back());*/
 			for (Champ spell : SpellDB)
 			{
 				if (hero->GetChampionName() == spell.hero)
@@ -1283,7 +1283,7 @@ namespace Evade
 					s.startTime = GameTimer;
 					s.obj = champ.obj;
 					s.spell = castInfo;
-					if (s.type != circular && s.range == 0 && (&castInfo->BasicAttackSpellData->Resource->Range)[castInfo->Level] != 0)
+					if ((s.type != circular && s.type != ring) && s.range == 0 && (&castInfo->BasicAttackSpellData->Resource->Range)[castInfo->Level] != 0)
 						s.range = (&castInfo->BasicAttackSpellData->Resource->Range)[castInfo->Level];
 					s.radiusRes = castInfo->BasicAttackSpellData->Resource->Radius;
 					if (s.radius == 0 && castInfo->BasicAttackSpellData->Resource->Radius != 0)

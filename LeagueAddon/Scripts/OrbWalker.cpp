@@ -7,6 +7,8 @@
 #include "../Input.h"
 #include "../Evade/Evade.h"
 
+bool IgnoreShield = false;
+
 std::string OrbWalker::AttackResets[] =
 {
 	xorstr("dariusnoxiantacticsonh"), xorstr("fiorae"), xorstr("garenq"), xorstr("gravesmove"),
@@ -193,7 +195,7 @@ GameObject* OrbWalker::GetTarget()
 				}
 			}
 		}
-		GameObject* target = TargetSelector::GetTarget(Local->AttackRange, DamageType::Physical);
+		GameObject* target = TargetSelector::GetTarget(Local->AttackRange, DamageType::Physical, IgnoreShield);
 		if (target != nullptr)
 			return target;
 	}
@@ -253,7 +255,7 @@ GameObject* OrbWalker::GetTarget()
 
 	if (_mode != OrbwalkingMode::LastHit)
 	{
-		GameObject* target = TargetSelector::GetTarget(Local->AttackRange, DamageType::Physical);
+		GameObject* target = TargetSelector::GetTarget(Local->AttackRange, DamageType::Physical, IgnoreShield);
 		if (Helper::isValidUnit(target) && target->IsInRange(Local, Local->AttackRange, true))
 		{
 			return target;
@@ -369,6 +371,9 @@ void OrbWalker::OnDeleteObject(void* thisPtr, GameObject* obj)
 {}
 
 void OrbWalker::Initialize() {
+	if (Local->GetChampionName() == "Senna" || Local->combat == CombatType::Melee)
+		IgnoreShield = true;
+
 	EventManager::AddEventHandler(EventManager::EventType::OnProcessSpell, OnProcessSpell);
 	EventManager::AddEventHandler(EventManager::EventType::OnDeleteObject, OnDeleteObject);
 	EventManager::AddEventHandler(EventManager::EventType::OnMenu, &OnMenu);

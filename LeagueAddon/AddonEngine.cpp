@@ -80,7 +80,6 @@ void DrawMenu() {
 
 		if (ImGui::CollapsingHeader("Settings")) {
 			if (ImGui::TreeNode("Target Selector")) {
-				ImGui::Checkbox("Ignore Missile Shield", &TargetSelector::IgnoreMissileShield);
 				if (ImGui::BeginCombo("Target mode 1", TargetSelector::targetingModeLabels[(int)TargetSelector::mode])) {
 					for (int i = 0; i < 10; i++) {
 						if (ImGui::Selectable(TargetSelector::targetingModeLabels[i], (int)TargetSelector::mode == i)) {

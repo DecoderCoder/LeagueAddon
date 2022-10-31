@@ -64,7 +64,7 @@ GameObject* TargetSelector::GetTarget(GameObject* champion, float range, DamageT
 	std::list<GameObject*> objects = filter(ObjectManager::HeroList(), [&](GameObject* enemy) { return Helper::isValidUnit(enemy) && enemy->IsInRange(Local, range, true); });
 
 	Render::BeginOverlay();
-	if (!IgnoreMissileShield && (hasEnemyYasuo || hasEnemySamira)) {
+	if (!ignoreShield && (hasEnemyYasuo || hasEnemySamira)) {
 		std::vector<Geometry::Polygon> shields;
 		if (hasEnemyYasuo) {
 			auto yasuoShields = filter(ObjectManager::MissileList(), [&](MissileSpellInfo* mis) { return StringCompare(mis->BasicAttackSpellData->Name, "YasuoW_VisualMis") && hasEnemyYasuo == mis->source_id; });
