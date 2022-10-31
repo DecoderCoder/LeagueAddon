@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -92,10 +94,10 @@ namespace LeagueParser
             var nD = dict.Where((x) => { return x.Value.mScriptName != null && x.Value.mScriptName.Contains("Summoner"); });
             foreach (var d in nD)
             {
-                
+
                 if (d.Value.mSpell != null)
                 {
-                   
+
                     try
                     {
                         byte[] image = request.Get("https://raw.communitydragon.org/latest/game/data/spells/icons2d/" + Path.GetFileNameWithoutExtension(d.Value.mSpell.mImgIconName[0]).ToLower() + ".png").ToBytes();
@@ -105,8 +107,8 @@ namespace LeagueParser
                     catch (Exception)
                     {
                     }
-                   
-                }                
+
+                }
             }
         }
 
