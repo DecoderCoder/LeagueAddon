@@ -13,7 +13,7 @@ namespace Visual {
 	inline bool ESP = true;
 	inline int ESP_Distance = 3000;
 
-	inline bool HighlightSelected = true;
+	inline bool HighlightSelected = false;
 
 	inline bool ShowAttackRadius = true;
 	inline bool ShowBoundingRadius = true;
@@ -21,7 +21,7 @@ namespace Visual {
 	inline bool AlwaysVisible = true;
 	inline bool ShowLastPos = true;
 
-	inline bool SpellTrackerMenu = false;
+	inline bool SpellTrackerMenu = true;
 	inline bool RecallTracker = true;
 	inline bool RecallTrackerMenu = true;
 

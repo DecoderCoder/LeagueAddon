@@ -16,10 +16,10 @@ void Visual::Initialize() {
 
 	for (auto obj : ObjectManager::HeroList()) {
 		if (obj->IsEnemyTo(Local)) {
-			distanceToHero.insert({ obj->NetworkID, 0 });
-			alwaysVisible.insert({ obj, false });
-			recallState.insert({ obj, false });
-			spellTrackerHeroes.push_back(obj);
+		distanceToHero.insert({ obj->NetworkID, 0 });
+		alwaysVisible.insert({ obj, false });
+		recallState.insert({ obj, false });
+		spellTrackerHeroes.push_back(obj);
 		}
 	}
 }
@@ -185,12 +185,18 @@ void Visual::OnMenu() {
 				//float	drawY = w2sP.y + 20;
 				float drawY = ImGui::GetWindowPos().y + 10 + yOffset;
 
-				float width = (((GetTickCount() - obj.second - recallTime) * windowWidth) / (obj.second - obj.second - recallTime));
+				float width = (((GetTickCount() - obj.second - recallTime) * windowWidth) / (obj.second - obj.second - recallTime));			
+
+				float hpWidth = obj.first->Health / obj.first->MaxHealth * windowWidth;
+
 
 				Render::Draw_Text_Centered(drawX, drawY, windowWidth, 15, obj.first->GetChampionName());
 				Render::Draw_FilledRectangle(drawX, drawY + 15, drawX + windowWidth, drawY + 10 + 15, ImColor(0, 0, 0));
 				Render::Draw_FilledRectangle(drawX, drawY + 15, drawX + abs(windowWidth - width), drawY + 10 + 15, ImColor(41, 128, 185));
-				yOffset += 30;
+
+				Render::Draw_FilledRectangle(drawX, drawY + 25, drawX + windowWidth, drawY + 35, ImColor(0, 0, 0));
+				Render::Draw_FilledRectangle(drawX, drawY + 25, drawX + hpWidth, drawY + 35, (hpWidth > windowWidth / 2 ? ImColor(46, 204, 113) : ImColor(231, 76, 60)));
+				yOffset += 40;
 			}
 		}
 		Render::EndOverlayTab();
@@ -386,6 +392,7 @@ void Visual::OnDraw() {
 						Render::Draw_Circle3DFilled(obj->Position, Function::GetBoundingRadius(obj), ImColor::ImColor(255, 255, 0));
 						Render::Draw_Text_Centered(ImVec2(w2sPos.x - Function::GetBoundingRadius(obj) / 2, w2sPos.y), ImVec2(Function::GetBoundingRadius(obj), 20), obj->GetChampionName(), ImColor::ImColor(0, 0, 0));
 						Render::Draw_Circle(mapPos.x, mapPos.y, 4, drawColor, 7);
+						Render::Draw_Line3D(obj->Position, obj->Position.Extend(obj->GetObjectDirection(), obj->GetBoundingRadius()), ImColor(255, 0, 0), 10);
 						Render::Draw_Text_Centered(mapPos.x - 1, mapPos.y - 1, 4, 4, string(1, obj->GetChampionName()[0]), drawTextColor);
 					}
 				}
