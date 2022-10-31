@@ -33,7 +33,7 @@ bool IsBadHeroToUlt(GameObject* hero) {
 	BuffManager* buffMng = &hero->BuffManager;
 	if (
 		hero->IsTargetable
-		&& !hero->IsInvulnearable()
+		&& !hero->IsInvulnearable(Local)
 		&& !buffMng->hasBuff("UndyingRage")
 		&& !buffMng->hasBuff("sionpassivezombie")
 		)

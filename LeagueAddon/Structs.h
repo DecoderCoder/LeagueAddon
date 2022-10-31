@@ -13,7 +13,7 @@ class SpellDataResource
 public:
 	union
 	{
-			DEFINE_MEMBER_N(float MissileSpeed, 0x460)
+		DEFINE_MEMBER_N(float MissileSpeed, 0x460)
 			DEFINE_MEMBER_N(float Width, 0x494)
 			DEFINE_MEMBER_N(float Radius, 0x40C)
 			DEFINE_MEMBER_N(float Range, 0x3D8);
@@ -26,7 +26,7 @@ public:
 	union
 	{
 		DEFINE_MEMBER_N(std::string Name, 0x18)
-		DEFINE_MEMBER_N(SpellDataResource* Resource, 0x40)
+			DEFINE_MEMBER_N(SpellDataResource* Resource, 0x40)
 	};
 
 	SpellData() {
@@ -37,7 +37,7 @@ public:
 class SpellInfo {
 public:
 	union {
-			DEFINE_MEMBER_0(SpellData*		BasicAttackSpellData)
+		DEFINE_MEMBER_0(SpellData* BasicAttackSpellData)
 			DEFINE_MEMBER_N(kSpellSlot		Slot, Offset::SpellInfo::Slot)
 			DEFINE_MEMBER_N(float			StartTime, Offset::SpellInfo::StartTime)
 			DEFINE_MEMBER_N(int				Index, 0x70)
@@ -53,9 +53,9 @@ public:
 			DEFINE_MEMBER_N(DWORD			TargetSize, 0xC0)
 
 			DEFINE_MEMBER_N(bool IsSpell, 0xE0);
-			DEFINE_MEMBER_N(bool IsBasicAttack, 0xE4);
-			DEFINE_MEMBER_N(bool IsSpecialAttack, 0xE5);
-			DEFINE_MEMBER_N(bool IsHeadshotAttack, 0xE6);
+		DEFINE_MEMBER_N(bool IsBasicAttack, 0xE4);
+		DEFINE_MEMBER_N(bool IsSpecialAttack, 0xE5);
+		DEFINE_MEMBER_N(bool IsHeadshotAttack, 0xE6);
 	};
 
 	SpellInfo() {
@@ -75,14 +75,15 @@ public:
 class MissileSpellInfo {
 public:
 	union {
-			DEFINE_MEMBER_N(int	Index, 0xB4)
-			DEFINE_MEMBER_N(SpellData*		BasicAttackSpellData, Offset::MissileData::SpellInfo)
+		DEFINE_MEMBER_N(int	Index, 0xB4)
+			DEFINE_MEMBER_N(SpellData* BasicAttackSpellData, Offset::MissileData::SpellInfo)
 			DEFINE_MEMBER_N(kSpellSlot		Slot, Offset::SpellInfo::Slot)
 			DEFINE_MEMBER_N(float			StartTime, Offset::SpellInfo::StartTime)
 			DEFINE_MEMBER_N(int				SpellIndex, Offset::SpellInfo::SpellIndex)
 			DEFINE_MEMBER_N(unsigned int	Level, Offset::SpellInfo::Level)
 			DEFINE_MEMBER_N(int				source_id, Offset::MissileData::SrcIdx)
 			DEFINE_MEMBER_N(unsigned int	SourceNetworkID, 0xB4)
+			DEFINE_MEMBER_N(Vector3			CurrentPosition, Offset::MissileData::CurPos)
 			DEFINE_MEMBER_N(Vector3			StartPosition, Offset::MissileData::StartPos)
 			DEFINE_MEMBER_N(Vector3			EndPosition, Offset::MissileData::EndPos)
 			DEFINE_MEMBER_N(Vector3			EndPosition2, Offset::MissileData::EndPos + 0xC)
@@ -144,6 +145,7 @@ public:
 			DEFINE_MEMBER_N(int				Team, Offset::GameObject::TeamID)
 			DEFINE_MEMBER_N(unsigned int	NetworkID, Offset::GameObject::NetworkID)
 			DEFINE_MEMBER_N(Vector3			Position, Offset::GameObject::Position)
+			DEFINE_MEMBER_N(Vector3			Direction, Offset::GameObject::Direction)
 			DEFINE_MEMBER_N(bool			IsVisible, Offset::GameObject::Visibility)
 			//DEFINE_MEMBER_N(int				Dead, Offset::GameObject::Dead)
 			DEFINE_MEMBER_N(bool			IsTargetable, Offset::GameObject::Targetable)
@@ -167,8 +169,8 @@ public:
 			DEFINE_MEMBER_N(float			ArmorPenMod, Offset::GameObject::ArmorPen)
 			DEFINE_MEMBER_N(float			MagicPenFlat, Offset::GameObject::MagicPenFlat)
 			DEFINE_MEMBER_N(float			MagicPenMod, Offset::GameObject::MagicPenMod)
-			DEFINE_MEMBER_N(void*			CharacterDataStack, Offset::GameObject::CharacterDataStack)
-			DEFINE_MEMBER_N(int*			SkinPtr, Offset::GameObject::SkinPtr)
+			DEFINE_MEMBER_N(void* CharacterDataStack, Offset::GameObject::CharacterDataStack)
+			DEFINE_MEMBER_N(int* SkinPtr, Offset::GameObject::SkinPtr)
 			//DEFINE_MEMBER_N(float			FlatMagicDamageMod, Offset::GameObject::FlatMagicDamageMod)
 			DEFINE_MEMBER_N(float			MovementSpeed, Offset::GameObject::MoveSpeed)
 			DEFINE_MEMBER_N(char* ChampionName, Offset::GameObject::ChampionName)
@@ -186,12 +188,34 @@ public:
 
 	};
 
+	bool IsFacing(GameObject* obj) {
+		return this->Position.distanceTo(obj->GetObjectDirection()) < this->Position.distanceTo(obj->Position);
+	}
+
+	Vector3 GetObjectDirection() {
+		return (this->Position + this->Direction).Rotate(this->Position, M_PI / 2); // M_PI / 2 = 90 degree
+	}
+
 	AIManager* GetAIManager() {
 		typedef AIManager* (__thiscall* OriginalFn)(PVOID);
 		return CallVirtual<OriginalFn>((PVOID)this, 150)((PVOID)this);
 
 
 		//return reinterpret_cast<AIManager * (__thiscall*)(GameObject*)>(this->VTable[149])(this);
+	}
+
+	Vector3 GetBasePosition() {
+		// Dragon Check
+
+		//Baron/Nashor Check
+
+
+		if (this->Team == 0x100)
+			return GameLocation::RadiantBase;
+		else if (this->Team == 0x200)
+			return GameLocation::DireBase;
+
+		return Vector3(this->Position);
 	}
 
 	float GetAbilityPower() {
@@ -203,10 +227,12 @@ public:
 		fnGetBoundingRadius gbr = (fnGetBoundingRadius)(DEFINE_RVA(Offset::Function::GetBoundingRadius));
 		return gbr(this);
 		//return Function::GetBoundingRadius(this);
-		//return reinterpret_cast<float(__thiscall*)(GameObject*)>(this->VTable[35])(this);
+		//return reinterpret_cast<float(__thiscall*)(GameObject*)>(this->VTable[34])(this);
 	}
 
-	bool IsInvulnearable() {
+	bool IsInvulnearable(GameObject* obj = nullptr) {
+		if (obj && this->BuffManager.hasBuff("PantheonE") && obj->IsFacing(this))
+			return true;
 		return *(BYTE*)((DWORD)this + Offset::GameObject::Invulnearable) % 0x2 == 1;
 	}
 
@@ -293,10 +319,10 @@ public:
 	union {
 		DEFINE_MEMBER_N(int				DestIdx, Offset::MissileData::DestIdx);
 
-		DEFINE_MEMBER_N(SpellInfo*			SpellInfo, Offset::MissileData::SpellInfo);
+		DEFINE_MEMBER_N(SpellInfo* SpellInfo, Offset::MissileData::SpellInfo);
 		DEFINE_MEMBER_N(int					SrcIdx, Offset::MissileData::SrcIdx);
 		DEFINE_MEMBER_N(Vector3				CurrentPos, 0xD8);
-		DEFINE_MEMBER_N(Vector3				StartPos, Offset::MissileData::StartPos);		
+		DEFINE_MEMBER_N(Vector3				StartPos, Offset::MissileData::StartPos);
 		DEFINE_MEMBER_N(Vector3				EndPos, Offset::MissileData::EndPos);
 	};
 };

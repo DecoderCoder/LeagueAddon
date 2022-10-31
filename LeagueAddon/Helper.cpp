@@ -3,14 +3,11 @@
 bool Helper::isValidUnit(GameObject* unit, float range, bool checkTeam, Vector3 from)
 {
 	if (unit == NULL || !unit->IsVisible || !Function::IsAlive(unit) || !unit->IsTargetable
-		|| unit->IsInvulnearable()		
+		|| unit->IsInvulnearable(Local)
 		|| unit->BuffManager.hasBuff("NilahWBuff")
 		|| unit->BuffManager.hasBuff("NilahWAllyBuff")
 		|| (unit->Health < 150 && unit->BuffManager.hasBuff("UndyingRage")) // Tryndamere ult
-		|| unit->BuffManager.hasBuff("NilahWAllyBuff")
-
-		)
-
+		|| unit->BuffManager.hasBuff("NilahWAllyBuff"))
 	{
 		return false;
 	}
@@ -31,7 +28,7 @@ bool Helper::isValidUnit(GameObject* unit, float range, bool checkTeam, Vector3 
 float Helper::CalcDamage(GameObject* from, GameObject* to, bool isAA, float damage, DamageType damageType) {
 
 	float totalDamage;
-
+	return 0;
 }
 
 float Helper::calcReducedDamage(float rawDamage, float armor, float penetration, float lethality, bool calc0armor)
@@ -111,7 +108,7 @@ float Helper::CalcAutoAttackDamage(GameObject* from, GameObject* to) {
 
 
 			А если купить Щит Дорана, Кольцо Дорана и Слезу богини - то ты нанесешь на 0 урона больше вообще ахахах*/
-		// int CountCauseBug = 0
+			// int CountCauseBug = 0
 		if (inventory->HasItem(3070) || inventory->HasItem(1056) || inventory->HasItem(1054)) {
 			physDmg += 5;
 		}
@@ -124,7 +121,7 @@ float Helper::CalcAutoAttackDamage(GameObject* from, GameObject* to) {
 
 	//  Клинок падшего короля
 	if (inventory->HasItem(3153)) {
-		
+
 		physDmg += to->Health * (from->combat == CombatType::Melee ? 0.12 : 0.08);
 	}
 
