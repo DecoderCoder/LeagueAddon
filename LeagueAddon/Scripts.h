@@ -7,3 +7,4 @@
 #include "Scripts/Yasuo.h"
 #include "Scripts/Draven.h"
 #include "Scripts/Vayne.h"
+#include "Scripts/Tristana.h"

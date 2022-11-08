@@ -8,14 +8,15 @@ using namespace std;
 
 namespace TargetSelector
 {
-	inline int hasEnemyYasuo = 0;
-	inline GameObject* hasEnemySamira = nullptr;
+	inline bool enemyYasuo = false;
+	inline std::list<GameObject*> enemySamira; // URF All4One etc.
 	inline bool IgnoreMissileShield = false;
 
 	inline const char* targetingModeLabels[] = { "AutoPriority", "LowHP", "LowEfficientHP", "MostAD", "MostAP", "Closest", "NearMouse", "LessAttack", "LessCast", "MostStack" };
 
 	inline std::vector<GameObject*> attackOrder;
 	inline std::vector<GameObject*> attackOrderIgnore;
+	inline std::vector<GameObject*> attackOrderLast;
 	inline TargetingMode mode = TargetingMode::LowEfficientHP;
 	inline TargetingMode mode2 = TargetingMode::LowEfficientHP;
 

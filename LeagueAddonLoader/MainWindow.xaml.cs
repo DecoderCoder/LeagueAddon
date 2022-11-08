@@ -12,23 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MicaWPF;
-using MicaWPF.Controls;
 
 namespace LeagueAddonLoader
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    /// 
-    public partial class MainWindow : MicaWindow
+    public partial class MainWindow : Window
     {
-        SolidColorBrush LogoBrush = new SolidColorBrush(Colors.White);
-
         public MainWindow()
-        {            
+        {
             InitializeComponent();
-          //  this.Resources.Add("PinkBrush", SystemParameters.WindowGlassBrush);
         }
     }
 }

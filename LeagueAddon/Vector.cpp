@@ -120,7 +120,7 @@ bool Vector3::operator==(Vector3 const& other) const
 
 bool Vector3::operator!=(Vector3 const& other) const
 {
-	return other.x == this->x && other.y == this->y && other.z == this->z;
+	return other.x != this->x || other.y != this->y || other.z != this->z;
 }
 
 /*Vector3& Vector3::operator/=(const Vector3& v)

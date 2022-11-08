@@ -64,6 +64,7 @@ namespace Function {
 	int GetBaseDrawPosition(GameObject* Object, Vector3* Position);
 	bool GetHPBarPosition(GameObject* Object, Vector3* out);
 	int* CastSpell(DWORD* spellbook, DWORD* spelldatainst, int spellslot, Vector3* Origin, Vector3* Target, DWORD networkid);
+	void SendPing(Vector3* Pos, int NetworkID, PingType pingType);
 	Vector2 WorldToMap(const Vector3& pos);
 	int GetPing();
 	float GameTime();

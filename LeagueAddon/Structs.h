@@ -25,7 +25,7 @@ class SpellData
 public:
 	union
 	{
-		DEFINE_MEMBER_N(std::string Name, 0x18)
+			DEFINE_MEMBER_N(std::string Name, 0x18)
 			DEFINE_MEMBER_N(SpellDataResource* Resource, 0x40)
 	};
 
@@ -37,13 +37,13 @@ public:
 class SpellInfo {
 public:
 	union {
-		DEFINE_MEMBER_0(SpellData* BasicAttackSpellData)
+			DEFINE_MEMBER_0(SpellData* BasicAttackSpellData)
 			DEFINE_MEMBER_N(kSpellSlot		Slot, Offset::SpellInfo::Slot)
 			DEFINE_MEMBER_N(float			StartTime, Offset::SpellInfo::StartTime)
 			DEFINE_MEMBER_N(int				Index, 0x70)
 			DEFINE_MEMBER_N(int				SpellIndex, Offset::SpellInfo::SpellIndex)
 			DEFINE_MEMBER_N(unsigned int	Level, Offset::SpellInfo::Level)
-			DEFINE_MEMBER_N(int	source_id, Offset::SpellInfo::source_id)
+			DEFINE_MEMBER_N(int	source_id,	Offset::SpellInfo::source_id)
 			DEFINE_MEMBER_N(unsigned int	SourceNetworkID, Offset::SpellInfo::SourceNetworkID)
 			DEFINE_MEMBER_N(Vector3			StartPosition, Offset::SpellInfo::StartPosition)
 			DEFINE_MEMBER_N(Vector3			EndPosition, Offset::SpellInfo::EndPosition)
@@ -52,10 +52,10 @@ public:
 			DEFINE_MEMBER_N(DWORD			TargetArray, 0xB8)
 			DEFINE_MEMBER_N(DWORD			TargetSize, 0xC0)
 
-			DEFINE_MEMBER_N(bool IsSpell, 0xE0);
-		DEFINE_MEMBER_N(bool IsBasicAttack, 0xE4);
-		DEFINE_MEMBER_N(bool IsSpecialAttack, 0xE5);
-		DEFINE_MEMBER_N(bool IsHeadshotAttack, 0xE6);
+			DEFINE_MEMBER_N(bool IsSpell, 0xE4);
+			DEFINE_MEMBER_N(bool IsBasicAttack, 0xE8);
+			DEFINE_MEMBER_N(bool IsSpecialAttack, 0xE9);
+			DEFINE_MEMBER_N(bool IsHeadshotAttack, 0xEA);
 	};
 
 	SpellInfo() {

@@ -54,6 +54,11 @@ void Debug::OnDraw() {
 				offsetY += offsetYStep;
 				Render::Draw_Text(w2s.x, w2s.y + offsetY, "IsVisible: " + string(obj->IsVisible ? "true" : "false"));
 				offsetY += offsetYStep;
+				Render::Draw_Text(w2s.x, w2s.y + offsetY, "IsTargetable: " + string(obj->IsTargetable ? "true" : "false"));
+				offsetY += offsetYStep;
+				Render::Draw_Text(w2s.x, w2s.y + offsetY, "IsInvulnearable: " + string(obj->IsInvulnearable() ? "true" : "false"));
+				offsetY += offsetYStep;
+				
 
 				if (drawObjectInfoBuffs) {
 					for (auto buff : obj->BuffManager.entries()) {
@@ -172,7 +177,7 @@ void Debug::OnMenu() {
 							if (ImGui::TreeNode((("[ " + QWERDF[i] + " ] " + spell->GetName()).c_str()))) {
 								ImGui::Text(("Spell CD		: " + to_string(spell->GetCD())).c_str());
 								ImGui::Text(("Spell Charges	: " + to_string(spell->GetCharges())).c_str());
-								//ImGui::Text(("Spell Charges	: " + to_string(spell->GetSpellInfo())).c_str());
+								ImGui::Text(("Spell Daamge	: " + to_string(spell->GetDamage())).c_str());
 								ImGui::TreePop();
 							}
 						}

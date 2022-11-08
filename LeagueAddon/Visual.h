@@ -20,6 +20,9 @@ namespace Visual {
 
 	inline bool AlwaysVisible = true;
 	inline bool ShowLastPos = true;
+	inline bool PingInvisibleEnemy = false;
+	inline PingType PingInvisibleEnemyTypeTo = PingType::Danger;
+	inline PingType PingInvisibleEnemyTypeFrom= PingType::Missing;
 
 	inline bool SpellTrackerMenu = true;
 	inline bool RecallTracker = true;

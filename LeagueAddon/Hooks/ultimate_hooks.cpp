@@ -35,7 +35,6 @@ DWORD UltimateHooks::AddEzHook(DWORD target, size_t hookSize, DWORD hook) {
 		return -1;
 
 	ezHook.origFunc = allocation;
-
 	VirtualProtect((void*)target, hookSize, PAGE_EXECUTE_READWRITE, &oldProt);
 	memcpy((void*)allocation, (void*)target, hookSize);
 

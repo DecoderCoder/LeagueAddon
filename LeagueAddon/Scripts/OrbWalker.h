@@ -44,6 +44,7 @@ namespace OrbWalker {
 	inline float LastMoveCommandT;
 
 	inline bool dravenMode = false;
+	inline bool TristanaTargetE = false;
 	inline bool vayneQMode = false;
 	inline float vayneQDelay = 0;
 	inline float vayneCanAttack = 0;

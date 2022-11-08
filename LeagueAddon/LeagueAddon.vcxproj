@@ -147,6 +147,7 @@
     <ClInclude Include="Scripts\Draven.h" />
     <ClInclude Include="Scripts\Garen.h" />
     <ClInclude Include="Scripts\OrbWalker.h" />
+    <ClInclude Include="Scripts\Tristana.h" />
     <ClInclude Include="Scripts\Twitch.h" />
     <ClInclude Include="Scripts\Vayne.h" />
     <ClInclude Include="Scripts\Yasuo.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="Scripts\Draven.cpp" />
     <ClCompile Include="Scripts\Garen.cpp" />
     <ClCompile Include="Scripts\OrbWalker.cpp" />
+    <ClCompile Include="Scripts\Tristana.cpp" />
     <ClCompile Include="Scripts\Twitch.cpp" />
     <ClCompile Include="Scripts\Vayne.cpp" />
     <ClCompile Include="Scripts\Yasuo.cpp" />

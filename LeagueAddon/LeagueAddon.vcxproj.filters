@@ -254,6 +254,9 @@
     <ClInclude Include="Scripts\Vayne.h">
       <Filter>Scripts\Vayne</Filter>
     </ClInclude>
+    <ClInclude Include="Scripts\Tristana.h">
+      <Filter>Scripts\Tristana</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utils.cpp">
@@ -365,6 +368,9 @@
     </ClCompile>
     <ClCompile Include="Scripts\Vayne.cpp">
       <Filter>Scripts\Vayne</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Tristana.cpp">
+      <Filter>Scripts\Tristana</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

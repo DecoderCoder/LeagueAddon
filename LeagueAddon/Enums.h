@@ -94,6 +94,7 @@ enum class IsNotWallFlags {
 };
 
 static const char* WardTypeName[] = { "YellowTrinket", "BlueTrinket", "JammerDevice", "ShacoBox", "TeemoShroom", "NidaliTrap", "CaytlinTrap", "JinxTrap", "JhinTrap", "MaokaiTrap"};
+static const char* PingTypeName[] = { "Default", "Attack", "Danger", "Missing", "On my way", "Be careful", "Help", "Warded" };
 
 enum class WardType {
 	Yellow = 0,
@@ -106,4 +107,15 @@ enum class WardType {
 	JinxTrap = 7,
 	JhinTrap = 8,
 	MaokaiTrap = 9,
+};
+
+enum class PingType {
+	Default = 0,
+	Attack = 1,
+	Danger = 2,
+	Missing = 3,
+	OnMyWay = 4,
+	BeCareful = 5,
+	Help = 6,
+	Warded = 7,
 };

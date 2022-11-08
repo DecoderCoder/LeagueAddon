@@ -1,23 +1,12 @@
-﻿<mica:MicaWindow xmlns:mica="clr-namespace:MicaWPF.Controls;assembly=MicaWPF" x:Class="LeagueAddonLoader.MainWindow"
+﻿<Window x:Class="LeagueAddonLoader.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LeagueAddonLoader"
         mc:Ignorable="d"
-        WindowStyle="None"
-        WindowStartupLocation="CenterScreen"
-        Background="{Binding Source={x:Static SystemColors.ControlBrush}}"
-        Title="LeagueAddon" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="23*"/>
-            <ColumnDefinition Width="137*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30" />
-            <RowDefinition Height="30" />
-        </Grid.RowDefinitions>
-        <TextBlock Padding="10" FontWeight="Black" FontSize="20" Text="LeagueAddon" Foreground="{Binding Source={x:Static SystemParameters.WindowGlassBrush}}" VerticalAlignment="Center" Grid.ColumnSpan="2" Width="auto"/>
+        
     </Grid>
-</mica:MicaWindow>
+</Window>

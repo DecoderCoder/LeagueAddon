@@ -190,11 +190,20 @@ GameObject* OrbWalker::GetTarget()
 		if (selectedPriority) {
 			if (int selectedId = Function::GetSelected()) {
 				GameObject* object = ObjectManager::GetObjectByIndex(selectedId);
-				if (object->IsEnemyTo(Local) && Helper::isValidUnit(object) && object->IsInRange(Local, Local->AttackRange, true)) {
+				if (Helper::isValidUnit(object) && object->IsEnemyTo(Local) && object->IsInRange(Local, Local->AttackRange, true)) {
 					return object;
 				}
 			}
 		}
+		if (TristanaTargetE) {
+			auto chargedList = filter(ObjectManager::HeroList(), [&](GameObject* enemy) { return enemy->BuffManager.hasBuff("tristanaechargesound"); });
+			for (auto charged : chargedList) {
+				if (Helper::isValidUnit(charged) && charged->IsEnemyTo(Local) && charged->IsInRange(Local, Local->AttackRange, true)) {
+					return charged;
+				}
+			}
+		}
+
 		GameObject* target = TargetSelector::GetTarget(Local->AttackRange, DamageType::Physical, IgnoreShield);
 		if (target != nullptr)
 			return target;
@@ -357,6 +366,8 @@ void OrbWalker::OnProcessSpell(void* spellBook, SpellInfo* castInfo) {
 			vayneCanAttack = GetTickCount() + vayneQDelay * 1000;
 		}
 	}
+
+	//MessageBoxA(0, to_hex(castInfo).c_str(), "", 0);
 
 	if (castInfo->BasicAttackSpellData != nullptr && (castInfo->IsBasicAttack || castInfo->IsSpecialAttack || castInfo->IsHeadshotAttack))
 	{

@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <limits>
+#include <string>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
@@ -133,6 +134,10 @@ public:
 		float px = dx * cos(theta) - dz * sin(theta);
 		float pz = dx * sin(theta) + dz * cos(theta);
 		return { px + startPos.x, this->y, pz + startPos.z };
+	}
+	
+	std::string ToString() {
+		return std::to_string(this->x) + "\n" + std::to_string(this->y) + "\n" + std::to_string(this->z);
 	}
 };
 

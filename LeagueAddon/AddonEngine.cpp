@@ -23,6 +23,14 @@ __declspec(naked) void* __cdecl get_peb2() {
 }
 Vector3 vector22;
 
+int __cdecl sub_1248DA0(const char* a1, int a2)
+{
+	MessageBoxA(0, "Hello from inside", "", 0);
+	return 0;
+}
+
+int pingType = 0;
+
 void DrawMenu() {
 	BlockInput(true);
 
@@ -31,6 +39,10 @@ void DrawMenu() {
 	if (Hooks::Hooked) {
 		ImGui::Text(("Local ID: " + to_string(Local->NetworkID)).c_str());
 		ImGui::Text(("PEB: " + to_hex(get_peb2())).c_str());
+		if (GetAsyncKeyStateN(VK_HOME)) {
+			Function::SendPing(Function::GetMouseWorldPosition(), Local->NetworkID, (PingType)pingType);
+		}
+
 		/*ImGui::Text(("x" + to_string(ai->Facing.x)).c_str());
 		ImGui::Text(("y" + to_string(ai->Facing.y)).c_str());
 		ImGui::Text(("z" + to_string(ai->Facing.z)).c_str());*/
@@ -98,6 +110,27 @@ void DrawMenu() {
 						ImGui::EndCombo();
 					}
 					ImGui::Separator();
+
+					ImGui::Text("Drag the hero at this label to attack priority");
+
+					if (ImGui::BeginDragDropTarget())
+					{
+						const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TARGETORDER");
+						if (payload != NULL) {
+							if (*(int*)payload->Data >= 10 && *(int*)payload->Data < 20) {
+								int pos = *(int*)payload->Data - 10;
+								TargetSelector::attackOrder.insert(TargetSelector::attackOrder.begin() + 0, TargetSelector::attackOrderIgnore[pos]);
+								TargetSelector::attackOrderIgnore.erase(TargetSelector::attackOrderIgnore.begin() + pos);
+							}
+							else if (*(int*)payload->Data >= 20) {
+								int pos = *(int*)payload->Data - 20;
+								TargetSelector::attackOrder.insert(TargetSelector::attackOrder.begin() + 0, TargetSelector::attackOrderLast[pos]);
+								TargetSelector::attackOrderLast.erase(TargetSelector::attackOrderLast.begin() + pos);
+							}
+						}
+						ImGui::EndDragDropTarget();
+					}
+
 					int secondTarget = 0;
 					for (int i = 0; i < TargetSelector::attackOrder.size(); i++) {
 						ImGui::Text(("[" + to_string(i) + "] " + TargetSelector::attackOrder[i]->GetChampionName()).c_str());
@@ -120,11 +153,15 @@ void DrawMenu() {
 						{
 							const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TARGETORDER");
 							if (payload != NULL) {
-								if (*(int*)payload->Data >= 10) {
+								if (*(int*)payload->Data >= 10 && *(int*)payload->Data < 20) {
 									int pos = *(int*)payload->Data - 10;
 									TargetSelector::attackOrder.insert(TargetSelector::attackOrder.begin() + i + 1, TargetSelector::attackOrderIgnore[pos]);
 									TargetSelector::attackOrderIgnore.erase(TargetSelector::attackOrderIgnore.begin() + pos);
-									//TargetSelector::attackOrder[*(int*)payload->Data] = swap;
+								}
+								else if (*(int*)payload->Data >= 20) {
+									int pos = *(int*)payload->Data - 20;
+									TargetSelector::attackOrder.insert(TargetSelector::attackOrder.begin() + i + 1, TargetSelector::attackOrderLast[pos]);
+									TargetSelector::attackOrderLast.erase(TargetSelector::attackOrderLast.begin() + pos);
 								}
 								else {
 									GameObject* swap = TargetSelector::attackOrder[i];
@@ -141,12 +178,15 @@ void DrawMenu() {
 					if (ImGui::BeginDragDropTarget()) {
 
 						const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TARGETORDER");
-						if (payload != NULL && *(int*)payload->Data < 10 && TargetSelector::attackOrder.size() > 1) {
-							TargetSelector::attackOrderIgnore.push_back(TargetSelector::attackOrder[*(int*)payload->Data]);
-							TargetSelector::attackOrder.erase(TargetSelector::attackOrder.begin() + *(int*)payload->Data);
-							//GameObject* swap = TargetSelector::attackOrder[i];
-							//TargetSelector::attackOrder[i] = ;
-							//TargetSelector::attackOrder[*(int*)payload->Data] = swap;
+						if (payload != NULL) {
+							if (*(int*)payload->Data < 10) {
+								TargetSelector::attackOrderIgnore.push_back(TargetSelector::attackOrder[*(int*)payload->Data]);
+								TargetSelector::attackOrder.erase(TargetSelector::attackOrder.begin() + *(int*)payload->Data);
+							}
+							else if (*(int*)payload->Data >= 20) {
+								TargetSelector::attackOrderIgnore.push_back(TargetSelector::attackOrderLast[*(int*)payload->Data - 20]);
+								TargetSelector::attackOrderLast.erase(TargetSelector::attackOrderLast.begin() + *(int*)payload->Data - 20);
+							}
 						}
 					}
 					for (int i = 0; i < TargetSelector::attackOrderIgnore.size(); i++) {
@@ -155,6 +195,33 @@ void DrawMenu() {
 							secondTarget = i + 10;
 							ImGui::SetDragDropPayload("TARGETORDER", &secondTarget, sizeof(int));
 							ImGui::Text(TargetSelector::attackOrderIgnore[secondTarget - 10]->GetChampionName().c_str());
+							ImGui::EndDragDropSource();
+						}
+					}
+					ImGui::Separator();
+
+					ImGui::Text("Drag the hero at this label to attack last");
+
+					if (ImGui::BeginDragDropTarget()) {
+
+						const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TARGETORDER");
+						if (payload != NULL && *(int*)payload->Data < 20) {
+							if (*(int*)payload->Data < 10) {	// 1
+								TargetSelector::attackOrderLast.push_back(TargetSelector::attackOrder[*(int*)payload->Data]);
+								TargetSelector::attackOrder.erase(TargetSelector::attackOrder.begin() + *(int*)payload->Data);
+							}
+							else {								// 2
+								TargetSelector::attackOrderLast.push_back(TargetSelector::attackOrderIgnore[*(int*)payload->Data - 10]);
+								TargetSelector::attackOrderIgnore.erase(TargetSelector::attackOrderIgnore.begin() + *(int*)payload->Data - 10);
+							}
+						}
+					}
+					for (int i = 0; i < TargetSelector::attackOrderLast.size(); i++) {
+						ImGui::Text(("[" + to_string(i) + "] " + TargetSelector::attackOrderLast[i]->GetChampionName()).c_str());
+						if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+							secondTarget = i + 20;
+							ImGui::SetDragDropPayload("TARGETORDER", &secondTarget, sizeof(int));
+							ImGui::Text(TargetSelector::attackOrderLast[secondTarget - 20]->GetChampionName().c_str());
 							ImGui::EndDragDropSource();
 						}
 					}
@@ -178,7 +245,7 @@ void DrawMenu() {
 				ImGui::TreePop();
 			}
 
-			
+
 		}
 	}
 
@@ -209,6 +276,8 @@ bool AddonEngine::Initialize() {
 		Draven::Initialize();
 	if (Local->GetChampionName() == "Vayne")
 		Vayne::Initialize();
+	if (Local->GetChampionName() == "Tristana")
+		Tristana::Initialize();
 
 	//// Main code
 

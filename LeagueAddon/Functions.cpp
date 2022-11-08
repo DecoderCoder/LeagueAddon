@@ -193,6 +193,23 @@ int Function::GetPing() {
 	return res;
 }
 
+void Function::SendPing(Vector3* Pos, int NetworkID, PingType pingType)
+{
+	typedef void(__thiscall* fnSendPing)(DWORD pThis, Vector2* worldPos, Vector2* screenPos, int NetworkID, int pingType);
+	fnSendPing ping = (fnSendPing)DEFINE_RVA(Offset::Function::SendPing);
+	DWORD pingInstance = *(DWORD*)(*(DWORD*)DEFINE_RVA(Offset::Data::HudInstance) + 0x8);
+	Vector3 w2s;
+
+
+
+	Function::World2Screen(Pos, &w2s);
+
+	Vector2 w2s2 = Vector2(w2s.x, w2s.z);
+	Vector2 pos2 = Vector2(Pos->x, Pos->z);
+
+	ping(pingInstance, &pos2, &w2s2, NetworkID, (int)pingType);
+}
+
 Vector2 Function::WorldToMap(const Vector3& pos) {
 	const DWORD MinimapObjectHud = *(DWORD*)((*(DWORD*)(baseAddr + Offset::Minimap::Object)) + Offset::Minimap::ObjectHud);
 	const Vector2 worldSize = *(Vector2*)(MinimapObjectHud + Offset::Minimap::HudWorldSize);

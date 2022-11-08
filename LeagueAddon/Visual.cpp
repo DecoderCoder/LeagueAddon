@@ -6,8 +6,12 @@ std::map<int, float> distanceToHero;
 std::map<GameObject*, bool> alwaysVisible;
 std::map<GameObject*, float> recallState;
 bool showTrackableModel = true;
-
 std::vector<GameObject*> spellTrackerHeroes;
+
+float lastPing = 0;
+std::map<GameObject*, float> lastPingEnemy;
+std::map<GameObject*, Vector3> lastEnemyPos;
+
 
 void Visual::Initialize() {
 	EventManager::AddEventHandler(EventManager::EventType::OnMenu, OnMenu);
@@ -16,10 +20,12 @@ void Visual::Initialize() {
 
 	for (auto obj : ObjectManager::HeroList()) {
 		if (obj->IsEnemyTo(Local)) {
-		distanceToHero.insert({ obj->NetworkID, 0 });
-		alwaysVisible.insert({ obj, false });
-		recallState.insert({ obj, false });
-		spellTrackerHeroes.push_back(obj);
+			distanceToHero.insert({ obj->NetworkID, 0 });
+			alwaysVisible.insert({ obj, false });
+			recallState.insert({ obj, false });
+			spellTrackerHeroes.push_back(obj);
+			lastEnemyPos.insert({ obj, obj->Position });
+			lastPingEnemy.insert({ obj, GetTickCount() });
 		}
 	}
 }
@@ -61,6 +67,36 @@ void Visual::OnMenu() {
 				ImGui::TreePop();
 			}
 			ImGui::Checkbox("Show last position", &ShowLastPos);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Ping enemy in fog of war")) {
+			ImGui::Checkbox("Enabled", &PingInvisibleEnemy);
+
+			if (ImGui::BeginCombo("Ping type enemy is coming", PingTypeName[(int)PingInvisibleEnemyTypeTo])) {
+				if (ImGui::Selectable("Attack", PingInvisibleEnemyTypeTo == PingType::Attack)) {
+					PingInvisibleEnemyTypeTo = PingType::Attack;
+				}
+				if (ImGui::Selectable("Danger", PingInvisibleEnemyTypeTo == PingType::Danger)) {
+					PingInvisibleEnemyTypeTo = PingType::Danger;
+				}
+				if (ImGui::Selectable("Missing", PingInvisibleEnemyTypeTo == PingType::Missing)) {
+					PingInvisibleEnemyTypeTo = PingType::Missing;
+				}
+				ImGui::EndCombo();
+			}
+
+			if (ImGui::BeginCombo("Ping type is leaving", PingTypeName[(int)PingInvisibleEnemyTypeFrom])) {
+				if (ImGui::Selectable("Attack", PingInvisibleEnemyTypeFrom == PingType::Attack)) {
+					PingInvisibleEnemyTypeFrom = PingType::Attack;
+				}
+				if (ImGui::Selectable("Danger", PingInvisibleEnemyTypeFrom == PingType::Danger)) {
+					PingInvisibleEnemyTypeFrom = PingType::Danger;
+				}
+				if (ImGui::Selectable("Missing", PingInvisibleEnemyTypeFrom == PingType::Missing)) {
+					PingInvisibleEnemyTypeFrom = PingType::Missing;
+				}
+				ImGui::EndCombo();
+			}
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Spell Tracker")) {
@@ -112,7 +148,6 @@ void Visual::OnMenu() {
 			}*/
 			yOffset += 18;
 			for (int spellNum = 3; spellNum <= 5; spellNum++) {
-				//MessageBoxA(0, hero->GetChampionName().c_str(), ("ChampionName - " + to_hex((int)hero)).c_str(), 0);
 				CSpellSlot* spell = hero->SpellBook.GetSpellSlotByID(spellNum);
 				if (!spell)
 					continue;
@@ -171,13 +206,17 @@ void Visual::OnMenu() {
 				recallTime = 0;
 			}
 
-			if (recallTime != 0 && obj.second == 0) {
-				recallState[obj.first] = GetTickCount() + recallTime;
-			}
-			else {
-				if (obj.first->RecallState == kRecallState::None)
-					recallState[obj.first] = 0;
-			}
+			//if (recallTime != 0 && obj.second == 0) {
+			//	recallState[obj.first] = GetTickCount() + recallTime;
+			//}
+			//else {
+			//	if (obj.first->RecallState == kRecallState::None) {
+
+			//		recallState[obj.first] = 0;
+			//	}
+
+
+			//}
 
 			if (recallTime != 0) {
 				float windowWidth = ImGui::GetWindowContentRegionWidth() - 10;
@@ -185,7 +224,7 @@ void Visual::OnMenu() {
 				//float	drawY = w2sP.y + 20;
 				float drawY = ImGui::GetWindowPos().y + 10 + yOffset;
 
-				float width = (((GetTickCount() - obj.second - recallTime) * windowWidth) / (obj.second - obj.second - recallTime));			
+				float width = (((GetTickCount() - obj.second - recallTime) * windowWidth) / (obj.second - obj.second - recallTime));
 
 				float hpWidth = obj.first->Health / obj.first->MaxHealth * windowWidth;
 
@@ -285,6 +324,28 @@ void Visual::OnDraw() {
 	Vector3 lw2s; // Local World 2 Screen
 	Function::World2Screen(&Local->Position, &lw2s);
 
+	if (PingInvisibleEnemy) {
+		for (auto obj : lastEnemyPos) {
+			if ((Function::IsAlive(obj.first)) && obj.first->Position.distanceTo(lastEnemyPos[obj.first]) > 100) { // !obj.first->IsVisible   				
+				if (obj.first->Position.distanceTo(Local->Position) < ESP_Distance * 2) {
+					if (!obj.first->IsVisible && lastPingEnemy[obj.first] < GetTickCount() && lastPing < GetTickCount()) {
+						//MessageBoxA(0, (obj.first->Position.ToString() + "\n\n\n" + lastEnemyPos[obj.first].ToString()).c_str(), "Position", 0);
+						lastPing = GetTickCount() + 500;
+						if (obj.first->IsFacing(Local)) {
+							Function::SendPing(&obj.first->Position, obj.first->NetworkID, PingInvisibleEnemyTypeTo);
+						}
+						else {
+							Function::SendPing(&obj.first->Position, obj.first->NetworkID, PingInvisibleEnemyTypeFrom);
+						}
+
+						//Function::PrintChat("Pinging: " + to_string(obj.first->NetworkID));
+						lastPingEnemy[obj.first] = GetTickCount() + 5000;
+					}
+				}
+			}
+		}
+	}
+
 	Render::BeginOverlay();
 	if (ESP) {
 		if (RecallTracker)
@@ -308,8 +369,14 @@ void Visual::OnDraw() {
 					recallState[obj.first] = GetTickCount() + recallTime;
 				}
 				else {
-					if (obj.first->RecallState == kRecallState::None)
+					if (obj.first->RecallState == kRecallState::None) {
+						if (GetTickCount() > recallState[obj.first] - 500) {
+							//obj.first->Health = obj.first->MaxHealth;
+						}
 						recallState[obj.first] = 0;
+					}
+
+
 				}
 
 				if (recallTime != 0) {
@@ -440,6 +507,8 @@ void Visual::OnDraw() {
 			if (obj->IsEnemyTo(Local))
 				if (obj->GetChampionName() == "YellowTrinket")
 					AddTrackable(obj, WardType::Yellow);
+				else if (obj->GetChampionName() == "SightWard")
+					AddTrackable(obj, WardType::Yellow);
 				else if (obj->GetChampionName() == "YellowTrinketUpgrade")
 					AddTrackable(obj, WardType::Yellow);
 				else if (obj->GetChampionName() == "Ward")
@@ -480,4 +549,8 @@ void Visual::OnDraw() {
 	}
 
 	Render::EndOverlay();
+
+	for (auto obj : lastEnemyPos) {
+		lastEnemyPos[obj.first] = obj.first->Position;
+	}
 }

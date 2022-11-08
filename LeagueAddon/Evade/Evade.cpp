@@ -7,6 +7,9 @@ using namespace std;
 #define Compare(x, y, z) StringCompare(x, y, z)
 #define _DEBUGEVADE 0
 #define _DEBUGMISSILES 0
+
+bool forceEvade = false;
+
 namespace Evade
 {
 	std::list<int> addedSpells;
@@ -73,6 +76,7 @@ namespace Evade
 			ImGui::Checkbox("Draw spells", &DrawSpells);
 			ImGui::Checkbox("Evade spells", &EvadeSpells);
 			ImGui::Checkbox("Use missiles", &UseMissiles);
+			ImGui::Checkbox("Force evade", &forceEvade);
 			ImGui::Separator();
 			ImGui::Text("Evading spells");
 			for (int champ_c = 0; champ_c < ChampsInGame.size(); champ_c++)
@@ -102,6 +106,7 @@ namespace Evade
 
 		if (UseMissiles)
 			for (MissileSpellInfo* missile : ObjectManager::MissileList()) {
+				//MessageBoxA(0, to_hex(missile).c_str(), "", 0);
 #if !_DEBUGEVADE
 				auto source = ObjectManager::FindObjectByIndex(ObjectManager::HeroList(), missile->source_id);
 				if (source && source->IsEnemyTo(Local)) // for sylas
@@ -414,6 +419,8 @@ namespace Evade
 		if (!ExtendedPos.IsZero())
 		{
 			MoveToPos(ExtendedPos);
+			if (!forceEvade)
+				ExtendedPos = Vector3(0, 0, 0);
 		}
 	}
 
@@ -1278,7 +1285,6 @@ namespace Evade
 			{
 				if (Compare(castInfo->BasicAttackSpellData->Name, s.name, true))
 				{
-
 					addedSpells.push_back(castInfo->Index);
 					s.startTime = GameTimer;
 					s.obj = champ.obj;
@@ -1339,15 +1345,15 @@ namespace Evade
 
 			Spell Q1;
 			Q1.name = "AatroxQ";
-			Q1.icon = "AatroxQ1";
+			Q1.icon = "AatroxQ";
 			Q1.displayName = "The Darkin Blade [First]";
 			Q1.missileName = "";
 			Q1.slot = _Q;
 			Q1.type = linear;
 			Q1.speed = MathHuge;
-			Q1.range = 850;
+			Q1.range = 660;
 			Q1.delay = 0.5;
-			Q1.radius = 200;
+			Q1.radius = 120;
 			Q1.danger = 3;
 			Q1.cc = true;
 			Q1.collision = false;
@@ -1355,8 +1361,50 @@ namespace Evade
 			Q1.hitbox = false;
 			Q1.fow = false;
 			Q1.exception = false;
-			Q1.extend = false;
+			Q1.extend = true;
 			Aatrox.spells.emplace_back(Q1);
+
+			Spell Q2;
+			Q2.name = "AatroxQ2";
+			Q2.icon = "AatroxQ";
+			Q2.displayName = "The Darkin Blade [Second]";
+			Q2.missileName = "";
+			Q2.slot = _Q;
+			Q2.type = linear;
+			Q2.speed = MathHuge;
+			Q2.range = 510;
+			Q2.delay = 0.5;
+			Q2.radius = 350;
+			Q2.danger = 3;
+			Q2.cc = true;
+			Q2.collision = false;
+			Q2.windwall = false;
+			Q2.hitbox = false;
+			Q2.fow = false;
+			Q2.exception = false;
+			Q2.extend = true;
+			Aatrox.spells.emplace_back(Q2);
+
+			Spell Q3;
+			Q3.name = "AatroxQ3";
+			Q3.icon = "AatroxQ";
+			Q3.displayName = "The Darkin Blade [Third]";
+			Q3.missileName = "";
+			Q3.slot = _Q;
+			Q3.type = circular;
+			Q3.speed = MathHuge;
+			Q3.range = 200;
+			Q3.delay = 0.5;
+			Q3.radius = 160;
+			Q3.danger = 3;
+			Q3.cc = true;
+			Q3.collision = false;
+			Q3.windwall = false;
+			Q3.hitbox = false;
+			Q3.fow = false;
+			Q3.exception = false;
+			Q3.extend = true;
+			Aatrox.spells.emplace_back(Q3);
 
 			/*Spell Q1;
 			Q1.name = "AatroxQWrapperCast";
@@ -3618,7 +3666,7 @@ namespace Evade
 			W.fow = true;
 			W.exception = false;
 			W.extend = true;
-			W.followEnemy = true;
+			W.followEnemy = false;
 			Fiora.spells.emplace_back(W);
 
 			SpellDB.emplace_back(Fiora);

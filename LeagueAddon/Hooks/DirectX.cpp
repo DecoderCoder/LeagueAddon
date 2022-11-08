@@ -311,15 +311,16 @@ bool DirectXHook::HookDX11() {
 	//else
 	//	oPresentDX11 = UltHook.AddEzHook((DWORD)((int)target + 5), 6, (DWORD)&DirectXHook::Hooked_PresentDX11);
 	//MessageBoxA(0, to_hex((int)oPresentDX11).c_str(), "opresentDX11", 0);
+	
 	if (*(BYTE*)(target) == 0xE9) {
-		target = ((DWORD)target + *(DWORD*)((DWORD)target + 1));
-		//if (*(BYTE*)target == 0xFF) {
-			target += 5;
+		target = ((DWORD)target + *(DWORD*)((DWORD)target + 1)) + 5;
+		if (*(BYTE*)(target) == 0xE9) {
+			target = ((DWORD)target + *(DWORD*)((DWORD)target + 1)) + 5;
 			oPresentDX11 = UltHook.AddEzHook((DWORD)target, 6, (DWORD)&DirectXHook::Hooked_PresentDX11);
-		//}
-		/*else {
-
-		}*/
+		}
+		else {
+			oPresentDX11 = UltHook.AddEzHook((DWORD)target, 6, (DWORD)&DirectXHook::Hooked_PresentDX11);
+		}
 	}
 	else
 		oPresentDX11 = UltHook.AddEzHook((DWORD)target, 5, (DWORD)&DirectXHook::Hooked_PresentDX11);
@@ -347,7 +348,7 @@ bool DirectXHook::unHook() {
 	if (oPresentDX11)
 		UltHook.RemoveEzHook(oPresentDX11);
 
-	if(oResizeBufferDX11)
+	if (oResizeBufferDX11)
 		HookVTableFunction(gpSwapChain, (void*)oResizeBufferDX11, 13);
 
 	if (oGetDeviceState)

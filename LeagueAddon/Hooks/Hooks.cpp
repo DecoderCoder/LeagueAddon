@@ -68,8 +68,12 @@ void Hooks::ApplyHooks() {
 
 	if (*(BYTE*)&GetCursorPos == 0xE9) {
 		targetGCP = ((DWORD)targetGCP + *(DWORD*)((DWORD)targetGCP + 1)) + 5;
-		//MessageBoxA(0, to_hex(targetGCP).c_str(), "&GetCursorPos", 0);
-		Input::oGetCursorPos = UltHook.AddEzHook(targetGCP, 6, (DWORD)&hGetCursorPos);
+		if (*(BYTE*)targetGCP == 0xE9) {
+			targetGCP = ((DWORD)targetGCP + *(DWORD*)((DWORD)targetGCP + 1)) + 5;
+			Input::oGetCursorPos = UltHook.AddEzHook(targetGCP, 6, (DWORD)&hGetCursorPos);
+		}
+		else
+			Input::oGetCursorPos = UltHook.AddEzHook(targetGCP, 6, (DWORD)&hGetCursorPos);
 	}
 	else
 		Input::oGetCursorPos = UltHook.AddEzHook((DWORD)&GetCursorPos, 5, (DWORD)&hGetCursorPos);
