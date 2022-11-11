@@ -8,6 +8,8 @@ namespace Offset {
 		static constexpr int HudInstance = 0x18BBF74; //8B ? ? ? ? ? 6A 00 8B ? ? E8 ? ? ? ? B0 01 ?
 		static constexpr int Camera = 0x25095EC; // E8 ?? ?? ?? ?? 8B 0D ?? ?? ?? ?? 8D 43 24
 
+		static constexpr int ViewProjMatrices = 0x3181D70;
+
 		static constexpr int ManagerTemplate_Minions = 0x25095CC; // 8B 0D ? ? ? ? E8 ? ? ? ? EB 09 56 E8 ? ? ? ? 83 C4 04 8B CB C7 44 24 ? ? ? ? ?  First
 		static constexpr int ManagerTemplate_Turrets = 0x315089C; //  8B 35 ? ? ? ? 8B 76 18  // 51 53 55 56 8B F1 8D 44 24 0C 89 35 ? ? ? ? 
 		static constexpr int ManagerTemplate_Heroes = 0x18BBF40; // 83 EC 64 A1 ? ? ? ? 33 C4 89 44 24 60 8B 44 24 68 83 CA FF 
@@ -138,6 +140,7 @@ namespace Offset {
 		static constexpr int Dashing = 0x214;
 		static constexpr int DashingSpeed = 0x1f8;
 		static constexpr int NavArray = 0x1e4;
+		static constexpr int NavArraySize = 0x1e8;
 		static constexpr int NavArrayEnd = 0x1e8;
 	};
 

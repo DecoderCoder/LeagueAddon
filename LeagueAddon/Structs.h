@@ -115,11 +115,31 @@ public:
 			DEFINE_MEMBER_N(float DashingSpeed, Offset::AIManager::DashingSpeed)
 			DEFINE_MEMBER_N(Vector3* NavArray, Offset::AIManager::NavArray)
 			DEFINE_MEMBER_N(Vector3* NavArrayEnd, Offset::AIManager::NavArrayEnd)
+			DEFINE_MEMBER_N(int NavArraySize, Offset::AIManager::NavArraySize)
+			DEFINE_MEMBER_N(int CurrentSegment, Offset::AIManager::CurrentSegment)
 	};
+
+	//int pathSize()
+	//{
+	//	return ((DWORD)this->NavArrayEnd - (DWORD)this->NavArray) / (sizeof(Vector3));
+	//}
+
+	int currentSegment() {
+		/*float minDist = FLT_MAX;
+		int currentSeg = this->CurrentSegment;
+		for (int i = 0; i < pathSize(); i++) {
+			if (this->NavArray[i - 1].distanceTo(this->NavStartPos) < minDist)
+			{
+				minDist = this->NavArray[i - 1].distanceTo(this->NavStartPos);
+				currentSeg = i;
+			}
+		}*/
+		return 0;
+	}
 
 	int pathSize()
 	{
-		return ((DWORD)this->NavArrayEnd - (DWORD)this->NavArray) / (sizeof(Vector3));
+		return NavArraySize;
 	}
 
 	float pathLength()

@@ -48,8 +48,6 @@ bool Function::IsChatOpen() {
 	return *(bool*)(*(int*)(baseAddr + Offset::Data::ChatInstance) + Offset::Data::IsChatOpenOffset);
 }
 
-
-
 bool Function::World2Screen(Vector3* in, Vector3* out) {
 	FuncType::WorldToScreen w2sFunc = (FuncType::WorldToScreen)DEFINE_RVA(Offset::Function::WorldToScreen);
 	DWORD* V4 = (DWORD*)((*(DWORD*)(DEFINE_RVA(Offset::Data::W2SInstance))) + Offset::Data::W2SInstanceOffset);
@@ -61,15 +59,64 @@ bool Function::World2Screen(Vector3* in, Vector3* out) {
 	return ret;
 }
 
-Vector2 Function::WorldToScreen(Vector3* in)
-{
-	FuncType::WorldToScreen w2sFunc = (FuncType::WorldToScreen)DEFINE_RVA(Offset::Function::WorldToScreen);
-	Vector3 out;
-	//w2sFunc(in, &out);
-	Vector2 out2 = Vector2(out.x, out.y);
-	delete out;
-	return out2;
+void MultiplyMatrices(float* out, float* a, int row1, int col1, float* b, int row2, int col2) {
+	int size = row1 * col2;
+	for (int i = 0; i < row1; i++) {
+		for (int j = 0; j < col2; j++) {
+			float sum = 0.f;
+			for (int k = 0; k < col1; k++)
+				sum = sum + a[i * col1 + k] * b[k * col2 + j];
+			out[i * col2 + j] = sum;
+		}
+	}
 }
+
+Vector3 Function::WorldToScreen(Vector3* pos)
+{
+	float    viewMatrix[16];
+	float    projMatrix[16];
+	float    viewProjMatrix[16];
+
+	{
+		memcpy(viewMatrix, (void*)DEFINE_RVA(Offset::Data::ViewProjMatrices), 16 * sizeof(float));
+		memcpy(projMatrix, (void*)DEFINE_RVA(Offset::Data::ViewProjMatrices + 0x40), 16 * sizeof(float));
+		MultiplyMatrices(viewProjMatrix, viewMatrix, 4, 4, projMatrix, 4, 4);
+	}
+
+
+	Vector3 out = { 0.f, 0.f, 0.f };
+	Vector2 screen = { (float)Render::RenderWidth, (float)Render::RenderHeight };
+	static Vector4 clipCoords;
+	clipCoords.x = pos->x * viewProjMatrix[0] + pos->y * viewProjMatrix[4] + pos->z * viewProjMatrix[8] + viewProjMatrix[12];
+	clipCoords.y = pos->x * viewProjMatrix[1] + pos->y * viewProjMatrix[5] + pos->z * viewProjMatrix[9] + viewProjMatrix[13];
+	clipCoords.z = pos->x * viewProjMatrix[2] + pos->y * viewProjMatrix[6] + pos->z * viewProjMatrix[10] + viewProjMatrix[14];
+	clipCoords.w = pos->x * viewProjMatrix[3] + pos->y * viewProjMatrix[7] + pos->z * viewProjMatrix[11] + viewProjMatrix[15];
+
+	if (clipCoords.w < 1.0f)
+		clipCoords.w = 1.f;
+
+	Vector3 M;
+	M.x = clipCoords.x / clipCoords.w;
+	M.y = clipCoords.y / clipCoords.w;
+	M.z = clipCoords.z / clipCoords.w;
+
+	out.x = (screen.x / 2.f * M.x) + (M.x + screen.x / 2.f);
+	out.y = -(screen.y / 2.f * M.y) + (M.y + screen.y / 2.f);
+
+
+	return out;
+}
+
+//Vector3 Function::WorldToScreen(Vector3* in)
+//{
+//	Vector3 out;
+//	FuncType::WorldToScreen w2sFunc = (FuncType::WorldToScreen)DEFINE_RVA(Offset::Function::WorldToScreen);
+//	DWORD* V4 = (DWORD*)((*(DWORD*)(DEFINE_RVA(Offset::Data::W2SInstance))) + Offset::Data::W2SInstanceOffset);
+//
+//	bool ret = w2sFunc(V4, in, &out);
+//	//w2sFunc(in, &out);	
+//	return out;
+//}
 
 DWORD Gadget = DEFINE_RVA(0x510D);
 
@@ -198,11 +245,7 @@ void Function::SendPing(Vector3* Pos, int NetworkID, PingType pingType)
 	typedef void(__thiscall* fnSendPing)(DWORD pThis, Vector2* worldPos, Vector2* screenPos, int NetworkID, int pingType);
 	fnSendPing ping = (fnSendPing)DEFINE_RVA(Offset::Function::SendPing);
 	DWORD pingInstance = *(DWORD*)(*(DWORD*)DEFINE_RVA(Offset::Data::HudInstance) + 0x8);
-	Vector3 w2s;
-
-
-
-	Function::World2Screen(Pos, &w2s);
+	Vector3 w2s = Function::WorldToScreen(Pos);
 
 	Vector2 w2s2 = Vector2(w2s.x, w2s.z);
 	Vector2 pos2 = Vector2(Pos->x, Pos->z);

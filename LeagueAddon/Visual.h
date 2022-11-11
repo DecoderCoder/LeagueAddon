@@ -11,7 +11,8 @@ namespace Visual {
 
 
 	inline bool ESP = true;
-	inline int ESP_Distance = 3000;
+	inline int ESP_Distance = 5000;
+	inline bool ESP_ShowNav = true;
 
 	inline bool HighlightSelected = false;
 

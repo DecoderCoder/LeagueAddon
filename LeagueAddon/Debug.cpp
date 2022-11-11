@@ -25,13 +25,11 @@ void Debug::OnDraw() {
 		if (drawSpellDirection)
 			for (int i = 0; i < detectedSpells.size(); i++)
 			{
-				Vector3 w2sStartPos;
-				Vector3 w2sEndPos;
-				Function::World2Screen(&detectedSpells[i].StartPosition, &w2sStartPos);
-				Function::World2Screen(&detectedSpells[i].EndPosition, &w2sEndPos);
+				Vector3 w2sStartPos = Function::WorldToScreen(&detectedSpells[i].StartPosition);
+				Vector3 w2sEndPos = Function::WorldToScreen(&detectedSpells[i].EndPosition);
+
 				if (detectedSpells[i].EndPosition2.x != 0 && detectedSpells[i].EndPosition2.y != 0) {
-					Vector3 w2sEndPos2;
-					Function::World2Screen(&detectedSpells[i].EndPosition2, &w2sEndPos2);
+					Vector3 w2sEndPos2 = Function::WorldToScreen(&detectedSpells[i].EndPosition2);
 					Render::Draw_Line(w2sEndPos2.x, w2sEndPos2.y, w2sEndPos.x, w2sEndPos.y, ImColor(255, 0, 0), 1);
 				}
 				Render::Draw_Line(w2sStartPos.x, w2sStartPos.y, w2sEndPos.x, w2sEndPos.y, ImColor(0, 0, 255), 1);
@@ -41,8 +39,8 @@ void Debug::OnDraw() {
 
 		if (drawObjectInfo)
 			for (auto obj : ObjectManager::GetAllObjects()) {
-				Vector3 w2s;
-				Function::World2Screen(&obj->Position, &w2s);
+				Vector3 w2s = Function::WorldToScreen(&obj->Position);;
+
 				int offsetY = 0;
 				const int offsetYStep = 15;
 
@@ -58,7 +56,7 @@ void Debug::OnDraw() {
 				offsetY += offsetYStep;
 				Render::Draw_Text(w2s.x, w2s.y + offsetY, "IsInvulnearable: " + string(obj->IsInvulnearable() ? "true" : "false"));
 				offsetY += offsetYStep;
-				
+
 
 				if (drawObjectInfoBuffs) {
 					for (auto buff : obj->BuffManager.entries()) {
@@ -79,7 +77,7 @@ void Debug::OnMenu() {
 	if (Enabled) {
 		ImGui::Begin("Debug");
 
-		
+
 
 		if (ImGui::CollapsingHeader("OrbWalker")) {
 			ImGui::Text(("LastAA  : " + to_string(OrbWalker::LastAttackCommandT)).c_str());
@@ -113,10 +111,11 @@ void Debug::OnMenu() {
 			auto missiles = ObjectManager::MissileList();
 			ImGui::Text(to_string(missiles.size()).c_str());
 			for (auto obj : missiles) {
-				Vector3 w2s;
 				Vector3* spellPos = (Vector3*)((int)obj + 0xD8);
+				Vector3 w2s = Function::WorldToScreen(spellPos);;
+
 				//Vector3* spellEndPos = (Vector3*)((int)obj + 0x2DC);
-				Function::World2Screen(spellPos, &w2s);
+
 				ImGui::Text(GetStr((DWORD)obj + 0x54));
 			}
 		}

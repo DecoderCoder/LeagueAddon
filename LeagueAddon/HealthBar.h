@@ -97,9 +97,9 @@ public:
 		Vector3 leftBottom;
 		Vector3 rightBottom;
 
-		Vector3 w2sP;
+		Vector3 w2sP = Function::WorldToScreen(&pos);
 
-		Function::World2Screen(&pos, &w2sP);
+		;
 
 		/*if (this->Type == HealthBarType::UnderHero_3D) {
 			Vector3 newPos;
@@ -120,8 +120,8 @@ public:
 		}
 		else */
 		{
-			Vector3 w2s;
-			Function::World2Screen(&pos, &w2s);
+			Vector3 w2s = Function::WorldToScreen(&pos);
+			
 			if (center) {
 				drawX = w2s.x - this->Width / 2;
 				//	drawY = w2s.y + yOffset;

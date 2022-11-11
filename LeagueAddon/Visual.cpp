@@ -51,6 +51,7 @@ void Visual::OnMenu() {
 			if (ESP) {
 				ImGui::SliderInt("ESP Distance", &ESP_Distance, 600, 15000);
 			}
+			ImGui::Checkbox("Show Navgitoon path", &ESP_ShowNav);
 			ImGui::Checkbox("Show own attack radius", &ShowAttackRadius);
 			ImGui::Checkbox("Show enemy bounding radius", &ShowBoundingRadius);
 			ImGui::Checkbox("Highlight selected", &HighlightSelected);
@@ -321,8 +322,8 @@ void Visual::OnDraw() {
 		blinkTimer = GetTickCount() + 500;
 	}
 
-	Vector3 lw2s; // Local World 2 Screen
-	Function::World2Screen(&Local->Position, &lw2s);
+	Vector3 lw2s = Function::WorldToScreen(&Local->Position);; // Local World 2 Screen
+
 
 	if (PingInvisibleEnemy) {
 		for (auto obj : lastEnemyPos) {
@@ -348,6 +349,35 @@ void Visual::OnDraw() {
 
 	Render::BeginOverlay();
 	if (ESP) {
+		if (ESP_ShowNav) {
+
+			for (auto obj : ObjectManager::HeroList()) {
+				if (obj->IsAllyTo(Local))
+					continue;
+				AIManager* mng = obj->GetAIManager();
+				if (Function::IsAlive(obj) && mng->Moving) {
+					//Render::Draw_Line3D(obj->Position, mng->NavArray[mng->currentSegment()], ImColor(255, 255, 255), 1);
+
+					for (int i = 0; i < mng->pathSize() - 1; i++) {
+						Vector3 w2s1 = Function::WorldToScreen(&mng->NavArray[i]), w2s2 = Function::WorldToScreen(&mng->NavArray[i + 1]);
+						Render::Draw_Line(w2s1.x, w2s1.y, w2s2.x, w2s2.y, ImColor(255, 255, 255), 1);
+						//Render::Draw_Line3D(mng->NavArray[i], mng->NavArray[i + 1], ImColor(255, 255, 255), 1);
+
+					}
+
+					Vector3 w2s = Function::WorldToScreen(&mng->NavArray[mng->pathSize() - 1]);
+
+					Render::Draw_Text(100, 100, to_string(w2s.x));
+
+					Render::Draw_Text(100, 120, to_string(w2s.y));
+
+					Render::Draw_Text(w2s.x, w2s.y, obj->GetChampionName(), ImColor(255, 255, 255));
+				}
+
+			}
+
+		}
+
 		if (RecallTracker)
 			for (auto obj : recallState) {
 				int recallTime = 0;
@@ -382,8 +412,8 @@ void Visual::OnDraw() {
 				if (recallTime != 0) {
 					// TODO: 3D Optimization
 
-					Vector3 w2sP;
-					Function::World2Screen(&obj.first->Position, &w2sP);
+					Vector3 w2sP = Function::WorldToScreen(&obj.first->Position);
+
 
 					float drawX = w2sP.x - 140 / 2;
 					//float	drawY = w2sP.y + 20;
@@ -412,8 +442,8 @@ void Visual::OnDraw() {
 				if (Function::IsAlive(obj) && obj->IsVisible) {
 					float distance = Local->Position.distanceTo(obj->Position);
 					if (distance < ESP_Distance) {
-						Vector3 ew2s; // Enemy W2S
-						Function::World2Screen(&obj->Position, &ew2s);
+						Vector3 ew2s = Function::WorldToScreen(&obj->Position); // Enemy W2S
+
 
 						if (distanceToHero[obj->NetworkID] > distance)
 							Render::Draw_Line(lw2s.x, lw2s.y, ew2s.x, ew2s.y, ImColor(231, 76, 60), 2);
@@ -423,8 +453,8 @@ void Visual::OnDraw() {
 
 						Vector3 nameCoord = Local->Position.Extend(obj->Position, Local->AttackRange);
 
-						Vector3 nameCoordw2s;
-						Function::World2Screen(&nameCoord, &nameCoordw2s);
+						Vector3 nameCoordw2s = Function::WorldToScreen(&nameCoord);
+
 
 						Render::Draw_Text_Centered(ImVec2(nameCoordw2s.x, nameCoordw2s.y), ImVec2(50, 20), obj->GetChampionName(), 0xFFFFFFFF, 15);
 					}
@@ -444,9 +474,9 @@ void Visual::OnDraw() {
 			if (ShowLastPos && obj->IsEnemyTo(Local) && Function::IsAlive(obj)) {
 				ImColor drawColor;
 				ImColor drawTextColor;
-				Vector3 w2sPos;
 				Vector2 mapPos = Function::WorldToMap(obj->Position);
-				Function::World2Screen(&obj->Position, &w2sPos);
+				Vector3 w2sPos = Function::WorldToScreen(&obj->Position);
+
 
 
 				drawColor = ImColor::ImColor(255, 255, 255);

@@ -162,8 +162,8 @@ namespace Evade
 					}
 			}
 
-		Vector3 lpPos;
-		Function::World2Screen(&Local->Position, &lpPos);
+		Vector3 lpPos = Function::WorldToScreen(&Local->Position);
+		
 
 		Render::BeginOverlay();
 		Render::Draw_Text_Centered(lpPos.x - 15, lpPos.y - 7, 30, 15, (EvadeSpells ? "E: ON" : "E: OFF"), (EvadeSpells ? ImColor(0, 255, 0) : ImColor(255, 0, 0)));

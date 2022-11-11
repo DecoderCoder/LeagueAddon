@@ -22,7 +22,7 @@ void Misc::Initialize() {
 			for (int i = 0; i < 6; i++)
 				if (StringContains(hero->SpellBook.GetSpellSlotByID(i)->GetName(), "SummonerSmite", false)) {
 					enemyJungler = hero;
-					break;
+					break; 
 				}
 		}
 		if (enemyJungler)
@@ -120,7 +120,7 @@ void Misc::OnDraw() {
 					}
 				}
 
-				if (smiteSlot->GetCharges() == 2 || !AutoSmite_HasSecondSmite) {
+				if (enemyJungler && (smiteSlot->GetCharges() == 2 || !AutoSmite_HasSecondSmite)) {
 					if (AutoSmite_Buff)
 						if (StringContains(obj->GetChampionName(), "SRU_Red") || StringContains(obj->GetChampionName(), "SRU_Blue")) {
 							if (enemyJungler->IsVisible && Function::IsAlive(enemyJungler) && enemyJungler->Position.distanceTo(obj->Position) < 700) {

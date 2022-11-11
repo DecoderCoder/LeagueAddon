@@ -85,10 +85,8 @@ void Render::Draw_Circle3D(Vector3 center, float radius, ImColor color, float th
 }
 
 void Render::Draw_Line3D(Vector3 pos1, Vector3 pos2, ImColor color, float thickness) {
-	Vector3 w2s1, w2s2;
+	Vector3 w2s1 = Function::WorldToScreen(&pos1), w2s2 = Function::WorldToScreen(&pos2);
 
-	Function::World2Screen(&pos1, &w2s1);
-	Function::World2Screen(&pos2, &w2s2);
 	Render::Draw_Line(w2s1.x, w2s1.y, w2s2.x, w2s2.y, color, thickness);
 }
 
@@ -159,7 +157,7 @@ void Render::Polygon(Geometry::Polygon poly, ImColor color, float tick)
 	int i = 0;
 	for (auto& point : poly.Points)
 	{
-		Function::World2Screen(&point, &out);
+		out = Function::WorldToScreen(&point);
 		Vector2 screenSpace = Vector2(out.x, out.y);
 
 		points[i].x = screenSpace.x;
@@ -176,20 +174,18 @@ void draw_line(Vector2 start_pos, Vector2 end_pos, ImColor color, float thicknes
 }
 void draw_line(Vector3 start_pos, Vector3 end_pos, ImColor color, float thickness)
 {
-	Vector3 temp;
-	Function::World2Screen(&start_pos, &temp);
+	Vector3 temp = Function::WorldToScreen(&start_pos);
 	Vector2 startWorldPos = Vector2(temp.x, temp.y);
-	Function::World2Screen(&end_pos, &temp);
+	temp = Function::WorldToScreen(&end_pos);
 	Vector2 endWorldPos = Vector2(temp.x, temp.y);
 	//delete temp;
 	ImGui::GetWindowDrawList()->AddLine(ImVec2(startWorldPos.x, startWorldPos.y), ImVec2(endWorldPos.x, endWorldPos.y), color, thickness);
 }
 void draw_line3D(Vector3 start_pos, Vector3 end_pos, ImColor color, float thickness)
 {
-	Vector3 temp;
-	Function::World2Screen(&start_pos, &temp);
+	Vector3 temp = Function::WorldToScreen(&start_pos);
 	Vector2 startWorldPos = Vector2(temp.x, temp.y);
-	Function::World2Screen(&end_pos, &temp);
+	temp = Function::WorldToScreen(&end_pos);
 	Vector2 endWorldPos = Vector2(temp.x, temp.y);
 	//delete temp;
 	ImGui::GetWindowDrawList()->AddLine(ImVec2(startWorldPos.x, endWorldPos.y), ImVec2(endWorldPos.x, endWorldPos.y), color, thickness);

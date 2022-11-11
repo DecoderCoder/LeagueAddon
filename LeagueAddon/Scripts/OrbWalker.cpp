@@ -74,8 +74,8 @@ void OrbWalker::Orbwalk(GameObject* target, float extraWindup) {
 				//Function::SetSelected(selectedBefore);
 			}
 		else {
-			Vector3 w2s;
-			Function::World2Screen(&target->Position, &w2s);
+			Vector3 w2s = Function::WorldToScreen(&target->Position);
+			
 			Input::Move(w2s.x, w2s.y);
 			Input::PressRightClick();
 		}

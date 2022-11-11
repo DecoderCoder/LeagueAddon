@@ -41,7 +41,7 @@ namespace FuncType {
 namespace Function {
 	Vector3* GetMouseWorldPosition();
 	bool IsChatOpen();
-	Vector2 WorldToScreen(Vector3* in);
+	Vector3 WorldToScreen(Vector3* in);
 	bool World2Screen(Vector3* in, Vector3* out);
 	bool IsAlive(GameObject* object);
 	float GetBoundingRadius(GameObject* object);

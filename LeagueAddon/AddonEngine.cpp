@@ -23,14 +23,6 @@ __declspec(naked) void* __cdecl get_peb2() {
 }
 Vector3 vector22;
 
-int __cdecl sub_1248DA0(const char* a1, int a2)
-{
-	MessageBoxA(0, "Hello from inside", "", 0);
-	return 0;
-}
-
-int pingType = 0;
-
 void DrawMenu() {
 	BlockInput(true);
 
@@ -40,7 +32,7 @@ void DrawMenu() {
 		ImGui::Text(("Local ID: " + to_string(Local->NetworkID)).c_str());
 		ImGui::Text(("PEB: " + to_hex(get_peb2())).c_str());
 		if (GetAsyncKeyStateN(VK_HOME)) {
-			Function::SendPing(Function::GetMouseWorldPosition(), Local->NetworkID, (PingType)pingType);
+			MessageBoxA(0, to_hex(Local->GetAIManager()).c_str(), "AiManager", 0);
 		}
 
 		/*ImGui::Text(("x" + to_string(ai->Facing.x)).c_str());

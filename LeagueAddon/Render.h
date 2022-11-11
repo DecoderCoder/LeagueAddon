@@ -4,6 +4,7 @@
 #include "Functions.h"
 #include "Geometry.h"
 #include "Resources.h"
+#include "directxmath.h"
 
 namespace Render {
 	inline Image_Manager Images_Manager = nullptr;
