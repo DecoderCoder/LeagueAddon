@@ -311,7 +311,7 @@ bool DirectXHook::HookDX11() {
 	//else
 	//	oPresentDX11 = UltHook.AddEzHook((DWORD)((int)target + 5), 6, (DWORD)&DirectXHook::Hooked_PresentDX11);
 	//MessageBoxA(0, to_hex((int)oPresentDX11).c_str(), "opresentDX11", 0);
-	
+
 	if (*(BYTE*)(target) == 0xE9) {
 		target = ((DWORD)target + *(DWORD*)((DWORD)target + 1)) + 5;
 		if (*(BYTE*)(target) == 0xE9) {
@@ -362,9 +362,21 @@ bool DirectXHook::unHook() {
 	return false;
 }
 
+double clockToMilliseconds(clock_t ticks) {
+	// units/(units/time) => time (seconds) * 1000 = milliseconds
+	return (ticks / (double)CLOCKS_PER_SEC) * 1000.0;
+}
+
+clock_t deltaTime = 0;
+clock_t deltaTimeTimes = 0;
+
+float lastAvarageTime = 0;
+
 HRESULT __stdcall DirectXHook::Hooked_PresentDX11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) {
+
 	//if (GetAsyncKeyState(VK_HOME))
 	//	Inited = false;
+	Debug::drawStartTime = clock();
 	if (!Inited)
 	{
 		Utils::Log(" > DX11Present: Init: Begin");
@@ -477,6 +489,23 @@ HRESULT __stdcall DirectXHook::Hooked_PresentDX11(IDXGISwapChain* pSwapChain, UI
 	ImGui::Render();
 	pContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	Debug::drawEndTime = clock();
+
+	if (Debug::Enabled) {
+
+		deltaTime += abs(Debug::drawStartTime - Debug::drawEndTime);
+		deltaTimeTimes++;
+
+		if (lastAvarageTime < GetTickCount()) {
+			Debug::avarageDrawTime = (deltaTime * 1000) / deltaTimeTimes;
+
+			deltaTime = 0;
+			deltaTimeTimes = 0;
+
+			lastAvarageTime = GetTickCount() + 1000;
+		}
+	}
+
 	return ((PresentDX11)oPresentDX11)(pSwapChain, SyncInterval, Flags);
 }
 

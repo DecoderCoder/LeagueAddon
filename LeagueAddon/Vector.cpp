@@ -489,6 +489,12 @@ Vector3 Vector3::Append(Vector3 pos1, Vector3 pos2, float dist) const
 	return pos2 + (pos2 - pos1).Normalized() * dist;
 }
 
+Vector3 Vector3::Prepend(Vector3 pos1, Vector3 pos2, float dist) const
+{
+	return pos1 + (pos2 - pos1).Normalized() * dist;
+	//return pos2 + (pos2 - pos1).Normalized() * dist;
+}
+
 ProjectionInfo::ProjectionInfo(const bool is_on_segment, Vector3 const& segment_point, Vector3 const& line_point) :
 	IsOnSegment(is_on_segment), LinePoint(line_point), SegmentPoint(segment_point)
 {

@@ -58,8 +58,8 @@ void Garen::OnDraw() {
 		Vector3 pos = obj->Position;
 		//Vector3 w2sPos = obj.GetHpBarPosition();
 		//Vector3 HpBarPosition = obj.GetHpBarPosition();
-		Vector3 w2sPos;
-		Function::World2Screen(&pos, &w2sPos);
+		Vector3 w2sPos = Function::WorldToScreen(&pos);
+		
 
 		HealthBar hpBar = HealthBar(HealthBarType::UnderHero);
 

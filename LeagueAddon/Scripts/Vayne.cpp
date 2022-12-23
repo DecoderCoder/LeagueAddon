@@ -45,8 +45,8 @@ void Vayne::OnDraw()
 				Render::Draw_Line3D(nextPos, nextPos.Extend(hitPos1, i1), hitWall1 ? ImColor(231, 76, 60) : ImColor(52, 152, 219), 1);
 
 				if (hitWall1 && (!autoEHighChance || hitWall2) && eSpell->IsReady() && Local->Mana > 90 && GetAsyncKeyStateN(VK_SPACE)) {
-					Vector3 w2s;
-					Function::World2Screen(&target->Position, &w2s);
+					Vector3 w2s = Function::WorldToScreen(&target->Position);
+					
 					if (lastPressTime < GetTickCount())
 					{
 						Input::Move(w2s.x, w2s.y);

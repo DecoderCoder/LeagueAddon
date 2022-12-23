@@ -1,6 +1,8 @@
 #pragma once
 #include "./Structs.h"
 #include "Render.h"
+#include "Input.h"
+#include "Settings.h"
 
 namespace FuncType {
 	typedef int* (__thiscall* fnIssueOrder)(GameObject* Object, int Order, Vector3* Position, GameObject* Target, bool IsAttackMove, bool IsMinion, DWORD Unknown);
@@ -61,6 +63,7 @@ namespace Function {
 	bool IsWall(Vector3 position);
 
 	int* IssueOrder(GameObject* Object, int Order, Vector3* Position, GameObject* Target, bool IsAttackMove, bool IsMinion, DWORD Unknown);
+	void NewCastSpell(int slot, int castType, float x = 1, float y = -1);
 	int GetBaseDrawPosition(GameObject* Object, Vector3* Position);
 	bool GetHPBarPosition(GameObject* Object, Vector3* out);
 	int* CastSpell(DWORD* spellbook, DWORD* spelldatainst, int spellslot, Vector3* Origin, Vector3* Target, DWORD networkid);

@@ -4,6 +4,7 @@
 #include "../ObjectManager.h"
 #include "../Helper.h"
 #include "../Health.h"
+#include "../Settings.h"
 
 namespace OrbWalker {
 	inline std::list<GameObject*> MinionListAA;
@@ -36,7 +37,6 @@ namespace OrbWalker {
 
 	inline bool _working = false;
 
-	inline bool useIssueOrder = true;
 	inline bool lockCamera = true;
 
 	inline bool Reseted = false;

@@ -4,6 +4,7 @@
 #include "AddonEngine.h"
 #include "EventManager/EventManager.h"
 #include "psapi.h"
+#include "Hooks/ultimate_hooks.h"
 
 HMODULE g_module;
 uintptr_t initThreadHandle;
@@ -90,10 +91,24 @@ LONG CALLBACK TopLevelHandler(EXCEPTION_POINTERS* info)
 		//		}
 		//	}
 		//}
-		
+
+	}
+	if (info->ExceptionRecord->ExceptionCode == EXCEPTION_BREAKPOINT) {
+		*(BYTE*)info->ExceptionRecord->ExceptionAddress = 0x90;
+		MessageBoxA(0, to_hex(info->ExceptionRecord->ExceptionAddress).c_str(), "BRK", 0);
 	}
 
 	return EXCEPTION_CONTINUE_SEARCH;
+}
+
+void WINAPI hOutputDebugStringW(_In_opt_ LPCWSTR lpOutputString) {
+	MessageBoxA(0, "hOutputDebugStringW", "odsAddr", 0);
+	return;
+}
+
+void WINAPI hOutputDebugStringA(_In_opt_ LPCSTR lpOutputString) {
+	MessageBoxA(0, "hOutputDebugStringA", "odsAddr", 0);
+	return;
 }
 
 DWORD WINAPI MainThread(LPVOID param) {
@@ -104,6 +119,34 @@ DWORD WINAPI MainThread(LPVOID param) {
 
 	exceptionHandler = AddVectoredExceptionHandler(TRUE, TopLevelHandler);
 
+
+
+
+
+
+	UltHook.RestoreNtProtectVirtualMemory();
+	UltHook.RestoreSysDll("ntdll.dll");
+	MessageBoxA(0, to_hex((int)&OutputDebugStringW).c_str(), to_hex((int)&OutputDebugStringA).c_str(), 0);
+	UltHook.AddEzHook((DWORD)&OutputDebugStringW, 6, (DWORD)&hOutputDebugStringW);
+	UltHook.AddEzHook((DWORD)&OutputDebugStringA, 6, (DWORD)&hOutputDebugStringA);
+
+	//DWORD old;
+	//UltHook.RestoreNtProtectVirtualMemory();
+	//HMODULE ntdll = GetModuleHandleA("ntdll.dll");
+	//auto Ldr = (DWORD)GetProcAddress(ntdll, "LdrInitializeThunk");
+	//
+	//VirtualProtect((LPVOID)Ldr, 1, 0x40, &old);
+
+	//MessageBoxA(0, to_hex(Ldr).c_str(), "LdrInitializeThunk", 0);
+
+	//VirtualProtect((LPVOID)Ldr, 1, old, &old);
+
+	//*(BYTE*)Ldr = 0x90;
+
+	while (!GetAsyncKeyState(VK_END)) {
+		Sleep(1);
+	}
+	return 1;
 
 	while (Function::GameTime() < 2) {
 		std::this_thread::sleep_for(1ms);

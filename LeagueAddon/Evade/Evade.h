@@ -252,6 +252,9 @@ namespace Evade
 			std::string hero;
 			std::list<EvadeSpell>spells;
 		};
+
+		inline float GameTimer;
+
 		inline std::list< EvadeChamp>EvadeSpellDB;
 		inline std::list<EvadeSpell>MyEvadeSpells;
 
@@ -263,7 +266,6 @@ namespace Evade
 		inline std::list<Spell>DangerSkillshots;
 
 		inline float BoundingRadius;
-		inline float GameTimer = 0;
 
 		inline Vector3 MyHeroPos;
 		inline Vector3 PreviousPos;

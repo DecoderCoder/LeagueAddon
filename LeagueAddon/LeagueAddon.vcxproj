@@ -80,6 +80,10 @@
       <LanguageStandard_C>Default</LanguageStandard_C>
       <ExceptionHandling>false</ExceptionHandling>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -131,6 +135,7 @@
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="JustEvade\JustEvade.h" />
     <ClInclude Include="League\HeroInventory.h" />
     <ClInclude Include="League\Item.h" />
     <ClInclude Include="League\ItemInfo.h" />
@@ -151,6 +156,7 @@
     <ClInclude Include="Scripts\Twitch.h" />
     <ClInclude Include="Scripts\Vayne.h" />
     <ClInclude Include="Scripts\Yasuo.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="SkinChanger.h" />
     <ClInclude Include="Structs.h" />
     <ClInclude Include="TargetSelector.h" />
@@ -185,6 +191,7 @@
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="JustEvade\JustEvade.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="Render.cpp" />

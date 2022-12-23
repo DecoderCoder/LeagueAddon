@@ -30,6 +30,13 @@ namespace Geometry
 			return ClipperLib::PointInPolygon(p, ToClipperPath()) != 1;
 		}
 
+		Polygon SetY(float Y) {
+			for (int i = 0; i < Points.size(); i++) {
+				Points[i].y = Y;
+			}
+			return *this;
+		}
+
 		int PointInPolygon(const Vector3& point)
 		{
 			const auto p = ClipperLib::IntPoint(point.x, point.z);
@@ -44,6 +51,79 @@ namespace Geometry
 				result.emplace_back(point.x, point.z);
 
 			return result;
+		}
+
+		std::vector<Polygon> operator + (const Polygon& poly) {
+			std::vector<Polygon> returnValue;
+			returnValue.push_back(*this);
+			returnValue.push_back(poly);
+			return returnValue;
+		}
+
+		std::vector<Polygon> operator + (const std::vector<Polygon>& poly) {
+			std::vector<Polygon> returnValue;
+			returnValue.push_back(*this);
+			for (auto p : poly) {
+				returnValue.push_back(p);
+			}
+			return returnValue;
+		}
+
+		Polygon OffsetPolygon(float offset) {
+			if (offset == 0)
+				return *this;
+			Polygon newPoly;
+			Polygon oldPoly = *this;
+			float yOffset = 0;
+			if (oldPoly.Points.size() > 0)
+				yOffset = oldPoly.Points[0].y;
+			for (int i = 0; i < oldPoly.Points.size(); i++)
+				oldPoly.Points[i].y = 0;
+
+			for (int i = 0; i < oldPoly.Points.size(); i++) {
+
+				auto j = i - 1, k = i + 1;
+
+
+				if (j < 0)
+					j = oldPoly.Points.size() - 1;
+				if (k > oldPoly.Points.size() - 1)
+					k = 0;
+
+				Vector3 p1 = oldPoly.Points[j];
+				Vector3 p2 = oldPoly.Points[i];
+				Vector3 p3 = oldPoly.Points[k];
+
+				auto n1 = (p2 - p1).Normalized().Perpendicular() * offset;
+				auto a = (p1 + n1), b = (p2 + n1);
+				auto n2 = (p3 - p2).Normalized().Perpendicular() * offset;
+				auto c = (p2 + n2), d = (p3 + n2);
+
+				auto iint = a.Intersection(b, c, d).Point;
+
+				auto dist = p2.distanceTo(iint);
+				auto dot = (p1.x - p2.x) * (p3.x - p2.x) + (p1.y - p2.y) * (p3.y - p2.y);
+				auto cross = (p1.x - p2.x) * (p3.z - p2.z) - (p1.z - p2.z) * (p3.x - p2.x);
+				auto angle = atan2f(cross, dot);
+
+				if (dist > offset && angle > 0) {
+					auto ex = p2 + (iint - p2).Normalized() * offset;
+					auto dir = (ex - p2).Perpendicular().Normalized() * dist;
+					auto e = ex - dir;
+					auto f = ex + dir;
+					auto i1 = e.Intersection(f, a, b).Point;
+					auto i2 = e.Intersection(f, c, d).Point;
+					newPoly.Points.push_back(i1);
+					newPoly.Points.push_back(i2);
+				}
+				else {
+					newPoly.Points.push_back(iint);
+				}
+			}
+
+			for (int i = 0; i < newPoly.Points.size(); i++)
+				newPoly.Points[i].y = yOffset;
+			return newPoly;
 		}
 	};
 
@@ -143,16 +223,16 @@ namespace Geometry
 			Radius = radius;
 		}
 
-		Polygon ToPolygon(int offset = 0, float overrideWidth = -1)
+		Polygon ToPolygon(int offset = 0, float overrideWidth = -1, int segmentsCount = CircleLineSegmentN)
 		{
 			Polygon result = Polygon();
 			float outRadius = overrideWidth > 0
 				? overrideWidth
-				: (offset + Radius) / (float)cos(2 * M_PI / CircleLineSegmentN);
+				: (offset + Radius) / (float)cos(2 * M_PI / segmentsCount);
 
-			double step = 2 * M_PI / CircleLineSegmentN;
+			double step = 2 * M_PI / segmentsCount;
 			double angle = Radius;
-			for (int i = 0; i <= CircleLineSegmentN; i++)
+			for (int i = 0; i <= segmentsCount; i++)
 			{
 				angle += step;
 				Vector3 point = Vector3(Center.x + outRadius * (float)cos(angle),
@@ -182,22 +262,47 @@ namespace Geometry
 			Perpendicular = Direction.Perpendicular();
 		}
 
-		Polygon ToPolygon(int offset = 0, float overrideWidth = -1)
+		////
+		// Side -1 = None
+		// 0 = Left
+		// 1 = Right
+		////
+		Polygon ToPolygon(int offset = 0, float overrideWidth = -1, int Side = -1)
 		{
 			Polygon result = Polygon();
 
-			result.Add(RStart +
-				Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) -
-				Direction * offset);
-			result.Add(RStart -
-				Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) -
-				Direction * offset);
-			result.Add(REnd -
-				Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) +
-				Direction * offset);
-			result.Add(REnd +
-				Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) +
-				Direction * offset);
+			switch (Side) {
+			case 0:
+				result.Add(RStart + Perpendicular * (overrideWidth > 0 ? overrideWidth : 0 + offset) - Direction * offset);
+				result.Add(RStart - Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) - Direction * offset);
+				result.Add(REnd - Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) + Direction * offset);
+				result.Add(REnd + Perpendicular * (overrideWidth > 0 ? overrideWidth : 0 + offset) + Direction * offset);
+				break;
+			case 1:
+				result.Add(RStart + Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) - Direction * offset);
+				result.Add(RStart - Perpendicular * (overrideWidth > 0 ? overrideWidth : 0 + offset) - Direction * offset);
+				result.Add(REnd - Perpendicular * (overrideWidth > 0 ? overrideWidth : 0 + offset) + Direction * offset);
+				result.Add(REnd + Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) + Direction * offset);
+				break;
+			default:
+				result.Add(RStart +
+					Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) -
+					Direction * offset);
+				result.Add(RStart -
+					Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) -
+					Direction * offset);
+				result.Add(REnd -
+					Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) +
+					Direction * offset);
+				result.Add(REnd +
+					Perpendicular * (overrideWidth > 0 ? overrideWidth : Width + offset) +
+					Direction * offset);
+				break;
+			}
+
+
+
+
 
 			return result;
 		}
@@ -303,6 +408,21 @@ namespace Geometry
 			c.Execute(ClipperLib::ClipType::ctUnion, solution, ClipperLib::PolyFillType::pftNegative, ClipperLib::PolyFillType::pftNonZero);
 
 			return solution;
+		}
+
+		static Polygon ClipToPolygons(std::vector<std::vector<ClipperLib::IntPoint>> clip, float Y) {
+			Polygon retPoly;
+
+			for (int i = 0; i < clip.size(); i++) {
+				for (int j = 0; j < clip[i].size(); j++) {
+					retPoly.Points.push_back(Vector3(clip[i][j].X, Y, clip[i][j].Y));
+				}
+			}
+
+			//for (int i = 0; i < retPoly.Points.size(); i++) {
+			//	retPoly.Points[i] = retPoly.Points[i].SwitchYZ();
+			//}
+			return retPoly;
 		}
 
 		static std::vector<Vector3> CutPath(std::vector<Vector3> path, float distanceTo)

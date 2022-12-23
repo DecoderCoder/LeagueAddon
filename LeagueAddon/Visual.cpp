@@ -359,19 +359,11 @@ void Visual::OnDraw() {
 					//Render::Draw_Line3D(obj->Position, mng->NavArray[mng->currentSegment()], ImColor(255, 255, 255), 1);
 
 					for (int i = 0; i < mng->pathSize() - 1; i++) {
-						Vector3 w2s1 = Function::WorldToScreen(&mng->NavArray[i]), w2s2 = Function::WorldToScreen(&mng->NavArray[i + 1]);
-						Render::Draw_Line(w2s1.x, w2s1.y, w2s2.x, w2s2.y, ImColor(255, 255, 255), 1);
-						//Render::Draw_Line3D(mng->NavArray[i], mng->NavArray[i + 1], ImColor(255, 255, 255), 1);
-
+						Render::Draw_Line(Function::WorldToScreen(&mng->NavArray[i]), Function::WorldToScreen(&mng->NavArray[i + 1]), ImColor(255, 255, 255), 1);
+						Render::Draw_Line(Function::WorldToMap(mng->NavArray[i]), Function::WorldToMap(mng->NavArray[i + 1]), ImColor(255, 255, 255), 1);
 					}
 
-					Vector3 w2s = Function::WorldToScreen(&mng->NavArray[mng->pathSize() - 1]);
-
-					Render::Draw_Text(100, 100, to_string(w2s.x));
-
-					Render::Draw_Text(100, 120, to_string(w2s.y));
-
-					Render::Draw_Text(w2s.x, w2s.y, obj->GetChampionName(), ImColor(255, 255, 255));
+					Render::Draw_Text(Function::WorldToScreen(&mng->NavArray[mng->pathSize() - 1]), obj->GetChampionName(), ImColor(255, 255, 255));
 				}
 
 			}

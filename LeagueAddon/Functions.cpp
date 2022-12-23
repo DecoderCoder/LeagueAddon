@@ -135,6 +135,39 @@ int Function::GetBaseDrawPosition(GameObject* Object, Vector3* Position) {
 
 }
 
+void Function::NewCastSpell(int slot, int castType, float x, float y)
+{
+	if (x > 0 && x < Render::RenderWidth && y > 0 && y < Render::RenderHeight)
+		Input::Move(x, y);
+	if (Settings::Global::useNewCastSpell)
+	{
+		typedef void(__thiscall* fnnewcastspell)(DWORD hudinstance, int spellIndex, int castType, float a4);
+		static fnnewcastspell CastSpell = (fnnewcastspell)(DEFINE_RVA(Offset::Function::NewCastSpell));
+
+		DWORD HUDInputLogic = *(DWORD*)(*(DWORD*)DEFINE_RVA(Offset::Data::HudInstance) + 0x34);
+
+		DWORD CastSpellAddr = DEFINE_RVA(Offset::Function::NewCastSpell);//IssueOrder	
+		bool Detected;
+		__asm {
+			push retnHere
+			push 0.0f
+			push castType
+			push slot
+			//push HUDInputLogic			
+			mov ecx, HUDInputLogic
+			push Gadget
+			jmp CastSpellAddr
+			retnHere :
+			//mov al, 1
+		}
+
+		//CastSpell(HUDInputLogic, slot, castType, 0.0f);
+	}
+	else {
+		Input::PressKey(Settings::Binding::GetSpellSlotBinding(slot));
+	}	
+}
+
 bool Function::GetHPBarPosition(GameObject* Object, Vector3* out) {
 	//There is a problem with this call
 	Vector3 drawPosition;

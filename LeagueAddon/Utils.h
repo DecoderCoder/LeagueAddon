@@ -22,6 +22,7 @@ using namespace std;
 #define DEFINE_MEMBER_0(x)                    x;
 #define DEFINE_MEMBER_N(x,offset)            struct { MAKE_PAD((DWORD)offset); x; };
 #define GetAsyncKeyStateN(key)	GetAsyncKeyState(key) & 0x8000
+#define Compare(x, y, z) StringCompare(x, y, z)
 
 bool IsLeagueInForeground();
 HWND GetHwndProc();

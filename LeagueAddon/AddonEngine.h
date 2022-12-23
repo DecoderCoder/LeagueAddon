@@ -12,6 +12,7 @@
 #include <thread>
 #include "winternl.h"
 #include "Evade/Evade.h"
+#include "JustEvade/JustEvade.h"
 #include "Visual.h"
 #include "Debug.h"
 #include "SkinChanger.h"

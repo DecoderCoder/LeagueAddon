@@ -14,9 +14,11 @@ bool TargetSelector::checkUnit(GameObject* unit)
 
 void TargetSelector::Initialize() {
 	attackOrder.clear();
+	attackOrderIgnore.clear();
+	attackOrderLast.clear();
 	for (auto hero : ObjectManager::HeroList()) {
 		if (hero->IsEnemyTo(Local)) {
-			attackOrder.push_back(hero);
+			attackOrderIgnore.push_back(hero);
 			if (hero->GetChampionName() == "Yasuo")
 				enemyYasuo = true;
 			if (hero->GetChampionName() == "Samira")

@@ -16,8 +16,7 @@ void Tristana::OnDraw()
 				
 
 				if (eSpell->IsReady() && Local->Mana > 90 && GetAsyncKeyStateN(VK_SPACE)) {
-					Vector3 w2s;
-					Function::World2Screen(&target->Position, &w2s);
+					Vector3 w2s = Function::WorldToScreen(&target->Position);
 					if (lastPressTimeTristana < GetTickCount())
 					{
 						Input::Move(w2s.x, w2s.y);

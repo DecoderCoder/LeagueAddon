@@ -97,6 +97,9 @@
     <Filter Include="Scripts\Vayne">
       <UniqueIdentifier>{5ece39f1-1a01-4c34-ae2e-9f65673af1e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="JustEvade">
+      <UniqueIdentifier>{2d452374-7a1d-4c81-be67-349e1ab8f832}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utils.h">
@@ -257,6 +260,12 @@
     <ClInclude Include="Scripts\Tristana.h">
       <Filter>Scripts\Tristana</Filter>
     </ClInclude>
+    <ClInclude Include="JustEvade\JustEvade.h">
+      <Filter>JustEvade</Filter>
+    </ClInclude>
+    <ClInclude Include="Settings.h">
+      <Filter>Scripts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utils.cpp">
@@ -371,6 +380,9 @@
     </ClCompile>
     <ClCompile Include="Scripts\Tristana.cpp">
       <Filter>Scripts\Tristana</Filter>
+    </ClCompile>
+    <ClCompile Include="JustEvade\JustEvade.cpp">
+      <Filter>JustEvade</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

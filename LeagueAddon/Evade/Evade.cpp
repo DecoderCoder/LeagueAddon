@@ -101,6 +101,7 @@ namespace Evade
 
 	void Core::OnDraw()
 	{
+
 		if (!DrawSpells)
 			return;
 
@@ -1129,10 +1130,8 @@ namespace Evade
 
 	Vector3 Core::CalculateEndPos(Spell& spellInfo)
 	{
-
 		Vector3 startPos1 = spellInfo.startPos;
 		Vector3 placementPos = spellInfo.endPos;
-		//MessageBoxA(0, (to_string(startPos1.x) + "\n" + to_string(startPos1.y) + "\n" + to_string(startPos1.z) + "\n\n\n\n" + to_string(placementPos.x) + "\n" + to_string(placementPos.y) + "\n" + to_string(placementPos.z)).c_str(), "", 0);
 		Vector3 unitPos = spellInfo.obj->Position;
 		float range = spellInfo.range;
 		Vector3 endPos = startPos1.Extend(placementPos, range);

@@ -63,9 +63,13 @@ void OrbWalker::Orbwalk(GameObject* target, float extraWindup) {
 
 	if (Evade::Core::Evading && Evade::Core::EvadeSpells)
 		return;
+
+	/*if (Local->RecallState != kRecallState::None && Local->RecallState != kRecallState::Yuumi_W_Ally)
+		return;*/
+
 	if (target && CanAttack()) {
 		//Vector2 w2s = riot_render->WorldToScreen(target->Position);
-		if (useIssueOrder)
+		if (Settings::Global::useIssueOrder)
 			if (Function::IsMinion(target))
 				Function::IssueOrder(Local, 3, &target->Position, target, true, true, false);
 			else {
@@ -86,7 +90,7 @@ void OrbWalker::Orbwalk(GameObject* target, float extraWindup) {
 	{
 		//Vector2 w2s = riot_render->WorldToScreen(Functions::GetMouseWorldPosition());
 		//Functions::IssueOrder(EOrderType::move, w2s.x, w2s.y);
-		if (useIssueOrder)
+		if (Settings::Global::useIssueOrder)
 			Function::IssueOrder(Local, 2, Function::GetMouseWorldPosition(), NULL, true, true, false);
 		else
 		{
@@ -107,13 +111,13 @@ void OrbWalker::OnUpdate()
 	//	return;
 	//}
 
-	if (GetAsyncKeyState(VK_SPACE)) {
+	if (GetAsyncKeyStateN(VK_SPACE)) {
 		_mode = OrbwalkingMode::Combo;
 	}
-	else if (GetAsyncKeyState(VK_CONTROL)) {
+	else if (GetAsyncKeyStateN(VK_CONTROL)) {
 		_mode = OrbwalkingMode::LaneClear;
 	}
-	else if (GetAsyncKeyState(VK_LMENU)) {
+	else if (GetAsyncKeyStateN(VK_LMENU)) {
 		_mode = OrbwalkingMode::LastHit;
 	}
 	else
@@ -134,7 +138,7 @@ void OrbWalker::OnUpdate()
 		Function::LockCamera(false);
 	}
 
-	if (OrbWalker::useIssueOrder && GetAsyncKeyState(VK_SPACE) && (!GetAsyncKeyState(0x51) && !GetAsyncKeyState(0x57) && !GetAsyncKeyState(0x45) && !GetAsyncKeyState(0x52) && !GetAsyncKeyState(0x44) && !GetAsyncKeyState(0x46)))
+	if (Settings::Global::useIssueOrder && GetAsyncKeyStateN(VK_SPACE) && (!GetAsyncKeyStateN(0x51) && !GetAsyncKeyStateN(0x57) && !GetAsyncKeyStateN(0x45) && !GetAsyncKeyStateN(0x52) && !GetAsyncKeyStateN(0x44) && !GetAsyncKeyStateN(0x46)))
 		Function::BlockInput(true);
 	else
 		Function::BlockInput(false);
@@ -336,7 +340,6 @@ void OrbWalker::OnMenu()
 	if (ImGui::CollapsingHeader("OrbWalker")) {
 		ImGui::Checkbox("Enabled", &OrbWalker::enabled);
 		ImGui::Checkbox("Prioritize selected", &OrbWalker::selectedPriority);
-		ImGui::Checkbox("Use IssueOrder (RISK OF BAN !!! )", &OrbWalker::useIssueOrder);
 		ImGui::Checkbox("Lock camera on hero", &OrbWalker::lockCamera);
 	}
 }

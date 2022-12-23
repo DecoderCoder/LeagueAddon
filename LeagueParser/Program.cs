@@ -224,8 +224,96 @@ namespace LeagueParser
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Data source");
+            Console.WriteLine("0 - https://raw.communitydragon.org/");
+            Console.WriteLine("1 - JustEvade");
+
+            Console.Write("Enter data source: ");
+            int source = 0;
+            int.TryParse(Console.ReadLine(), out source);
+
             HttpRequest request = new HttpRequest();
-            string HTML = request.Get("https://raw.communitydragon.org/" + RAW_LAST_PATCH + "/game/assets/characters/").ToString();
+            string HTML;
+
+            if (source == 1)
+            {
+                List<string> output = new List<string>();
+
+                output.Add("void InitSpellsDB() {");
+
+                HTML = request.Get("https://raw.githubusercontent.com/Impulsx/GoS/master/JustEvade.lua").ToString();
+
+                HTML = HTML.Substring(HTML.IndexOf("local SpellDatabase = {"));
+                HTML = HTML.Substring(0, HTML.IndexOf("local EvadeSpells"));
+
+                Regex regex = new Regex("^\t\\[\"(.*?)\"(.*?)\t},", RegexOptions.Multiline | RegexOptions.Singleline);
+                MatchCollection matches = regex.Matches(HTML);
+                foreach (Match champ in matches)
+                {
+                    output.Add("{");
+            
+                    string ChampName = champ.Groups[1].Value;
+                    string ChampValue = champ.Groups[2].Value;
+
+                    output.Add("Champ " + ChampName + ";");
+                    output.Add(ChampName + ".Name = \"" + ChampName + "\"; ");
+                    Regex spells = new Regex("^\t\t\\[\"(.*?)\"\\] = {(.*?},)", RegexOptions.Multiline | RegexOptions.Singleline);
+                    foreach (Match spell in spells.Matches(ChampValue))
+                    {                       
+                        string SpellName = spell.Groups[1].Value;
+                        string SpellBody = spell.Groups[2].Value;
+                        output.Add("Spell " + SpellName + ";");
+
+                        string icon = new Regex("icon = Icons\\.\\.\"(.*?)\"").Match(SpellBody).Groups[1].Value;
+                        string displayName = new Regex("displayName = \"(.*?)\"").Match(SpellBody).Groups[1].Value;
+                        string missileName = new Regex("missileName = \"(.*?)\"").Match(SpellBody).Groups[1].Value;
+                        string slot = new Regex("slot = _(.)").Match(SpellBody).Groups[1].Value;
+                        string type = new Regex("type = \"(.*?)\"").Match(SpellBody).Groups[1].Value;
+                        string speed = new Regex("speed = (.*?),").Match(SpellBody).Groups[1].Value;
+                        string range = new Regex("range = (.*?),").Match(SpellBody).Groups[1].Value;
+                        string radius = new Regex("radius = (.*?),").Match(SpellBody).Groups[1].Value;
+                        string delay = new Regex("delay = (.*?),").Match(SpellBody).Groups[1].Value;
+                        string danger = new Regex("danger = (.),").Match(SpellBody).Groups[1].Value;
+                        string cc = new Regex("cc = (.*?),").Match(SpellBody).Groups[1].Value;
+                        string collision = new Regex("collision = (.*?),").Match(SpellBody).Groups[1].Value;
+                        string windwall = new Regex("windwall = (.*?),").Match(SpellBody).Groups[1].Value;
+                        string hitbox = new Regex("hitbox = (.*?),").Match(SpellBody).Groups[1].Value;
+                        string fow = new Regex("fow = (.*?),").Match(SpellBody).Groups[1].Value;
+                        string exception = new Regex("exception = (.*?),").Match(SpellBody).Groups[1].Value;
+                        string extend = new Regex("extend = (.*?)},").Match(SpellBody).Groups[1].Value;
+
+                        output.Add(SpellName + ".name = \"" + SpellName + "\";");
+                        output.Add(SpellName + ".icon = \"" + icon + "\";");
+                        output.Add(SpellName + ".displayName = \"" + displayName + "\";");
+                        output.Add(SpellName + ".missileName = \"" + missileName + "\";");
+                        output.Add(SpellName + ".slot = SpellSlot::" + slot + ";");
+                        output.Add(SpellName + ".type = SpellType::" + type + ";");
+                        output.Add(SpellName + ".range = " + (range != "" ? range : "0") + ";");
+                        output.Add(SpellName + ".radius = " + (radius != "" ? radius : "0") + ";");
+                        output.Add(SpellName + ".delay = " + (delay != "" ? delay : "0") + ";");
+                        output.Add(SpellName + ".danger = " + danger + ";");
+                        output.Add(SpellName + ".speed = " + speed + ";");
+                        output.Add(SpellName + ".cc = " + cc + ";");
+                        output.Add(SpellName + ".collisionMinions = " + collision + ";");
+                        output.Add(SpellName + ".windwall = " + windwall + ";");
+                        output.Add(SpellName + ".hitbox = " + (hitbox != "" ? hitbox : "false") + ";");
+                        output.Add(SpellName + ".fow = " + fow + ";");
+                        output.Add(SpellName + ".exception = " + exception + ";");
+                        output.Add(SpellName + ".extend = " + extend + ";");
+
+                        output.Add(ChampName + ".Spells.push_back(" + SpellName + ");");
+                    }
+
+                    output.Add("Core::SpellDB.emplace_back(" + ChampName + ");");
+                    output.Add("}");
+                }
+                output.Add("}");
+                File.WriteAllLines("InitSpellsDB.txt", output);
+                return;
+            }
+
+
+            HTML = request.Get("https://raw.communitydragon.org/" + RAW_LAST_PATCH + "/game/assets/characters/").ToString();
             heroesLinks = Parses("<td class=\"link\"><a href=\"", HTML, "\"").Select((x) => { return x.Substring(0, x.Length - 1); }).ToList().Where(x => { return !(x.StartsWith("tft") || x.StartsWith("bw_") || x.StartsWith("brush") || x.StartsWith(".")); }).ToList();
             if (heroesLinks.Count > 2)
             {

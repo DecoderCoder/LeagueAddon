@@ -29,10 +29,10 @@ GameObject* GetNearestToCursor(POINT cursorPos, std::vector<GameObject*>* object
 		for (auto obj : ObjectManager::HeroList()) {
 			if (obj->NetworkID != Local->NetworkID) {
 				Vector3 cursor = Vector3(cursorPos.x, cursorPos.y, 0);
-				Vector3 lpW2S;
-				Vector3 objW2S;
-				Function::World2Screen(&Local->Position, &lpW2S);
-				Function::World2Screen(&obj->Position, &objW2S);
+				Vector3 lpW2S = Function::WorldToScreen(&Local->Position);
+				Vector3 objW2S = Function::WorldToScreen(&obj->Position);
+
+
 				if (cursor.Distance(objW2S) < nearestDistance) {
 					if (Function::IsAlive(obj) && obj->IsVisible && obj->IsEnemyTo(Local)) {
 						nearest = obj;
@@ -76,15 +76,21 @@ void Yasuo::MainThread() {
 			if (obj != NULL && obj->NetworkID != Local->NetworkID) {
 				Vector3 pos = obj->Position;
 				Vector3 predictedPath = Predict(pos, aiManager->Velocity, 350 - (Local->AttackSpeedMulti * 100) / 2);
-				Vector3 w2s;
-				Function::World2Screen(&predictedPath, &w2s);
+				Vector3 w2s = Function::WorldToScreen(&predictedPath);
+
 				if (Local->Position.Distance(predictedPath) <= 520) {
 					//Functions.WorldToScreen(&pos, &w2s);
-					if (w2s.x >= 0 && w2s.y >= 0 && w2s.x <= Render::RenderWidth && w2s.y <= Render::RenderHeight) {
-						Input::Move(w2s.x, w2s.y);
-						//Functions.PrintChat(Offset::Chat, ("Input::Move called Input::mMouse [" + to_string(Input::mMouseX) + "] [" + to_string(Input::mMouseY) + "]").c_str(), 0xFFFFFF);
-						Q_Pressed = Function::GameTimeTick();
+					if (!Settings::Global::useCastSpell) {
+						Function::NewCastSpell(0, 2, w2s.x, w2s.y);
 					}
+
+
+
+					//if (w2s.x >= 0 && w2s.y >= 0 && w2s.x <= Render::RenderWidth && w2s.y <= Render::RenderHeight) {
+
+						//Functions.PrintChat(Offset::Chat, ("Input::Move called Input::mMouse [" + to_string(Input::mMouseX) + "] [" + to_string(Input::mMouseY) + "]").c_str(), 0xFFFFFF);
+					Q_Pressed = Function::GameTimeTick();
+					//}
 				}
 			}
 		}
@@ -100,7 +106,7 @@ void Yasuo::OnMenu() {
 	if (Local->NetworkID != -1 && Local->GetChampionName() == "Yasuo") {
 		if (ImGui::CollapsingHeader("Yasuo")) {
 			ImGui::Checkbox("Q Aim Assist", &Q_Aim);
-			//ImGui::Checkbox("Use Q when Flash in E", &UseQinEWhenFlash);
+			ImGui::Checkbox("Use Q when Flash in E", &UseQinEWhenFlash);
 
 			//ImGui::Checkbox("Show skill damage", &SkillDamage);
 
@@ -124,12 +130,12 @@ void Yasuo::OnDraw() {
 				Vector3 pos = obj->Position;
 				//Vector3 w2sPos = obj.GetHpBarPosition();
 				//Vector3 HpBarPosition = obj.GetHpBarPosition();
-				Vector3 w2sPos;
-				Function::World2Screen(&pos, &w2sPos);
+				Vector3 w2sPos = Function::WorldToScreen(&pos);
+
 
 				Vector3 predictedPath = Predict(pos, aiManager->Velocity, 350 - (Local->AttackSpeedMulti * 100) / 2);
-				Vector3 w2sPrediction;
-				Function::World2Screen(&predictedPath, &w2sPrediction);
+				Vector3 w2sPrediction = Function::WorldToScreen(&predictedPath);
+
 				ImColor color;
 				if (Local->Position.Distance(predictedPath) < 520)
 					color = ImColor(192, 57, 43);

@@ -48,8 +48,8 @@ void Render::Draw_Circle3DFilled(Vector3 center, float radius, ImColor color) {
 	for (int i = 0; i <= 45; ++i, angle += angleStep)
 	{
 		Vector3 pos = Vector3(radius * cosf(angle) + center.x, center.y, radius * sinf(angle) + center.z);
-		Vector3 w2sPos;
-		verticesValid[i] = Function::World2Screen(&pos, &w2sPos);
+		Vector3 w2sPos = Function::WorldToScreen(&pos);
+		verticesValid[i] = w2sPos.x > 0 && w2sPos.x < Render::RenderWidth&& w2sPos.y > 0 && w2sPos.y < Render::RenderHeight;;
 		vertices[i] = ImVec2(w2sPos.x, w2sPos.y);
 		vertices2[i] = Vector3(w2sPos.x, w2sPos.y, 0);
 	}
@@ -70,8 +70,8 @@ void Render::Draw_Circle3D(Vector3 center, float radius, ImColor color, float th
 	for (int i = 0; i <= 45; ++i, angle += angleStep)
 	{
 		Vector3 pos = Vector3(radius * cosf(angle) + center.x, center.y, radius * sinf(angle) + center.z);
-		Vector3 w2sPos;
-		verticesValid[i] = Function::World2Screen(&pos, &w2sPos);
+		Vector3 w2sPos = Function::WorldToScreen(&pos);
+		verticesValid[i] = w2sPos.x > 0 && w2sPos.x < Render::RenderWidth && w2sPos.y > 0 && w2sPos.y < Render::RenderHeight;
 		vertices[i] = Vector3(w2sPos.x, w2sPos.y, 0);
 	}
 
@@ -85,9 +85,7 @@ void Render::Draw_Circle3D(Vector3 center, float radius, ImColor color, float th
 }
 
 void Render::Draw_Line3D(Vector3 pos1, Vector3 pos2, ImColor color, float thickness) {
-	Vector3 w2s1 = Function::WorldToScreen(&pos1), w2s2 = Function::WorldToScreen(&pos2);
-
-	Render::Draw_Line(w2s1.x, w2s1.y, w2s2.x, w2s2.y, color, thickness);
+	Render::Draw_Line(Function::WorldToScreen(&pos1), Function::WorldToScreen(&pos2), color, thickness);
 }
 
 
@@ -152,14 +150,13 @@ void Render::Draw_FilledRectangle(float_t x1, float_t y1, float_t x2, float_t y2
 
 void Render::Polygon(Geometry::Polygon poly, ImColor color, float tick)
 {
-	Vector3 out;
+	//Vector3 out;
 	ImVec2 points[200];
 	int i = 0;
 	for (auto& point : poly.Points)
 	{
-		out = Function::WorldToScreen(&point);
-		Vector2 screenSpace = Vector2(out.x, out.y);
-
+		//out = Function::WorldToScreen(&point);
+		Vector2 screenSpace = Function::WorldToScreen(&point);	
 		points[i].x = screenSpace.x;
 		points[i].y = screenSpace.y;
 		i++;
@@ -174,21 +171,13 @@ void draw_line(Vector2 start_pos, Vector2 end_pos, ImColor color, float thicknes
 }
 void draw_line(Vector3 start_pos, Vector3 end_pos, ImColor color, float thickness)
 {
-	Vector3 temp = Function::WorldToScreen(&start_pos);
-	Vector2 startWorldPos = Vector2(temp.x, temp.y);
-	temp = Function::WorldToScreen(&end_pos);
-	Vector2 endWorldPos = Vector2(temp.x, temp.y);
 	//delete temp;
-	ImGui::GetWindowDrawList()->AddLine(ImVec2(startWorldPos.x, startWorldPos.y), ImVec2(endWorldPos.x, endWorldPos.y), color, thickness);
+	ImGui::GetWindowDrawList()->AddLine(Function::WorldToScreen(&start_pos), Function::WorldToScreen(&end_pos), color, thickness);
 }
 void draw_line3D(Vector3 start_pos, Vector3 end_pos, ImColor color, float thickness)
 {
-	Vector3 temp = Function::WorldToScreen(&start_pos);
-	Vector2 startWorldPos = Vector2(temp.x, temp.y);
-	temp = Function::WorldToScreen(&end_pos);
-	Vector2 endWorldPos = Vector2(temp.x, temp.y);
 	//delete temp;
-	ImGui::GetWindowDrawList()->AddLine(ImVec2(startWorldPos.x, endWorldPos.y), ImVec2(endWorldPos.x, endWorldPos.y), color, thickness);
+	ImGui::GetWindowDrawList()->AddLine(Function::WorldToScreen(&start_pos), Function::WorldToScreen(&end_pos), color, thickness);
 }
 
 void Render::Rect(Vector3 start, Vector3 end, float radius, float width, ImColor color) {

@@ -12,6 +12,7 @@ namespace EventManager {
 		OnDeleteObject,
 		Size
 	};
+
 	extern std::vector<void*> EventCallbacks[(unsigned int)EventType::Size];
 	
 	void AddEventHandler(EventType eventId, void* callback);

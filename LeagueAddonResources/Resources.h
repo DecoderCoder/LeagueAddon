@@ -21,8 +21,6 @@
 
 using namespace std;
 
-
-
 extern "C" class EXPORT Skin {
 public:
 	std::map<string, string> Name;

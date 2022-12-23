@@ -4,6 +4,7 @@
 #include "ImGui/imgui.h"
 #include "Functions.h"
 #include "Input.h"
+#include "Settings.h"
 
 namespace Misc {
 	inline bool AutoSmite = true;

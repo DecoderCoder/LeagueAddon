@@ -19,8 +19,10 @@ void Debug::OnDraw() {
 	if (Enabled) {
 		Render::BeginOverlay();
 
-		Render::Draw_Text(100, 100, "GameTime  : " + to_string(Function::GameTime()));
-		Render::Draw_Text(100, 115, "Ping      : " + to_string(Function::GetPing()));
+		Render::Draw_Text(100, 100, "LeagueAddon [CUR]: " + to_string(abs(drawStartTime - drawEndTime) * 1000) + "");
+		Render::Draw_Text(100, 115, "LeagueAddon [AVG]: " + to_string(avarageDrawTime) + "");
+		Render::Draw_Text(100, 130, "GameTime         : " + to_string(Function::GameTime()));
+		Render::Draw_Text(100, 145, "Ping             : " + to_string(Function::GetPing()));
 
 		if (drawSpellDirection)
 			for (int i = 0; i < detectedSpells.size(); i++)
@@ -85,12 +87,80 @@ void Debug::OnMenu() {
 			ImGui::Text(("Reseted : " + string(OrbWalker::Reseted ? "TRUE" : "FALSE")).c_str());
 		}
 
+		if (ImGui::CollapsingHeader("JustEvade")) {
+			ImGui::Checkbox("Debug mode", &JustEvade::Core::Debug);
+			if (ImGui::TreeNode("DetectedSpells")) {
+				auto it = JustEvade::Core::DetectedSpells.begin();
+				while (it != JustEvade::Core::DetectedSpells.end()) {
+					JustEvade::Spell spell = *it;
+					if (ImGui::TreeNode((spell.name + "##" + to_string(spell.startTime)).c_str())) {
+
+						ImGui::Text(("Name: " + spell.name).c_str());
+						if (ImGui::TreeNode("CurrentPos")) {
+							ImGui::Text(("CurrentPos [X]: " + to_string(spell.currentPos.x)).c_str());
+							ImGui::Text(("CurrentPos [Y]: " + to_string(spell.currentPos.y)).c_str());
+							ImGui::Text(("CurrentPos [Z]: " + to_string(spell.currentPos.z)).c_str());
+							ImGui::TreePop();
+						}
+						if (ImGui::TreeNode("StartPos")) {
+							ImGui::Text(("StartPos [X]: " + to_string(spell.startPos.x)).c_str());
+							ImGui::Text(("StartPos [Y]: " + to_string(spell.startPos.y)).c_str());
+							ImGui::Text(("StartPos [Z]: " + to_string(spell.startPos.z)).c_str());
+							ImGui::TreePop();
+						}
+						if (ImGui::TreeNode("EndPos")) {
+							ImGui::Text(("EndPos [X]: " + to_string(spell.endPos.x)).c_str());
+							ImGui::Text(("EndPos [Y]: " + to_string(spell.endPos.y)).c_str());
+							ImGui::Text(("EndPos [Z]: " + to_string(spell.endPos.z)).c_str());
+							ImGui::TreePop();
+						}
+						if (ImGui::TreeNode("EndPos2")) {
+							ImGui::Text(("EndPos2 [X]: " + to_string(spell.endPos2.x)).c_str());
+							ImGui::Text(("EndPos2 [Y]: " + to_string(spell.endPos2.y)).c_str());
+							ImGui::Text(("EndPos2 [Z]: " + to_string(spell.endPos2.z)).c_str());
+							ImGui::TreePop();
+						}
+
+						ImGui::Text(("Speed: " + to_string(spell.speed)).c_str());
+						ImGui::Text(("Range: " + to_string(spell.range)).c_str());
+						ImGui::Text(("Radius: " + to_string(spell.radius)).c_str());
+
+						ImGui::Text(("MissileObject: " + to_string((int)spell.missileObject)).c_str());
+
+						ImGui::TreePop();
+					}
+
+					++it;
+				}
+				ImGui::TreePop();
+			}
+		}
+
+
 		if (ImGui::CollapsingHeader("OnProcessSpell")) {
 			int counter = 0;
 			for (auto spell : detectedSpells)
 			{
 				if (!spell.BasicAttackSpellData->Name.empty()) {
 					if (ImGui::TreeNode((to_string(counter) + " " + spell.BasicAttackSpellData->Name + "##DebugOnProcessSpell").c_str())) {
+						ImGui::Text("Start position");
+						ImGui::Text(to_string(spell.StartPosition.x).c_str());
+						ImGui::SameLine();
+						ImGui::Text(to_string(spell.StartPosition.y).c_str());
+						ImGui::SameLine();
+						ImGui::Text(to_string(spell.StartPosition.z).c_str());
+
+						ImGui::Text("");
+
+						ImGui::Text("End position");
+						ImGui::Text(to_string(spell.EndPosition.x).c_str());
+						ImGui::SameLine();
+						ImGui::Text(to_string(spell.EndPosition.y).c_str());
+						ImGui::SameLine();
+						ImGui::Text(to_string(spell.EndPosition.z).c_str());
+
+						ImGui::Text("");
+
 						ImGui::Text(("Distance 1: " + to_string(spell.StartPosition.distanceTo(spell.EndPosition))).c_str());
 						ImGui::Text(("Distance 2: " + to_string(spell.StartPosition.distanceTo(spell.EndPosition2))).c_str());
 						ImGui::Text(("Radius: " + to_string(spell.BasicAttackSpellData->Resource->Radius)).c_str());
@@ -176,7 +246,8 @@ void Debug::OnMenu() {
 							if (ImGui::TreeNode((("[ " + QWERDF[i] + " ] " + spell->GetName()).c_str()))) {
 								ImGui::Text(("Spell CD		: " + to_string(spell->GetCD())).c_str());
 								ImGui::Text(("Spell Charges	: " + to_string(spell->GetCharges())).c_str());
-								ImGui::Text(("Spell Daamge	: " + to_string(spell->GetDamage())).c_str());
+								ImGui::Text(("Spell Damage	: " + to_string(spell->GetDamage())).c_str());
+								ImGui::Text(("Spell Level	: " + to_string(spell->GetLevel())).c_str());
 								ImGui::TreePop();
 							}
 						}

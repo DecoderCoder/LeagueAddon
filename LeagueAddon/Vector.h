@@ -3,6 +3,7 @@
 #include <cmath>
 #include <limits>
 #include <string>
+#include "ImGui/imgui.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
@@ -20,6 +21,8 @@ public:
 	Vector2() = default;
 	Vector2(float xx, float yy) : x(xx), y(yy) {}
 	operator float* ();
+
+	operator ImVec2() const { return ImVec2(this->x, this->y); }
 
 	Vector2& operator+=(const Vector2& v);
 	Vector2& operator+=(float fl);
@@ -71,6 +74,9 @@ public:
 	float Distance(Vector3 const& segment_start, Vector3 const& segment_end, bool only_if_on_segment = false, bool squared = false) const;
 	float DistanceSquared(Vector3 const& to) const;
 
+	operator Vector2() const { return Vector2(this->x, this->y); }
+	operator ImVec2() const { return ImVec2(this->x, this->y); }
+
 	Vector3& operator*=(const Vector3& v);
 	Vector3& operator*=(float s);
 
@@ -117,6 +123,7 @@ public:
 	Vector3 Extend(Vector3 const& to, float distance) const;
 
 	Vector3 Append(Vector3 pos1, Vector3 pos2, float dist) const;
+	Vector3 Prepend(Vector3 pos1, Vector3 pos2, float dist) const;
 
 	ProjectionInfo ProjectOn(Vector3 const& segment_start, Vector3 const& segment_end) const;
 	IntersectionResult Intersection(Vector3 const& line_segment_end, Vector3 const& line_segment2_start, Vector3 const& line_segment2_end) const;

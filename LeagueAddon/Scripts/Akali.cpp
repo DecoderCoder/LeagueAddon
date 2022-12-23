@@ -113,8 +113,8 @@ void Akali::OnDraw() {
 									else
 										healthBar.AddRightArea(reducedDamage, ImColor(52, 152, 219));
 
-								Vector3 w2s;
-								Function::World2Screen(&obj->Position, &w2s);
+								/*Vector3 w2s;
+								Function::World2Screen(&obj->Position, &w2s);*/
 							}
 						}
 

@@ -2,26 +2,38 @@
 
 using namespace std;
 
-int spellNum = 0;
-int castType = 0;
-
-void CastSpell(int slot, int castType)
-{
-	typedef void(__thiscall* fnnewcastspell)(DWORD hudinstance, int spellIndex, int castType, float a4);
-	static fnnewcastspell CastSpell = (fnnewcastspell)(DEFINE_RVA(Offset::Function::NewCastSpell));
-
-	DWORD HUDInputLogic = *(DWORD*)(*(DWORD*)DEFINE_RVA(Offset::Data::HudInstance) + 0x34);
-	CastSpell(HUDInputLogic, slot, castType, 0.0f);
-}
-
-__declspec(naked) void* __cdecl get_peb2() {
-	__asm {
-		mov eax, fs:0x18
-		mov eax, [eax + 0x30]
-		retn
-	}
-}
 Vector3 vector22;
+
+DWORD* __fastcall OnProcessSpellCast(void* thisptr, void* edx, int state, SpellInfo* spellCastInfo, int a6) noexcept
+{
+	MessageBoxA(0, spellCastInfo->BasicAttackSpellData->Name.c_str(), "", 0);
+	return 0;
+}
+
+void* HookVTableFunction2(void* pVTable, void* fnHookFunc, int nOffset) // https://guidedhacking.com/threads/how-to-hook-directinput-emulate-key-presses.14011/
+{
+	DWORD alloc = (DWORD)VirtualAlloc(NULL, 0x1F8, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+
+	intptr_t ptrVtable = *((intptr_t*)pVTable);
+	memcpy((void*)alloc, (void*)ptrVtable, 0x1F8);
+
+	DWORD* vTable = (DWORD*)alloc;
+	vTable[nOffset] = (DWORD)fnHookFunc;
+
+	*(DWORD*)pVTable = (DWORD)alloc;
+	return 0;
+	//intptr_t ptrFunction = ptrVtable + sizeof(intptr_t) * nOffset;
+	//intptr_t ptrOriginal = *((intptr_t*)ptrFunction);
+	//MEMORY_BASIC_INFORMATION mbi;
+	////VirtualQuery((LPCVOID)ptrFunction, &mbi, sizeof(mbi));
+	//DWORD old;
+	//VirtualProtect((void*)ptrFunction, 4, PAGE_EXECUTE_READWRITE, &old);
+	//*((intptr_t*)ptrFunction) = (intptr_t)fnHookFunc;
+
+	//VirtualProtect((void*)ptrFunction, 4, old, &old);
+	//return (void*)ptrOriginal;
+	
+}
 
 void DrawMenu() {
 	BlockInput(true);
@@ -29,10 +41,13 @@ void DrawMenu() {
 	ImGui::Begin("LeagueAddon");
 
 	if (Hooks::Hooked) {
-		ImGui::Text(("Local ID: " + to_string(Local->NetworkID)).c_str());
-		ImGui::Text(("PEB: " + to_hex(get_peb2())).c_str());
+		ImGui::Text(("Local ID: " + to_string(Local->NetworkID)).c_str());		
 		if (GetAsyncKeyStateN(VK_HOME)) {
-			MessageBoxA(0, to_hex(Local->GetAIManager()).c_str(), "AiManager", 0);
+			for (auto obj : ObjectManager::HeroList()) {
+				GameObject* lp = obj;
+				//MessageBoxA(0, to_hex((int)(void*)((int)lp + 0xF30)).c_str(), "", 0);
+				HookVTableFunction2((void*)((int)lp + 0xF30), &OnProcessSpellCast, 29);
+			}
 		}
 
 		/*ImGui::Text(("x" + to_string(ai->Facing.x)).c_str());
@@ -83,6 +98,28 @@ void DrawMenu() {
 		EventManager::Trigger(EventManager::EventType::OnMenu);
 
 		if (ImGui::CollapsingHeader("Settings")) {
+			if (ImGui::TreeNode("Main settings")) {
+				ImGui::Checkbox("Use IssueOrder", &Settings::Global::useIssueOrder);
+				if (ImGui::BeginCombo("CastSpell", Settings::Global::useInput ? "Input" : (Settings::Global::useNewCastSpell ? "NewCastSpell" : (Settings::Global::useCastSpell ? "CastSpell" : "None")))) {
+					if (ImGui::Selectable("Input", Settings::Global::useInput)) {
+						Settings::Global::useInput = true;
+						Settings::Global::useNewCastSpell = false;
+						Settings::Global::useCastSpell = false;
+					}
+					if (ImGui::Selectable("NewCastSpell", Settings::Global::useNewCastSpell)) {
+						Settings::Global::useInput = false;
+						Settings::Global::useNewCastSpell = true;
+						Settings::Global::useCastSpell = false;
+					}
+					if (ImGui::Selectable("CastSpell", Settings::Global::useCastSpell)) {
+						Settings::Global::useInput = false;
+						Settings::Global::useNewCastSpell = false;
+						Settings::Global::useCastSpell = true;
+					}
+					ImGui::EndCombo();
+				}
+				ImGui::TreePop();
+			}
 			if (ImGui::TreeNode("Target Selector")) {
 				if (ImGui::BeginCombo("Target mode 1", TargetSelector::targetingModeLabels[(int)TargetSelector::mode])) {
 					for (int i = 0; i < 10; i++) {
@@ -276,6 +313,7 @@ bool AddonEngine::Initialize() {
 	Visual::Initialize();
 	OrbWalker::Initialize();
 	Evade::Core::Initalize();
+	//JustEvade::Core::Initialize();
 	SkinChanger::Initialize();
 	Misc::Initialize();
 

@@ -19,11 +19,13 @@ void Misc::Initialize() {
 
 	for (auto hero : ObjectManager::HeroList()) {
 		if (hero->IsEnemyTo(Local)) {
-			for (int i = 0; i < 6; i++)
-				if (StringContains(hero->SpellBook.GetSpellSlotByID(i)->GetName(), "SummonerSmite", false)) {
+			for (int i = 0; i < 6; i++) {
+				auto spellSlot = hero->SpellBook.GetSpellSlotByID(i);
+				if (spellSlot && StringContains(spellSlot->GetName(), "SummonerSmite", false)) {
 					enemyJungler = hero;
-					break; 
+					break;
 				}
+			}
 		}
 		if (enemyJungler)
 			break;
@@ -78,22 +80,23 @@ int lastAAFK = 0;
 int lastSmite = 0;
 
 void castSmite(GameObject* to) {
-	Vector3 w2s;
-	if (lastSmite < GetTickCount())
-		if (Function::World2Screen(&to->Position, &w2s)) {
-			if (w2s.x > 0 && w2s.y > 0 && w2s.x < GetSystemMetrics(SM_CXSCREEN) && w2s.y < GetSystemMetrics(SM_CYSCREEN)) {
-				Input::Move(w2s.x, w2s.y);
-				switch (smiteSlotNum) {
-				case 4:
-					Input::PressKey(D);
-					break;
-				case 5:
-					Input::PressKey(F);
-					break;
-				}
+
+	if (lastSmite < GetTickCount()) {
+		Vector3 w2s = Function::WorldToScreen(&to->Position);
+		if (w2s.x > 0 && w2s.y > 0 && w2s.x < GetSystemMetrics(SM_CXSCREEN) && w2s.y < GetSystemMetrics(SM_CYSCREEN)) {
+			Input::Move(w2s.x, w2s.y);
+			switch (smiteSlotNum) {
+			case 4:
+				Input::PressKey(D);
+				break;
+			case 5:
+				Input::PressKey(F);
+				break;
 			}
-			lastSmite = GetTickCount() + 70;
 		}
+	}
+
+	lastSmite = GetTickCount() + 70;
 }
 
 bool IsValid2Smite(GameObject* target) {
@@ -130,7 +133,7 @@ void Misc::OnDraw() {
 						}
 
 					if (AutoSmite_Crab)
-						if (StringContains(obj->GetChampionName(), "Sru_Crab")) {
+						if (StringContains(obj->GetChampionName(), "Sru_Crab"), false) {
 							if (enemyJungler->IsVisible && Function::IsAlive(enemyJungler) && enemyJungler->Position.distanceTo(obj->Position) < 700) {
 								castSmite(obj);
 								break;
@@ -141,7 +144,7 @@ void Misc::OnDraw() {
 		}
 	}
 
-	if (AntiAFK && !IsLeagueInForeground() && lastAAFK < GetTickCount()) {
+	if (Settings::Global::useIssueOrder && AntiAFK && !IsLeagueInForeground() && lastAAFK < GetTickCount()) {
 		Function::IssueOrder(Local, 2, &Local->Position, NULL, false, false, NULL);
 		lastAAFK = GetTickCount() + 1000;
 	}
